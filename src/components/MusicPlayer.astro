@@ -23,6 +23,18 @@ const config = JSON.stringify(musicPlayerConfig);
           <strong id="music-title">正在加载音乐...</strong>
           <span id="music-artist">QQ 音乐</span>
         </div>
+        <button
+          id="music-lyrics-toggle"
+          class="icon-button"
+          type="button"
+          aria-label="展开歌词"
+          aria-expanded="false"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M7 9h10M7 13h7M7 17h4" />
+          </svg>
+        </button>
         <button id="music-mute" class="icon-button" type="button" aria-label="静音">
           <svg class="volume-on" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M11 5 6 9H3v6h3l5 4V5Z" />
@@ -98,6 +110,11 @@ const config = JSON.stringify(musicPlayerConfig);
         </button>
       </div>
 
+      <section id="music-lyrics" class="music-lyrics" aria-label="歌词" hidden>
+        <div id="music-lyrics-content" class="music-lyrics-content">
+          <p class="music-lyrics-empty">暂无歌词</p>
+        </div>
+      </section>
       <div id="music-status" class="music-status" aria-live="polite"></div>
       <ol id="music-playlist" class="music-playlist" hidden></ol>
       <a
@@ -133,16 +150,21 @@ const config = JSON.stringify(musicPlayerConfig);
     const next = player.querySelector("#music-next");
     const loop = player.querySelector("#music-loop");
     const mute = player.querySelector("#music-mute");
+    const lyricsToggle = player.querySelector("#music-lyrics-toggle");
     const listToggle = player.querySelector("#music-list-toggle");
     const seek = player.querySelector("#music-seek");
     const volume = player.querySelector("#music-volume");
     const current = player.querySelector("#music-current");
     const duration = player.querySelector("#music-duration");
     const status = player.querySelector("#music-status");
+    const lyricsElement = player.querySelector("#music-lyrics");
+    const lyricsContent = player.querySelector("#music-lyrics-content");
     const playlistElement = player.querySelector("#music-playlist");
 
     let playlist = [];
     let currentIndex = 0;
+    let lyricLines = [];
+    let activeLyricIndex = -1;
 
     const formatTime = seconds => {
       if (!Number.isFinite(seconds)) return "0:00";
@@ -175,6 +197,64 @@ const config = JSON.stringify(musicPlayerConfig);
       element.style.setProperty("--range-progress", `${percentage}%`);
     };
 
+    const parseLyrics = lyrics => {
+      if (!lyrics) return [];
+      return lyrics
+        .split(/\r?\n/)
+        .flatMap(line => {
+          const text = line.replace(/\[(\d{1,3}):(\d{1,2}(?:\.\d+)?)\]/g, "").trim();
+          if (!text) return [];
+          return [...line.matchAll(/\[(\d{1,3}):(\d{1,2}(?:\.\d+)?)\]/g)].map(
+            match => ({
+              time: Number(match[1]) * 60 + Number(match[2]),
+              text,
+            })
+          );
+        })
+        .sort((a, b) => a.time - b.time);
+    };
+
+    const renderLyrics = lyrics => {
+      lyricLines = parseLyrics(lyrics);
+      activeLyricIndex = -1;
+      lyricsContent.replaceChildren();
+      if (!lyricLines.length) {
+        const empty = document.createElement("p");
+        empty.className = "music-lyrics-empty";
+        empty.textContent = "暂无歌词";
+        lyricsContent.append(empty);
+        return;
+      }
+      lyricLines.forEach(line => {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = line.text;
+        lyricsContent.append(paragraph);
+      });
+      lyricsContent.scrollTop = 0;
+    };
+
+    const updateLyrics = time => {
+      if (!lyricLines.length) return;
+      let nextIndex = -1;
+      for (let index = lyricLines.length - 1; index >= 0; index -= 1) {
+        if (time >= lyricLines[index].time) {
+          nextIndex = index;
+          break;
+        }
+      }
+      if (nextIndex === activeLyricIndex) return;
+      activeLyricIndex = nextIndex;
+      lyricsContent.querySelectorAll("p").forEach((line, index) => {
+        line.toggleAttribute("data-active", index === activeLyricIndex);
+      });
+      if (activeLyricIndex >= 0) {
+        lyricsContent.children[activeLyricIndex]?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    };
+
     const renderPlaylist = () => {
       playlistElement.replaceChildren();
       playlist.forEach((track, index) => {
@@ -204,6 +284,7 @@ const config = JSON.stringify(musicPlayerConfig);
       cover.hidden = !track.pic;
       if (track.pic) cover.src = track.pic;
       source.href = qqUrl();
+      renderLyrics(track.lrc);
       updateActiveTrack();
       if (shouldPlay) {
         audio.play().catch(() => {
@@ -226,6 +307,7 @@ const config = JSON.stringify(musicPlayerConfig);
               artist: item.author || item.artist || "未知歌手",
               url: item.url || "",
               pic: item.pic || item.cover || "",
+              lrc: item.lrc || item.lyric || "",
             }))
             .filter(item => item.url);
           if (playlist.length) {
@@ -255,6 +337,13 @@ const config = JSON.stringify(musicPlayerConfig);
     mute.addEventListener("click", () => {
       audio.muted = !audio.muted;
       mute.toggleAttribute("data-muted", audio.muted);
+    });
+    lyricsToggle.addEventListener("click", () => {
+      lyricsElement.hidden = !lyricsElement.hidden;
+      lyricsToggle.toggleAttribute("data-active", !lyricsElement.hidden);
+      lyricsToggle.setAttribute("aria-expanded", String(!lyricsElement.hidden));
+      lyricsToggle.setAttribute("aria-label", lyricsElement.hidden ? "展开歌词" : "收起歌词");
+      if (!lyricsElement.hidden) updateLyrics(audio.currentTime);
     });
     listToggle.addEventListener("click", () => {
       playlistElement.hidden = !playlistElement.hidden;
@@ -293,6 +382,7 @@ const config = JSON.stringify(musicPlayerConfig);
       current.textContent = formatTime(audio.currentTime);
       duration.textContent = formatTime(audio.duration);
       updateRange(seek);
+      updateLyrics(audio.currentTime);
     });
     audio.addEventListener("error", () => {
       status.textContent = "当前歌曲无法播放，请尝试下一首或前往 QQ 音乐。";
@@ -504,6 +594,51 @@ const config = JSON.stringify(musicPlayerConfig);
   .music-status {
     margin-top: 0.5rem;
     text-align: center;
+  }
+
+  .music-lyrics {
+    margin-top: 0.85rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+    padding-top: 0.75rem;
+  }
+
+  .music-lyrics-content {
+    height: 12rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: color-mix(in srgb, var(--muted-foreground) 45%, transparent) transparent;
+    scrollbar-width: thin;
+    text-align: center;
+    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  }
+
+  .music-lyrics-content p {
+    margin: 0;
+    padding: 0.4rem 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    opacity: 0.55;
+    transition:
+      color 180ms ease,
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+  .music-lyrics-content p[data-active] {
+    color: var(--accent);
+    font-weight: 600;
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  .music-lyrics-content .music-lyrics-empty {
+    display: grid;
+    height: 100%;
+    place-items: center;
+    padding: 0;
+    font-size: 0.9rem;
+    opacity: 0.65;
   }
 
   .music-playlist {
