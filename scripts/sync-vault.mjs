@@ -143,8 +143,9 @@ for (const sourceFile of files) {
     `description: ${yamlString(description)}`,
     `pubDatetime: ${pubDatetime}`,
     `modDatetime: ${modDatetime}`,
-    "tags:",
-    ...(tags.length ? tags.map(tag => `  - ${yamlString(tag)}`) : ["  - others"]),
+    ...(tags.length
+      ? ["tags:", ...tags.map(tag => `  - ${yamlString(tag)}`)]
+      : ["tags: []"]),
     "---",
     "",
   ].join("\n");

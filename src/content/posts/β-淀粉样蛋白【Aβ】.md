@@ -3,8 +3,7 @@ title: "β-淀粉样蛋白【Aβ】"
 description: "β-淀粉样蛋白，是由 β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】 经过"
 pubDatetime: 2026-06-14T20:43:02+08:00
 modDatetime: 2026-06-14T22:54:02+08:00
-tags:
-  - others
+tags: []
 ---
 ## 1 简介
 β-淀粉样蛋白，是由 [[β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】]] 经过
