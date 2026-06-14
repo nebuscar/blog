@@ -22,10 +22,7 @@ export default defineAstroPaperConfig({
     dynamicOgImage: false,
     showArchives: true,
     showBackButton: true,
-    editPost: {
-      enabled: true,
-      url: "https://github.com/nebuscar/blog/edit/main/",
-    },
+    editPost: { enabled: false },
     search: "pagefind",
   },
   socials: [
