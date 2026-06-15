@@ -219,6 +219,16 @@ const config = JSON.stringify(musicPlayerConfig);
         .replace(":id", id)
         .replace(":r", String(Math.random()));
 
+    const fetchLyrics = async lyrics => {
+      if (!lyrics || !/^https?:\/\//i.test(lyrics)) return lyrics || "";
+      try {
+        const response = await fetch(lyrics);
+        return response.ok ? await response.text() : "";
+      } catch {
+        return "";
+      }
+    };
+
     const updateRange = element => {
       const min = Number(element.min) || 0;
       const max = Number(element.max) || 100;
@@ -332,18 +342,17 @@ const config = JSON.stringify(musicPlayerConfig);
             if (!response.ok) continue;
             const data = await response.json();
             if (!Array.isArray(data) || !data.length) continue;
-            tracks.push(
-              ...data
-                .map(item => ({
+            const resourceTracks = await Promise.all(
+              data.map(async item => ({
                   name: item.title || item.name || "未知歌曲",
                   artist: item.author || item.artist || "未知歌手",
                   url: item.url || "",
                   pic: item.pic || item.cover || "",
-                  lrc: item.lrc || item.lyric || "",
+                  lrc: await fetchLyrics(item.lrc || item.lyric || ""),
                   resourceId,
                 }))
-                .filter(item => item.url)
             );
+            tracks.push(...resourceTracks.filter(item => item.url));
             break;
           } catch {}
         }
