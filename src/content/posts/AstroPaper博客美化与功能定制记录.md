@@ -1,8 +1,8 @@
 ---
 title: "AstroPaper 博客美化与功能定制记录"
 description: "记录 AstroPaper 博客的随机壁纸、导航栏、主题色、QQ 音乐播放器、技术栈页脚和图片自动图注等定制功能。"
-pubDatetime: 2026-06-15T00:00:00.000Z
-modDatetime: 2026-06-15T00:00:00.000Z
+pubDatetime: 2026-06-15T10:40:00.000Z
+modDatetime: 2026-06-15T10:40:00.000Z
 tags:
   - "Astro"
   - "AstroPaper"
@@ -312,4 +312,3 @@ export const musicConfig = {
 - [AstroPaper](https://github.com/satnaing/astro-paper)
 - [Firefly](https://github.com/CuteLeaf/Firefly)
 - [Astro 官方文档](https://docs.astro.build/)
-

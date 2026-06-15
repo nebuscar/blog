@@ -1,8 +1,8 @@
 ---
 title: "conda创建R环境"
 description: "conda create -n r441 -c conda-forge r-base=4.4.1"
-pubDatetime: 2026-01-17T00:00:00.000Z
-modDatetime: 2026-04-24T00:00:00.000Z
+pubDatetime: 2026-01-17T07:32:04.000Z
+modDatetime: 2026-04-24T08:08:01.000Z
 tags:
   - "环境配置"
 ---

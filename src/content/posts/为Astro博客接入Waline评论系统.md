@@ -1,8 +1,8 @@
 ---
 title: "为 Astro 博客接入 Waline 评论系统"
 description: "记录如何使用 Vercel 部署 Waline 服务端、绑定评论子域名，并在 Astro 博客文章详情页接入评论区。"
-pubDatetime: 2026-06-15T00:00:00.000Z
-modDatetime: 2026-06-15T00:00:00.000Z
+pubDatetime: 2026-06-15T10:35:00.000Z
+modDatetime: 2026-06-15T10:35:00.000Z
 tags:
   - "Astro"
   - "Waline"
@@ -283,4 +283,3 @@ waline-vercel-six.vercel.app
 - 下一篇：AstroPaper 博客美化与功能定制记录
 - [Waline 官方文档](https://waline.js.org/)
 - [Vercel 文档](https://vercel.com/docs)
-
