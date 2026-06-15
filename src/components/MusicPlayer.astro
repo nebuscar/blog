@@ -12,6 +12,22 @@ const config = JSON.stringify(musicPlayerConfig);
       aria-label="音乐播放器"
       transition:persist="music-player"
     >
+      <button
+        id="music-player-toggle"
+        class="music-player-toggle"
+        type="button"
+        aria-label="收起音乐播放器"
+        aria-expanded="true"
+      >
+        <svg class="collapse-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        <svg class="music-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 18V5l11-2v13" />
+          <circle cx="6" cy="18" r="3" />
+          <circle cx="17" cy="16" r="3" />
+        </svg>
+      </button>
       <header class="music-header">
         <span aria-hidden="true"></span>
         <strong>音乐</strong>
@@ -141,6 +157,7 @@ const config = JSON.stringify(musicPlayerConfig);
     if (!player) return;
 
     const audio = player.querySelector("#music-audio");
+    const playerToggle = player.querySelector("#music-player-toggle");
     const cover = player.querySelector("#music-cover");
     const title = player.querySelector("#music-title");
     const artist = player.querySelector("#music-artist");
@@ -165,6 +182,16 @@ const config = JSON.stringify(musicPlayerConfig);
     let currentIndex = 0;
     let lyricLines = [];
     let activeLyricIndex = -1;
+
+    const setCollapsed = collapsed => {
+      player.toggleAttribute("data-collapsed", collapsed);
+      playerToggle.setAttribute("aria-expanded", String(!collapsed));
+      playerToggle.setAttribute(
+        "aria-label",
+        collapsed ? "展开音乐播放器" : "收起音乐播放器"
+      );
+      localStorage.setItem("music-player-collapsed", String(collapsed));
+    };
 
     const formatTime = seconds => {
       if (!Number.isFinite(seconds)) return "0:00";
@@ -328,6 +355,9 @@ const config = JSON.stringify(musicPlayerConfig);
       if (audio.paused) audio.play().catch(() => {});
       else audio.pause();
     });
+    playerToggle.addEventListener("click", () => {
+      setCollapsed(!player.hasAttribute("data-collapsed"));
+    });
     prev.addEventListener("click", () => loadTrack(currentIndex - 1, true));
     next.addEventListener("click", () => loadTrack(currentIndex + 1, true));
     loop.addEventListener("click", () => {
@@ -389,6 +419,12 @@ const config = JSON.stringify(musicPlayerConfig);
     });
 
     source.href = qqUrl();
+    const savedCollapsed = localStorage.getItem("music-player-collapsed");
+    setCollapsed(
+      savedCollapsed === null
+        ? window.matchMedia("(max-width: 640px)").matches
+        : savedCollapsed === "true"
+    );
     const savedVolume = localStorage.getItem("music-volume");
     audio.volume = savedVolume === null ? settings.volume : Number(savedVolume);
     volume.value = String(audio.volume);
@@ -413,6 +449,51 @@ const config = JSON.stringify(musicPlayerConfig);
     box-shadow: 0 12px 30px rgb(0 0 0 / 12%);
     font-size: 0.875rem;
     backdrop-filter: blur(18px);
+    transition:
+      width 180ms ease,
+      padding 180ms ease,
+      border-radius 180ms ease;
+  }
+
+  .music-player-toggle {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    z-index: 2;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+  }
+
+  .music-player-toggle .music-icon {
+    display: none;
+  }
+
+  .music-player[data-collapsed] {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 999px;
+    padding: 0;
+  }
+
+  .music-player[data-collapsed] > :not(.music-player-toggle, audio) {
+    display: none;
+  }
+
+  .music-player[data-collapsed] .music-player-toggle {
+    position: static;
+    width: 100%;
+    height: 100%;
+    color: var(--accent);
+  }
+
+  .music-player[data-collapsed] .collapse-icon {
+    display: none;
+  }
+
+  .music-player[data-collapsed] .music-icon {
+    display: block;
+    width: 1.5rem;
   }
 
   .music-header {
@@ -421,6 +502,7 @@ const config = JSON.stringify(musicPlayerConfig);
     gap: 0.7rem;
     margin-bottom: 1rem;
     font-size: 1.25rem;
+    padding-right: 2rem;
   }
 
   .music-header span {
@@ -683,11 +765,37 @@ const config = JSON.stringify(musicPlayerConfig);
       bottom: 0.75rem;
       left: 0.75rem;
       width: calc(100vw - 1.5rem);
+      max-height: calc(100dvh - 1.5rem);
+      overflow-y: auto;
       padding: 0.9rem 1rem 0.8rem;
+    }
+
+    .music-player[data-collapsed] {
+      width: 3.25rem;
+      height: 3.25rem;
+      overflow: hidden;
+    }
+
+    .music-player-toggle {
+      top: 0.65rem;
+      right: 0.65rem;
     }
 
     .music-header {
       margin-bottom: 0.7rem;
+    }
+
+    .music-track img {
+      width: 3.25rem;
+      height: 3.25rem;
+    }
+
+    .music-timeline {
+      margin-left: 4rem;
+    }
+
+    .music-lyrics-content {
+      height: min(10rem, 30dvh);
     }
 
     .music-controls {
