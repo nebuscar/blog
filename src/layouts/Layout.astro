@@ -4,6 +4,7 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
 import { getAssetPath } from "@/utils/withBase";
 import MusicPlayer from "@/components/MusicPlayer.astro";
+import AppearanceSettings from "@/components/AppearanceSettings.astro";
 import config from "@/config";
 import "@/styles/global.css";
 
@@ -105,6 +106,11 @@ const rssHref = getRelativeLocaleUrl(
         root?.classList.toggle("dark", theme === "dark");
         // Expose value so theme.ts can skip re-detection.
         window.__theme = { value: theme };
+
+        const mode = localStorage.getItem("wallpaper-mode") || "banner";
+        const hue = localStorage.getItem("theme-hue") || "202";
+        root?.setAttribute("data-wallpaper-mode", mode);
+        root?.style.setProperty("--user-hue", hue);
       })();
     </script>
 
@@ -113,8 +119,11 @@ const rssHref = getRelativeLocaleUrl(
   <body
     class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
   >
+    <div id="site-wallpaper" aria-hidden="true"></div>
+    <div id="wallpaper-banner-spacer" aria-hidden="true"></div>
     <slot />
     <MusicPlayer />
+    <AppearanceSettings />
     <script>
       import "@/scripts/theme";
     </script>

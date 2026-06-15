@@ -36,3 +36,84 @@
 :target {
   scroll-margin-block: 1rem;
 }
+
+#site-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  isolation: isolate;
+}
+
+#wallpaper-banner-spacer {
+  display: none;
+  flex: none;
+}
+
+[data-wallpaper-mode="banner"] #site-wallpaper {
+  position: absolute;
+  bottom: auto;
+  height: 38svh;
+  opacity: 1;
+}
+
+[data-wallpaper-mode="banner"] #wallpaper-banner-spacer {
+  display: block;
+  height: 38svh;
+}
+
+[data-wallpaper-mode="banner"] body,
+[data-wallpaper-mode="fullscreen"] body,
+[data-wallpaper-mode="overlay"] body {
+  background: transparent;
+}
+
+[data-wallpaper-mode="fullscreen"] #site-wallpaper,
+[data-wallpaper-mode="overlay"] #site-wallpaper {
+  opacity: 1;
+}
+
+[data-wallpaper-mode="fullscreen"] body {
+  background: color-mix(in srgb, var(--background) 86%, transparent);
+}
+
+[data-wallpaper-mode="overlay"] body {
+  background: color-mix(in srgb, var(--background) 30%, transparent);
+}
+
+[data-wallpaper-mode="fullscreen"] header > div,
+[data-wallpaper-mode="fullscreen"] main,
+[data-wallpaper-mode="fullscreen"] footer > div {
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+[data-wallpaper-mode="overlay"] header > div,
+[data-wallpaper-mode="overlay"] main,
+[data-wallpaper-mode="overlay"] footer > div {
+  background: color-mix(in srgb, var(--background) 58%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+[data-wallpaper-mode="fullscreen"] main,
+[data-wallpaper-mode="overlay"] main {
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  [data-wallpaper-mode="banner"] #site-wallpaper,
+  [data-wallpaper-mode="banner"] #wallpaper-banner-spacer {
+    height: 28svh;
+  }
+}
