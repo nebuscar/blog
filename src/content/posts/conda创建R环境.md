@@ -6,15 +6,13 @@ modDatetime: 2026-04-24T00:00:00.000Z
 tags:
   - "环境配置"
 ---
-## 1 conda 创建 R 环境
-
-### 1.1 创建环境 + 安装 R-base
+## 1 创建环境 + 安装 R-base
 
 ```bash
 conda create -n r441 -c conda-forge r-base=4.4.1
 ```
 
-### 1.2 创建 conda R 虚拟环境
+## 2 创建 conda R 虚拟环境
 
 ```bash
 conda create -n r441
@@ -57,13 +55,13 @@ Executing transaction: done
 #     $ conda deactivate
 ```
 
-### 1.3 安装指定 R-base 版本
+## 3 安装指定 R-base 版本
 
 ```bash
 conda install conda-forge::r-base=4.4.1
 ```
 
-### 1.4 安装必需的 R 包
+## 4 安装必需的 R 包
 
 ```bash
 conda install conda-forge::r-tidyverse
@@ -71,6 +69,6 @@ conda install conda-forge::r-tidyverse
 
 ---
 
-### 1.5 参考资料
+## 5 参考资料
 
 1. [r-base - conda-forge \| Anaconda.org](https://anaconda.org/channels/conda-forge/packages/r-base/overview)
