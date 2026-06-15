@@ -11,12 +11,6 @@ import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const sourceDir = resolve(process.argv[2] ?? join(projectRoot, "..", "vault", "public"));
-const targetDir = resolve(process.argv[3] ?? join(projectRoot, "src", "content", "posts"));
-
-if (!existsSync(sourceDir)) {
-  throw new Error(`Vault public directory does not exist: ${sourceDir}`);
-}
 
 function walkMarkdown(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -59,7 +53,7 @@ function parseFrontmatter(markdown) {
   return { data, body: markdown.slice(match[0].length) };
 }
 
-function gitDate(file, format, reverse = false) {
+function gitDate(file, sourceDir, format, reverse = false) {
   try {
     const repoRoot = resolve(sourceDir, "..");
     const args = [
@@ -82,8 +76,17 @@ function gitDate(file, format, reverse = false) {
   }
 }
 
-function normalizeDate(value, fallback) {
+export function normalizeDate(value, fallback) {
   if (!value || Array.isArray(value)) return fallback;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const fallbackTime = fallback.match(
+      /T(\d{2}:\d{2}:\d{2}(?:\.\d+)?)(Z|[+-]\d{2}:\d{2})$/
+    );
+    if (fallbackTime) {
+      const parsed = new Date(`${value}T${fallbackTime[1]}${fallbackTime[2]}`);
+      if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+    }
+  }
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? fallback : parsed.toISOString();
 }
@@ -112,49 +115,67 @@ function yamlString(value) {
   return JSON.stringify(String(value));
 }
 
-rmSync(targetDir, { recursive: true, force: true });
-mkdirSync(targetDir, { recursive: true });
+export function syncVault(sourceDir, targetDir) {
+  if (!existsSync(sourceDir)) {
+    throw new Error(`Vault public directory does not exist: ${sourceDir}`);
+  }
 
-const files = walkMarkdown(sourceDir);
-for (const sourceFile of files) {
-  const { data, body } = parseFrontmatter(readFileSync(sourceFile, "utf8"));
-  const relativePath = relative(sourceDir, sourceFile);
-  const title = data.title || basename(sourceFile, extname(sourceFile));
-  const createdByGit = gitDate(sourceFile, "%aI", true);
-  const modifiedByGit = gitDate(sourceFile, "%aI");
-  const fallbackDate = createdByGit || new Date().toISOString();
-  const pubDatetime = normalizeDate(
-    data.pubDatetime || data.pubDate || data["date created"],
-    fallbackDate
-  );
-  const modDatetime = normalizeDate(
-    data.modDatetime || data.updatedDate || data["date modified"],
-    modifiedByGit || pubDatetime
-  );
-  const description =
-    typeof data.description === "string" && data.description
-      ? data.description
-      : makeDescription(body, title);
-  const tags = Array.isArray(data.tags) ? data.tags : [];
+  rmSync(targetDir, { recursive: true, force: true });
+  mkdirSync(targetDir, { recursive: true });
 
-  const frontmatter = [
-    "---",
-    `title: ${yamlString(title)}`,
-    `description: ${yamlString(description)}`,
-    `pubDatetime: ${pubDatetime}`,
-    `modDatetime: ${modDatetime}`,
-    ...(tags.length
-      ? ["tags:", ...tags.map(tag => `  - ${yamlString(tag)}`)]
-      : ["tags: []"]),
-    "---",
-    "",
-  ].join("\n");
+  const files = walkMarkdown(sourceDir);
+  for (const sourceFile of files) {
+    const { data, body } = parseFrontmatter(readFileSync(sourceFile, "utf8"));
+    const relativePath = relative(sourceDir, sourceFile);
+    const title = data.title || basename(sourceFile, extname(sourceFile));
+    const createdByGit = gitDate(sourceFile, sourceDir, "%aI", true);
+    const modifiedByGit = gitDate(sourceFile, sourceDir, "%aI");
+    const fallbackDate = createdByGit || new Date().toISOString();
+    const pubDatetime = normalizeDate(
+      data.pubDatetime || data.pubDate || data["date created"],
+      fallbackDate
+    );
+    const modDatetime = normalizeDate(
+      data.modDatetime || data.updatedDate || data["date modified"],
+      modifiedByGit || pubDatetime
+    );
+    const description =
+      typeof data.description === "string" && data.description
+        ? data.description
+        : makeDescription(body, title);
+    const tags = Array.isArray(data.tags) ? data.tags : [];
 
-  const targetFile = join(targetDir, relativePath);
-  mkdirSync(dirname(targetFile), { recursive: true });
-  writeFileSync(targetFile, `${frontmatter}${body.trimStart()}`, "utf8");
+    const frontmatter = [
+      "---",
+      `title: ${yamlString(title)}`,
+      `description: ${yamlString(description)}`,
+      `pubDatetime: ${pubDatetime}`,
+      `modDatetime: ${modDatetime}`,
+      ...(tags.length
+        ? ["tags:", ...tags.map(tag => `  - ${yamlString(tag)}`)]
+        : ["tags: []"]),
+      "---",
+      "",
+    ].join("\n");
+
+    const targetFile = join(targetDir, relativePath);
+    mkdirSync(dirname(targetFile), { recursive: true });
+    writeFileSync(targetFile, `${frontmatter}${body.trimStart()}`, "utf8");
+  }
+
+  return files.length;
 }
 
-process.stdout.write(
-  `Synced ${files.length} Markdown file(s) from ${sourceDir} to ${targetDir}\n`
-);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const sourceDir = resolve(
+    process.argv[2] ?? join(projectRoot, "..", "vault", "public")
+  );
+  const targetDir = resolve(
+    process.argv[3] ?? join(projectRoot, "src", "content", "posts")
+  );
+  const fileCount = syncVault(sourceDir, targetDir);
+
+  process.stdout.write(
+    `Synced ${fileCount} Markdown file(s) from ${sourceDir} to ${targetDir}\n`
+  );
+}
