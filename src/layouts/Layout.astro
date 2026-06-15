@@ -113,12 +113,6 @@ const rssHref = getRelativeLocaleUrl(
           savedMode === "overlay" ? "fullscreen" : savedMode || "banner";
         const hue = localStorage.getItem("theme-hue") || "202";
         root?.setAttribute("data-wallpaper-mode", mode);
-        root?.setAttribute(
-          "data-fullscreen-view",
-          mode === "fullscreen"
-            ? sessionStorage.getItem("fullscreen-view") || "wallpaper"
-            : "content"
-        );
         root?.style.setProperty("--user-hue", hue);
       })();
     </script>
@@ -130,15 +124,19 @@ const rssHref = getRelativeLocaleUrl(
   >
     <div id="site-wallpaper" aria-hidden="true"></div>
     <div id="wallpaper-banner-spacer" aria-hidden="true"></div>
-    <button
+    <div id="wallpaper-intro">
+      <h1>不吃鱼的小天地</h1>
+      <p>去码头整点薯条~</p>
+    </div>
+    <a
       id="wallpaper-scroll-down"
-      type="button"
+      href="#site-content"
       aria-label="向下进入博客内容"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m6 9 6 6 6-6"></path>
       </svg>
-    </button>
+    </a>
     <div id="site-content">
       <slot />
     </div>
@@ -146,24 +144,6 @@ const rssHref = getRelativeLocaleUrl(
     <AppearanceSettings />
     <script>
       import "@/scripts/theme";
-
-      const setupWallpaperScroll = () => {
-        document
-          .querySelector("#wallpaper-scroll-down")
-          ?.addEventListener("click", () => {
-            document.documentElement.dataset.fullscreenView = "content";
-            sessionStorage.setItem("fullscreen-view", "content");
-            const panel =
-              document.querySelector<HTMLElement>("#appearance-panel");
-            if (panel) panel.hidden = true;
-            document
-              .querySelector("#appearance-toggle")
-              ?.setAttribute("aria-expanded", "false");
-          });
-      };
-
-      setupWallpaperScroll();
-      document.addEventListener("astro:after-swap", setupWallpaperScroll);
     </script>
   </body>
 </html>

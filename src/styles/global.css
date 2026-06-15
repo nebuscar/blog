@@ -34,7 +34,7 @@
 }
 
 :target {
-  scroll-margin-block: 1rem;
+  scroll-margin-block: 0;
 }
 
 #site-wallpaper {
@@ -86,6 +86,10 @@ body {
   display: none;
 }
 
+#wallpaper-intro {
+  display: none;
+}
+
 [data-wallpaper-mode="banner"] #site-wallpaper {
   position: absolute;
   bottom: auto;
@@ -119,11 +123,42 @@ body {
 }
 
 [data-wallpaper-mode="fullscreen"] #wallpaper-banner-spacer {
-  display: none;
+  display: block;
+  height: 100svh;
 }
 
-[data-wallpaper-mode="fullscreen"][data-fullscreen-view="wallpaper"]
-  #wallpaper-scroll-down {
+[data-wallpaper-mode="fullscreen"] {
+  scroll-behavior: auto;
+}
+
+[data-wallpaper-mode="fullscreen"] #wallpaper-intro {
+  position: absolute;
+  top: 50svh;
+  left: 50%;
+  z-index: 10;
+  display: block;
+  width: min(90vw, 50rem);
+  color: white;
+  text-align: center;
+  text-shadow:
+    0 2px 8px rgb(0 0 0 / 80%),
+    0 0 24px rgb(0 0 0 / 55%);
+  transform: translate(-50%, -50%);
+}
+
+[data-wallpaper-mode="fullscreen"] #wallpaper-intro h1 {
+  margin: 0;
+  font-size: clamp(2.3rem, 6vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+[data-wallpaper-mode="fullscreen"] #wallpaper-intro p {
+  margin: 0.8rem 0 0;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+[data-wallpaper-mode="fullscreen"] #wallpaper-scroll-down {
   position: absolute;
   bottom: 1.5rem;
   left: 50%;
@@ -141,9 +176,7 @@ body {
   backdrop-filter: blur(8px);
 }
 
-[data-wallpaper-mode="fullscreen"][data-fullscreen-view="wallpaper"]
-  #wallpaper-scroll-down
-  svg {
+[data-wallpaper-mode="fullscreen"] #wallpaper-scroll-down svg {
   width: 2rem;
   fill: none;
   stroke: currentColor;
@@ -152,25 +185,20 @@ body {
   stroke-width: 2.5;
 }
 
-[data-wallpaper-mode="fullscreen"][data-fullscreen-view="wallpaper"] body {
-  height: 100svh;
-  overflow: hidden;
-}
-
-[data-wallpaper-mode="fullscreen"][data-fullscreen-view="wallpaper"]
-  #site-content {
-  display: none;
-}
-
-[data-wallpaper-mode="fullscreen"][data-fullscreen-view="content"]
-  #site-wallpaper,
-[data-wallpaper-mode="fullscreen"][data-fullscreen-view="content"]
-  #wallpaper-scroll-down {
-  display: none;
-}
-
-[data-wallpaper-mode="fullscreen"][data-fullscreen-view="content"] body {
+#site-content {
+  position: relative;
   background: var(--background);
+}
+
+[data-wallpaper-mode="fullscreen"] #site-content::before {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 4rem;
+  background: linear-gradient(to bottom, transparent, var(--background));
+  content: "";
+  pointer-events: none;
 }
 
 @media (max-width: 640px) {
@@ -179,8 +207,11 @@ body {
     height: 52svh;
   }
 
-  [data-wallpaper-mode="fullscreen"][data-fullscreen-view="wallpaper"]
-    #wallpaper-scroll-down {
+  [data-wallpaper-mode="fullscreen"] #wallpaper-scroll-down {
     bottom: 4.5rem;
+  }
+
+  [data-wallpaper-mode="fullscreen"] #wallpaper-intro {
+    top: 45svh;
   }
 }
