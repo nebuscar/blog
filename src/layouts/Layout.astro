@@ -40,6 +40,7 @@ const rssHref = getRelativeLocaleUrl(
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://t.alcy.cc" crossorigin="anonymous" />
     <link rel="icon" type="image/svg+xml" href={getAssetPath("favicon.svg")} />
     <link rel="icon" href={getAssetPath("favicon.ico")} />
     <link rel="canonical" href={canonicalURL} />
@@ -112,6 +113,12 @@ const rssHref = getRelativeLocaleUrl(
           savedMode === "overlay" ? "fullscreen" : savedMode || "banner";
         const hue = localStorage.getItem("theme-hue") || "202";
         root?.setAttribute("data-wallpaper-mode", mode);
+        root?.setAttribute(
+          "data-fullscreen-view",
+          mode === "fullscreen"
+            ? sessionStorage.getItem("fullscreen-view") || "wallpaper"
+            : "content"
+        );
         root?.style.setProperty("--user-hue", hue);
       })();
     </script>
@@ -132,7 +139,9 @@ const rssHref = getRelativeLocaleUrl(
         <path d="m6 9 6 6 6-6"></path>
       </svg>
     </button>
-    <slot />
+    <div id="site-content">
+      <slot />
+    </div>
     <MusicPlayer />
     <AppearanceSettings />
     <script>
@@ -142,11 +151,14 @@ const rssHref = getRelativeLocaleUrl(
         document
           .querySelector("#wallpaper-scroll-down")
           ?.addEventListener("click", () => {
+            document.documentElement.dataset.fullscreenView = "content";
+            sessionStorage.setItem("fullscreen-view", "content");
+            const panel =
+              document.querySelector<HTMLElement>("#appearance-panel");
+            if (panel) panel.hidden = true;
             document
-              .querySelector("#wallpaper-banner-spacer")
-              ?.nextElementSibling?.nextElementSibling?.scrollIntoView({
-                behavior: "smooth",
-              });
+              .querySelector("#appearance-toggle")
+              ?.setAttribute("aria-expanded", "false");
           });
       };
 

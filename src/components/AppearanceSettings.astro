@@ -105,12 +105,26 @@ const modes = [
       if (forceRefresh || !sessionStorage.getItem("wallpaper-url")) {
         sessionStorage.setItem("wallpaper-url", wallpaperUrl());
       }
-      wallpaper.style.backgroundImage = `url("${sessionStorage.getItem("wallpaper-url")}")`;
+      wallpaper.removeAttribute("data-loaded");
+      const image = new Image();
+      image.decoding = "async";
+      image.fetchPriority = "high";
+      image.onload = () => {
+        wallpaper.style.backgroundImage = `url("${image.src}")`;
+        wallpaper.toggleAttribute("data-loaded", true);
+      };
+      image.onerror = () => wallpaper.toggleAttribute("data-loaded", true);
+      image.src = sessionStorage.getItem("wallpaper-url");
     };
 
     const applyMode = mode => {
       if (mode === "overlay") mode = "fullscreen";
       root.dataset.wallpaperMode = mode;
+      root.dataset.fullscreenView =
+        mode === "fullscreen"
+          ? sessionStorage.getItem("fullscreen-view") || "wallpaper"
+          : "content";
+      if (mode === "fullscreen") window.scrollTo(0, 0);
       localStorage.setItem("wallpaper-mode", mode);
       modeButtons.forEach(button => {
         button.toggleAttribute(
@@ -140,9 +154,15 @@ const modes = [
     hueSlider.addEventListener("input", () => applyHue(hueSlider.value));
     refresh.addEventListener("click", () => applyWallpaper(true));
     modeButtons.forEach(button => {
-      button.addEventListener("click", () =>
-        applyMode(button.dataset.wallpaperMode)
-      );
+      button.addEventListener("click", () => {
+        sessionStorage.setItem(
+          "fullscreen-view",
+          button.dataset.wallpaperMode === "fullscreen"
+            ? "wallpaper"
+            : "content"
+        );
+        applyMode(button.dataset.wallpaperMode);
+      });
     });
 
     applyHue(localStorage.getItem("theme-hue") || String(settings.defaultHue));
