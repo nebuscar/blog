@@ -268,6 +268,7 @@ const config = JSON.stringify(musicPlayerConfig);
       }
       lyricLines.forEach(line => {
         const paragraph = document.createElement("p");
+        paragraph.className = "music-lyric-line";
         paragraph.textContent = line.text;
         lyricsContent.append(paragraph);
       });
@@ -305,6 +306,12 @@ const config = JSON.stringify(musicPlayerConfig);
         const text = document.createElement("span");
         const name = document.createElement("strong");
         const trackArtist = document.createElement("span");
+        item.className = "music-playlist-item";
+        button.className = "music-playlist-track";
+        artwork.className = "music-playlist-artwork";
+        text.className = "music-playlist-meta";
+        name.className = "music-playlist-title";
+        trackArtist.className = "music-playlist-artist";
         button.type = "button";
         artwork.src = track.pic;
         artwork.alt = "";
@@ -752,7 +759,7 @@ const config = JSON.stringify(musicPlayerConfig);
     mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
   }
 
-  .music-lyrics-content p {
+  .music-lyrics-content :global(.music-lyric-line) {
     margin: 0.15rem 0;
     padding: 0.5rem 0.35rem;
     border-radius: 0.65rem;
@@ -768,7 +775,7 @@ const config = JSON.stringify(musicPlayerConfig);
       transform 180ms ease;
   }
 
-  .music-lyrics-content p[data-active] {
+  .music-lyrics-content :global(.music-lyric-line[data-active]) {
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 10%, transparent);
     font-size: 0.96rem;
@@ -777,7 +784,7 @@ const config = JSON.stringify(musicPlayerConfig);
     transform: scale(1.03);
   }
 
-  .music-lyrics-content .music-lyrics-empty {
+  .music-lyrics-content :global(.music-lyrics-empty) {
     display: grid;
     height: 100%;
     place-items: center;
@@ -796,11 +803,11 @@ const config = JSON.stringify(musicPlayerConfig);
     scrollbar-width: thin;
   }
 
-  .music-playlist li {
+  .music-playlist :global(.music-playlist-item) {
     list-style: none;
   }
 
-  .music-playlist button {
+  .music-playlist :global(.music-playlist-track) {
     display: flex;
     width: 100%;
     align-items: center;
@@ -814,17 +821,17 @@ const config = JSON.stringify(musicPlayerConfig);
       transform 160ms ease;
   }
 
-  .music-playlist button:hover {
+  .music-playlist :global(.music-playlist-track:hover) {
     background: color-mix(in srgb, var(--accent) 7%, transparent);
   }
 
-  .music-playlist button[data-active] {
+  .music-playlist :global(.music-playlist-track[data-active]) {
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 12%, var(--background));
     box-shadow: 0 3px 12px rgb(0 0 0 / 8%);
   }
 
-  .music-playlist button img {
+  .music-playlist :global(.music-playlist-artwork) {
     width: 2.8rem;
     height: 2.8rem;
     flex: none;
@@ -832,25 +839,25 @@ const config = JSON.stringify(musicPlayerConfig);
     object-fit: cover;
   }
 
-  .music-playlist button > span {
+  .music-playlist :global(.music-playlist-meta) {
     display: flex;
     min-width: 0;
     flex-direction: column;
     gap: 0.08rem;
   }
 
-  .music-playlist button strong,
-  .music-playlist button span span {
+  .music-playlist :global(.music-playlist-title),
+  .music-playlist :global(.music-playlist-artist) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .music-playlist button strong {
+  .music-playlist :global(.music-playlist-title) {
     font-size: 0.85rem;
   }
 
-  .music-playlist button span span {
+  .music-playlist :global(.music-playlist-artist) {
     color: var(--muted-foreground);
     font-size: 0.72rem;
   }
