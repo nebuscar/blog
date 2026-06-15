@@ -30,6 +30,11 @@ const rssHref = getRelativeLocaleUrl(
   Astro.currentLocale ?? config.site.lang,
   "rss.xml"
 );
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isHomePage = currentPath === (basePath || "/");
+const pageTitle = title.replace(` | ${site.title}`, "");
 ---
 
 <!doctype html>
@@ -117,24 +122,29 @@ const rssHref = getRelativeLocaleUrl(
     <ClientRouter />
   </head>
   <body
+    data-page-kind={isHomePage ? "home" : "inner"}
     class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
   >
     <div id="site-wallpaper" aria-hidden="true"></div>
     <Header />
     <div id="wallpaper-spacer" aria-hidden="true"></div>
     <div id="wallpaper-intro">
-      <h1>不吃鱼的小天地</h1>
-      <p>去码头整点薯条~</p>
+      <h1>{isHomePage ? site.title : pageTitle}</h1>
+      {isHomePage && <p>去码头整点薯条~</p>}
     </div>
-    <a
-      id="wallpaper-scroll-down"
-      href="#site-content"
-      aria-label="向下进入博客内容"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m6 9 6 6 6-6"></path>
-      </svg>
-    </a>
+    {
+      isHomePage && (
+        <a
+          id="wallpaper-scroll-down"
+          href="#site-content"
+          aria-label="向下进入博客内容"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </a>
+      )
+    }
     <div id="site-content">
       <slot />
     </div>

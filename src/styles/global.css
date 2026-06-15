@@ -101,6 +101,12 @@ body {
   flex: none;
 }
 
+body[data-page-kind="inner"] #wallpaper-spacer {
+  height: 48svh;
+  min-height: 24rem;
+  max-height: 34rem;
+}
+
 #wallpaper-scroll-down {
   position: absolute;
   bottom: 1.5rem;
@@ -167,6 +173,14 @@ body {
   font-size: clamp(1rem, 2vw, 1.5rem);
 }
 
+body[data-page-kind="inner"] #wallpaper-intro {
+  top: clamp(12rem, 24svh, 17rem);
+}
+
+body[data-page-kind="inner"] #wallpaper-intro h1 {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+}
+
 #site-content {
   position: relative;
   background: var(--background);
@@ -199,5 +213,19 @@ body {
 
   #wallpaper-intro {
     top: 45svh;
+  }
+
+  body[data-page-kind="inner"] #wallpaper-spacer {
+    height: 38svh;
+    min-height: 18rem;
+    max-height: 24rem;
+  }
+
+  body[data-page-kind="inner"] #wallpaper-intro {
+    top: clamp(9rem, 19svh, 12rem);
+  }
+
+  body[data-page-kind="inner"] #wallpaper-intro h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
   }
 }
