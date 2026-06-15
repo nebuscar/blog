@@ -60,14 +60,6 @@ const config = JSON.stringify(backgroundWallpaper);
 <script is:inline define:vars={{ config }}>
   (() => {
     const settings = JSON.parse(config);
-    const root = document.documentElement;
-    const wallpaper = document.querySelector("#site-wallpaper");
-    const toggle = document.querySelector("#appearance-toggle");
-    const panel = document.querySelector("#appearance-panel");
-    const close = document.querySelector("#appearance-close");
-    const hueSlider = document.querySelector("#hue-slider");
-    const hueValue = document.querySelector("#hue-value");
-    const refresh = document.querySelector("#wallpaper-refresh");
 
     const wallpaperUrl = () => {
       const source = window.matchMedia("(max-width: 640px)").matches
@@ -76,7 +68,7 @@ const config = JSON.stringify(backgroundWallpaper);
       return `${source}${source.includes("?") ? "&" : "?"}r=${Date.now()}`;
     };
 
-    const applyWallpaper = (forceRefresh = false) => {
+    const applyWallpaper = (wallpaper, forceRefresh = false) => {
       if (!wallpaper) return;
       if (forceRefresh || !sessionStorage.getItem("wallpaper-url")) {
         sessionStorage.setItem("wallpaper-url", wallpaperUrl());
@@ -93,7 +85,8 @@ const config = JSON.stringify(backgroundWallpaper);
       image.src = sessionStorage.getItem("wallpaper-url");
     };
 
-    const applyHue = hue => {
+    const applyHue = (hueSlider, hueValue, hue) => {
+      const root = document.documentElement;
       root.style.setProperty("--user-hue", hue);
       hueSlider.value = hue;
       hueValue.value = hue;
@@ -101,19 +94,54 @@ const config = JSON.stringify(backgroundWallpaper);
       localStorage.setItem("theme-hue", hue);
     };
 
-    const setPanel = open => {
-      panel.hidden = !open;
-      toggle.setAttribute("aria-expanded", String(open));
-      toggle.setAttribute("aria-label", open ? "关闭外观设置" : "打开外观设置");
+    const setupAppearance = () => {
+      const wallpaper = document.querySelector("#site-wallpaper");
+      const toggle = document.querySelector("#appearance-toggle");
+      const panel = document.querySelector("#appearance-panel");
+      const close = document.querySelector("#appearance-close");
+      const hueSlider = document.querySelector("#hue-slider");
+      const hueValue = document.querySelector("#hue-value");
+      const refresh = document.querySelector("#wallpaper-refresh");
+      if (!toggle || !panel || !close || !hueSlider || !hueValue || !refresh)
+        return;
+
+      const setPanel = open => {
+        panel.hidden = !open;
+        toggle.setAttribute("aria-expanded", String(open));
+        toggle.setAttribute(
+          "aria-label",
+          open ? "关闭外观设置" : "打开外观设置"
+        );
+      };
+
+      if (!toggle.hasAttribute("data-appearance-bound")) {
+        toggle.toggleAttribute("data-appearance-bound", true);
+        toggle.addEventListener("click", () => setPanel(panel.hidden));
+        close.addEventListener("click", () => setPanel(false));
+        hueSlider.addEventListener("input", () =>
+          applyHue(hueSlider, hueValue, hueSlider.value)
+        );
+        refresh.addEventListener("click", () =>
+          applyWallpaper(wallpaper, true)
+        );
+      }
+
+      applyHue(
+        hueSlider,
+        hueValue,
+        localStorage.getItem("theme-hue") || String(settings.defaultHue)
+      );
+      applyWallpaper(wallpaper);
     };
 
-    toggle.addEventListener("click", () => setPanel(panel.hidden));
-    close.addEventListener("click", () => setPanel(false));
-    hueSlider.addEventListener("input", () => applyHue(hueSlider.value));
-    refresh.addEventListener("click", () => applyWallpaper(true));
-
-    applyHue(localStorage.getItem("theme-hue") || String(settings.defaultHue));
-    applyWallpaper();
+    window.__setupAppearance = setupAppearance;
+    if (!window.__appearancePageLoadBound) {
+      window.__appearancePageLoadBound = true;
+      document.addEventListener("astro:page-load", () =>
+        window.__setupAppearance?.()
+      );
+    }
+    setupAppearance();
   })();
 </script>
 
