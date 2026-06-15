@@ -1,0 +1,74 @@
+<section class="waline-comments app-layout" aria-labelledby="comments-title">
+  <hr class="my-8 border-dashed" />
+  <h2 id="comments-title" class="mb-6 text-2xl font-bold">评论</h2>
+  <div id="waline-comments"></div>
+</section>
+
+<script>
+  import { init, type WalineInstance } from "@waline/client";
+
+  type WalineWindow = Window & {
+    __walineInstance?: WalineInstance | null;
+    __walineLifecycleBound?: boolean;
+  };
+
+  function setupWaline() {
+    const container = document.querySelector<HTMLElement>("#waline-comments");
+    if (!container) return;
+
+    const walineWindow = window as WalineWindow;
+    walineWindow.__walineInstance?.destroy();
+    container.replaceChildren();
+
+    walineWindow.__walineInstance = init({
+      el: container,
+      serverURL: "https://comment.okisama.top",
+      path: window.location.pathname,
+      lang: "zh-CN",
+      dark: "html[data-theme='dark']",
+      login: "enable",
+      commentSorting: "latest",
+      reaction: true,
+    });
+  }
+
+  setupWaline();
+
+  const walineWindow = window as WalineWindow;
+  if (!walineWindow.__walineLifecycleBound) {
+    walineWindow.__walineLifecycleBound = true;
+    document.addEventListener("astro:before-swap", () => {
+      walineWindow.__walineInstance?.destroy();
+      walineWindow.__walineInstance = null;
+    });
+    document.addEventListener("astro:page-load", setupWaline);
+  }
+</script>
+
+<style is:global>
+  .waline-comments {
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  #waline-comments {
+    --waline-theme-color: var(--accent);
+    --waline-active-color: var(--accent);
+    --waline-color: var(--foreground);
+    --waline-bg-color: var(--background);
+    --waline-bg-color-light: var(--muted);
+    --waline-bg-color-hover: color-mix(
+      in srgb,
+      var(--accent) 10%,
+      var(--background)
+    );
+    --waline-border-color: var(--border);
+    --waline-info-bg-color: var(--muted);
+    --waline-info-color: var(--muted-foreground);
+  }
+
+  #waline-comments .wl-panel,
+  #waline-comments .wl-card {
+    box-sizing: border-box;
+  }
+</style>
