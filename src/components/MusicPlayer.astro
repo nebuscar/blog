@@ -27,6 +27,7 @@ const config = JSON.stringify(musicPlayerConfig);
           <circle cx="6" cy="18" r="3" />
           <circle cx="17" cy="16" r="3" />
         </svg>
+        <img id="music-mini-cover" class="music-mini-cover" alt="" hidden />
       </button>
       <header class="music-header">
         <span aria-hidden="true"></span>
@@ -159,6 +160,7 @@ const config = JSON.stringify(musicPlayerConfig);
     const audio = player.querySelector("#music-audio");
     const playerToggle = player.querySelector("#music-player-toggle");
     const cover = player.querySelector("#music-cover");
+    const miniCover = player.querySelector("#music-mini-cover");
     const title = player.querySelector("#music-title");
     const artist = player.querySelector("#music-artist");
     const source = player.querySelector("#music-source");
@@ -299,8 +301,18 @@ const config = JSON.stringify(musicPlayerConfig);
       playlist.forEach((track, index) => {
         const item = document.createElement("li");
         const button = document.createElement("button");
+        const artwork = document.createElement("img");
+        const text = document.createElement("span");
+        const name = document.createElement("strong");
+        const trackArtist = document.createElement("span");
         button.type = "button";
-        button.textContent = `${track.name} · ${track.artist}`;
+        artwork.src = track.pic;
+        artwork.alt = "";
+        artwork.hidden = !track.pic;
+        name.textContent = track.name;
+        trackArtist.textContent = track.artist;
+        text.append(name, trackArtist);
+        button.append(artwork, text);
         button.addEventListener("click", () => loadTrack(index, true));
         item.append(button);
         playlistElement.append(item);
@@ -310,7 +322,11 @@ const config = JSON.stringify(musicPlayerConfig);
     const updateActiveTrack = () => {
       playlistElement.querySelectorAll("button").forEach((button, index) => {
         button.toggleAttribute("data-active", index === currentIndex);
+        button.setAttribute("aria-current", index === currentIndex ? "true" : "false");
       });
+      playlistElement
+        .querySelector("button[data-active]")
+        ?.scrollIntoView({ block: "nearest" });
     };
 
     const loadTrack = (index, shouldPlay = false) => {
@@ -322,6 +338,9 @@ const config = JSON.stringify(musicPlayerConfig);
       artist.textContent = track.artist;
       cover.hidden = !track.pic;
       if (track.pic) cover.src = track.pic;
+      miniCover.hidden = !track.pic;
+      if (track.pic) miniCover.src = track.pic;
+      player.toggleAttribute("data-has-cover", Boolean(track.pic));
       source.href = qqUrl(track.resourceId);
       renderLyrics(track.lrc);
       updateActiveTrack();
@@ -488,6 +507,14 @@ const config = JSON.stringify(musicPlayerConfig);
     display: none;
   }
 
+  .music-mini-cover {
+    display: none;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
+
   .music-player[data-collapsed] {
     width: 3.5rem;
     height: 3.5rem;
@@ -513,6 +540,18 @@ const config = JSON.stringify(musicPlayerConfig);
   .music-player[data-collapsed] .music-icon {
     display: block;
     width: 1.5rem;
+  }
+
+  .music-player[data-collapsed] .music-mini-cover:not([hidden]) {
+    display: block;
+  }
+
+  .music-player[data-collapsed][data-has-cover] .music-icon {
+    display: none;
+  }
+
+  .music-player[data-collapsed][data-playing] .music-mini-cover {
+    animation: cover-spin 10s linear infinite;
   }
 
   .music-header {
@@ -714,23 +753,28 @@ const config = JSON.stringify(musicPlayerConfig);
   }
 
   .music-lyrics-content p {
-    margin: 0;
-    padding: 0.4rem 0.25rem;
+    margin: 0.15rem 0;
+    padding: 0.5rem 0.35rem;
+    border-radius: 0.65rem;
     color: var(--muted-foreground);
     font-size: 0.82rem;
     line-height: 1.5;
-    opacity: 0.55;
+    opacity: 0.42;
     transition:
+      background-color 180ms ease,
       color 180ms ease,
+      font-size 180ms ease,
       opacity 180ms ease,
       transform 180ms ease;
   }
 
   .music-lyrics-content p[data-active] {
     color: var(--accent);
-    font-weight: 600;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    font-size: 0.96rem;
+    font-weight: 700;
     opacity: 1;
-    transform: scale(1.04);
+    transform: scale(1.03);
   }
 
   .music-lyrics-content .music-lyrics-empty {
@@ -743,11 +787,13 @@ const config = JSON.stringify(musicPlayerConfig);
   }
 
   .music-playlist {
-    max-height: 9rem;
+    max-height: 13rem;
     margin-top: 0.75rem;
     overflow-y: auto;
     border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
-    padding-top: 0.5rem;
+    padding: 0.55rem 0.2rem 0 0;
+    scrollbar-color: color-mix(in srgb, var(--muted-foreground) 45%, transparent) transparent;
+    scrollbar-width: thin;
   }
 
   .music-playlist li {
@@ -755,12 +801,58 @@ const config = JSON.stringify(musicPlayerConfig);
   }
 
   .music-playlist button {
+    display: flex;
     width: 100%;
-    overflow: hidden;
-    padding: 0.35rem;
+    align-items: center;
+    gap: 0.65rem;
+    border-radius: 0.75rem;
+    padding: 0.45rem;
     text-align: left;
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .music-playlist button:hover {
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+
+  .music-playlist button[data-active] {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, var(--background));
+    box-shadow: 0 3px 12px rgb(0 0 0 / 8%);
+  }
+
+  .music-playlist button img {
+    width: 2.8rem;
+    height: 2.8rem;
+    flex: none;
+    border-radius: 0.55rem;
+    object-fit: cover;
+  }
+
+  .music-playlist button > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.08rem;
+  }
+
+  .music-playlist button strong,
+  .music-playlist button span span {
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .music-playlist button strong {
+    font-size: 0.85rem;
+  }
+
+  .music-playlist button span span {
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
   }
 
   .music-source {
@@ -824,7 +916,8 @@ const config = JSON.stringify(musicPlayerConfig);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .music-player[data-playing] .music-track img {
+    .music-player[data-playing] .music-track img,
+    .music-player[data-collapsed][data-playing] .music-mini-cover {
       animation: none;
     }
   }
