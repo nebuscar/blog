@@ -3,6 +3,8 @@ title: "为 Astro 博客接入 Waline 评论系统"
 description: "记录如何使用 Vercel 部署 Waline 服务端、绑定评论子域名，并在 Astro 博客文章详情页接入评论区。"
 pubDatetime: 2026-06-15T18:36:14+08:00
 modDatetime: 2026-06-15T19:30:57+08:00
+slug: 20260615-1836-o1kox
+legacySlug: "为astro博客接入waline评论系统"
 tags:
   - "评论系统"
   - "博客搭建"
