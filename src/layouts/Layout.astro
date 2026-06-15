@@ -5,6 +5,7 @@ import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
 import { getAssetPath } from "@/utils/withBase";
 import MusicPlayer from "@/components/MusicPlayer.astro";
 import AppearanceSettings from "@/components/AppearanceSettings.astro";
+import Header from "@/components/Header.astro";
 import config from "@/config";
 import "@/styles/global.css";
 
@@ -123,6 +124,7 @@ const rssHref = getRelativeLocaleUrl(
     class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
   >
     <div id="site-wallpaper" aria-hidden="true"></div>
+    <Header />
     <div id="wallpaper-banner-spacer" aria-hidden="true"></div>
     <div id="wallpaper-intro">
       <h1>不吃鱼的小天地</h1>
