@@ -4,10 +4,6 @@ description: "记录如何使用 AstroPaper、GitHub Actions 和 Cloudflare Page
 pubDatetime: 2026-06-15T10:30:00.000Z
 modDatetime: 2026-06-15T10:30:00.000Z
 tags:
-  - "Astro"
-  - "Obsidian"
-  - "Cloudflare Pages"
-  - "GitHub Actions"
   - "博客搭建"
 ---
 > 本文属于「个人博客搭建记录」系列：

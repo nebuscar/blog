@@ -4,9 +4,6 @@ description: "记录 AstroPaper 博客的随机壁纸、导航栏、主题色、
 pubDatetime: 2026-06-15T10:40:00.000Z
 modDatetime: 2026-06-15T10:40:00.000Z
 tags:
-  - "Astro"
-  - "AstroPaper"
-  - "前端美化"
   - "博客搭建"
 ---
 > 本文属于「个人博客搭建记录」系列：
