@@ -78,6 +78,16 @@ body {
   width: min(48rem, calc(100% - 2rem));
   padding: 0;
   transform: translateX(-50%);
+  transition:
+    transform 300ms ease,
+    opacity 250ms ease;
+  will-change: transform, opacity;
+}
+
+#site-header.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 2rem));
 }
 
 #site-header > div {
@@ -227,5 +237,11 @@ body[data-page-kind="inner"] #wallpaper-intro h1 {
 
   body[data-page-kind="inner"] #wallpaper-intro h1 {
     font-size: clamp(2rem, 10vw, 3rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #site-header {
+    transition: none;
   }
 }

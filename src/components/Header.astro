@@ -166,31 +166,152 @@ const isActive = (path: string) => {
 </header>
 
 <script>
-  function toggleNav() {
+  type HeaderWindow = Window & {
+    __headerAutoHideController?: AbortController;
+    __headerAutoHideTimer?: number;
+  };
+
+  function setupHeader() {
     const menuBtn = document.querySelector<HTMLButtonElement>("#menu-btn");
     const menuItems = document.querySelector("#menu-items");
     const menuIcon = document.querySelector("#menu-icon");
     const closeIcon = document.querySelector("#close-icon");
+    const header = document.querySelector<HTMLElement>("#site-header");
 
-    if (!menuBtn || !menuItems || !menuIcon || !closeIcon) return;
+    if (!menuBtn || !menuItems || !menuIcon || !closeIcon || !header) return;
+
+    const headerWindow = window as HeaderWindow;
+    headerWindow.__headerAutoHideController?.abort();
+
+    const controller = new AbortController();
+    const { signal } = controller;
+    headerWindow.__headerAutoHideController = controller;
+
+    let lastScrollY = window.scrollY;
+    let pointerOverHeader = false;
+    let headerHasFocus = false;
 
     const openLabel = menuBtn.dataset.labelOpen ?? "Open menu";
     const closeLabel = menuBtn.dataset.labelClose ?? "Close menu";
 
-    menuBtn.addEventListener("click", () => {
-      const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
+    const menuIsOpen = () => menuBtn.getAttribute("aria-expanded") === "true";
 
-      menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
-      menuBtn.setAttribute("aria-label", openMenu ? openLabel : closeLabel);
+    const clearHideTimer = () => {
+      if (headerWindow.__headerAutoHideTimer) {
+        window.clearTimeout(headerWindow.__headerAutoHideTimer);
+      }
+    };
 
-      menuItems.classList.toggle("hidden");
-      menuItems.classList.toggle("grid");
-      menuIcon.classList.toggle("hidden");
-      closeIcon.classList.toggle("hidden");
-    });
+    const showHeader = () => {
+      header.classList.remove("is-hidden");
+    };
+
+    const scheduleHide = () => {
+      clearHideTimer();
+      if (pointerOverHeader || headerHasFocus || menuIsOpen()) return;
+
+      headerWindow.__headerAutoHideTimer = window.setTimeout(() => {
+        if (pointerOverHeader || headerHasFocus || menuIsOpen()) return;
+        header.classList.add("is-hidden");
+      }, 3000);
+    };
+
+    const revealAndSchedule = () => {
+      showHeader();
+      scheduleHide();
+    };
+
+    menuBtn.addEventListener(
+      "click",
+      () => {
+        const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
+
+        menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
+        menuBtn.setAttribute("aria-label", openMenu ? openLabel : closeLabel);
+
+        menuItems.classList.toggle("hidden");
+        menuItems.classList.toggle("grid");
+        menuIcon.classList.toggle("hidden");
+        closeIcon.classList.toggle("hidden");
+        revealAndSchedule();
+      },
+      { signal }
+    );
+
+    header.addEventListener(
+      "pointerenter",
+      () => {
+        pointerOverHeader = true;
+        clearHideTimer();
+        showHeader();
+      },
+      { signal }
+    );
+
+    header.addEventListener(
+      "pointerleave",
+      () => {
+        pointerOverHeader = false;
+        scheduleHide();
+      },
+      { signal }
+    );
+
+    header.addEventListener(
+      "focusin",
+      () => {
+        headerHasFocus = true;
+        clearHideTimer();
+        showHeader();
+      },
+      { signal }
+    );
+
+    header.addEventListener(
+      "focusout",
+      () => {
+        headerHasFocus = false;
+        scheduleHide();
+      },
+      { signal }
+    );
+
+    document.addEventListener(
+      "pointermove",
+      event => {
+        if (event.clientY <= 72) revealAndSchedule();
+      },
+      { signal, passive: true }
+    );
+
+    document.addEventListener(
+      "touchstart",
+      event => {
+        if ((event.touches[0]?.clientY ?? 100) <= 72) revealAndSchedule();
+      },
+      { signal, passive: true }
+    );
+
+    document.addEventListener(
+      "scroll",
+      () => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY < lastScrollY - 4 || currentScrollY <= 24) {
+          revealAndSchedule();
+        } else if (currentScrollY > lastScrollY + 4) {
+          scheduleHide();
+        }
+
+        lastScrollY = currentScrollY;
+      },
+      { signal, passive: true }
+    );
+
+    revealAndSchedule();
   }
 
-  toggleNav();
+  setupHeader();
 
-  document.addEventListener("astro:after-swap", toggleNav);
+  document.addEventListener("astro:page-load", setupHeader);
 </script>
