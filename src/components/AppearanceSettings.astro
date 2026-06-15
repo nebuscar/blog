@@ -6,7 +6,6 @@ const config = JSON.stringify(backgroundWallpaper);
 const modes = [
   { value: "banner", label: "横幅壁纸", icon: "▣" },
   { value: "fullscreen", label: "全屏壁纸", icon: "▤" },
-  { value: "overlay", label: "全屏透明", icon: "▧" },
   { value: "none", label: "纯色背景", icon: "□" },
 ];
 ---
@@ -110,6 +109,7 @@ const modes = [
     };
 
     const applyMode = mode => {
+      if (mode === "overlay") mode = "fullscreen";
       root.dataset.wallpaperMode = mode;
       localStorage.setItem("wallpaper-mode", mode);
       modeButtons.forEach(button => {

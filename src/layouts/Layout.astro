@@ -107,7 +107,9 @@ const rssHref = getRelativeLocaleUrl(
         // Expose value so theme.ts can skip re-detection.
         window.__theme = { value: theme };
 
-        const mode = localStorage.getItem("wallpaper-mode") || "banner";
+        const savedMode = localStorage.getItem("wallpaper-mode");
+        const mode =
+          savedMode === "overlay" ? "fullscreen" : savedMode || "banner";
         const hue = localStorage.getItem("theme-hue") || "202";
         root?.setAttribute("data-wallpaper-mode", mode);
         root?.style.setProperty("--user-hue", hue);
@@ -121,11 +123,35 @@ const rssHref = getRelativeLocaleUrl(
   >
     <div id="site-wallpaper" aria-hidden="true"></div>
     <div id="wallpaper-banner-spacer" aria-hidden="true"></div>
+    <button
+      id="wallpaper-scroll-down"
+      type="button"
+      aria-label="向下进入博客内容"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m6 9 6 6 6-6"></path>
+      </svg>
+    </button>
     <slot />
     <MusicPlayer />
     <AppearanceSettings />
     <script>
       import "@/scripts/theme";
+
+      const setupWallpaperScroll = () => {
+        document
+          .querySelector("#wallpaper-scroll-down")
+          ?.addEventListener("click", () => {
+            document
+              .querySelector("#wallpaper-banner-spacer")
+              ?.nextElementSibling?.nextElementSibling?.scrollIntoView({
+                behavior: "smooth",
+              });
+          });
+      };
+
+      setupWallpaperScroll();
+      document.addEventListener("astro:after-swap", setupWallpaperScroll);
     </script>
   </body>
 </html>
