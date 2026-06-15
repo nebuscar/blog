@@ -109,11 +109,7 @@ const rssHref = getRelativeLocaleUrl(
         // Expose value so theme.ts can skip re-detection.
         window.__theme = { value: theme };
 
-        const savedMode = localStorage.getItem("wallpaper-mode");
-        const mode =
-          savedMode === "overlay" ? "fullscreen" : savedMode || "banner";
         const hue = localStorage.getItem("theme-hue") || "202";
-        root?.setAttribute("data-wallpaper-mode", mode);
         root?.style.setProperty("--user-hue", hue);
       })();
     </script>
@@ -125,7 +121,7 @@ const rssHref = getRelativeLocaleUrl(
   >
     <div id="site-wallpaper" aria-hidden="true"></div>
     <Header />
-    <div id="wallpaper-banner-spacer" aria-hidden="true"></div>
+    <div id="wallpaper-spacer" aria-hidden="true"></div>
     <div id="wallpaper-intro">
       <h1>不吃鱼的小天地</h1>
       <p>去码头整点薯条~</p>

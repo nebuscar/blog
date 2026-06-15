@@ -2,12 +2,6 @@
 import { backgroundWallpaper } from "@/config/backgroundWallpaper";
 
 const config = JSON.stringify(backgroundWallpaper);
-
-const modes = [
-  { value: "banner", label: "横幅壁纸", icon: "▣" },
-  { value: "fullscreen", label: "全屏壁纸", icon: "▤" },
-  { value: "none", label: "纯色背景", icon: "□" },
-];
 ---
 
 <button
@@ -58,23 +52,6 @@ const modes = [
     />
   </section>
 
-  <section>
-    <div class="setting-title">
-      <span></span>
-      <strong>壁纸模式</strong>
-    </div>
-    <div class="wallpaper-modes">
-      {
-        modes.map(mode => (
-          <button type="button" data-wallpaper-mode={mode.value}>
-            <b aria-hidden="true">{mode.icon}</b>
-            <span>{mode.label}</span>
-          </button>
-        ))
-      }
-    </div>
-  </section>
-
   <button id="wallpaper-refresh" class="wallpaper-refresh" type="button">
     更换随机壁纸
   </button>
@@ -91,7 +68,6 @@ const modes = [
     const hueSlider = document.querySelector("#hue-slider");
     const hueValue = document.querySelector("#hue-value");
     const refresh = document.querySelector("#wallpaper-refresh");
-    const modeButtons = panel.querySelectorAll("[data-wallpaper-mode]");
 
     const wallpaperUrl = () => {
       const source = window.matchMedia("(max-width: 640px)").matches
@@ -117,19 +93,6 @@ const modes = [
       image.src = sessionStorage.getItem("wallpaper-url");
     };
 
-    const applyMode = mode => {
-      if (mode === "overlay") mode = "fullscreen";
-      root.dataset.wallpaperMode = mode;
-      localStorage.setItem("wallpaper-mode", mode);
-      modeButtons.forEach(button => {
-        button.toggleAttribute(
-          "data-active",
-          button.dataset.wallpaperMode === mode
-        );
-      });
-      if (mode !== "none") applyWallpaper();
-    };
-
     const applyHue = hue => {
       root.style.setProperty("--user-hue", hue);
       hueSlider.value = hue;
@@ -148,14 +111,9 @@ const modes = [
     close.addEventListener("click", () => setPanel(false));
     hueSlider.addEventListener("input", () => applyHue(hueSlider.value));
     refresh.addEventListener("click", () => applyWallpaper(true));
-    modeButtons.forEach(button => {
-      button.addEventListener("click", () =>
-        applyMode(button.dataset.wallpaperMode)
-      );
-    });
 
     applyHue(localStorage.getItem("theme-hue") || String(settings.defaultHue));
-    applyMode(localStorage.getItem("wallpaper-mode") || settings.defaultMode);
+    applyWallpaper();
   })();
 </script>
 
@@ -276,34 +234,11 @@ const modes = [
     box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
   }
 
-  .wallpaper-modes {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-
-  .wallpaper-modes button,
   .wallpaper-refresh {
     border: 1px solid transparent;
     border-radius: 0.55rem;
     color: var(--muted-foreground);
     background: color-mix(in srgb, var(--accent) 7%, var(--background));
-  }
-
-  .wallpaper-modes button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 0.6rem 0.35rem;
-    font-size: 0.78rem;
-  }
-
-  .wallpaper-modes button:hover,
-  .wallpaper-modes button[data-active] {
-    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-    color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 16%, var(--background));
   }
 
   .wallpaper-refresh {
