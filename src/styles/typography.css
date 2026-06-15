@@ -56,7 +56,15 @@
     }
 
     figcaption {
-      @apply opacity-75;
+      @apply mt-2 text-center text-sm opacity-75;
+    }
+
+    figure {
+      @apply my-8;
+
+      img {
+        @apply mb-0;
+      }
     }
 
     table {
