@@ -1,54 +1,67 @@
 ---
-import LinkButton from "@/components/LinkButton.astro";
-import { tplStr, useTranslations } from "@/i18n";
-import config from "@/config";
-
-const { shareLinks } = config;
-const t = useTranslations(Astro.currentLocale);
-
-const icons = import.meta.glob<{
-  default: (_props: Record<string, unknown>) => unknown;
-}>("/src/assets/icons/socials/*.svg");
-
-const pageUrl = Astro.url;
-
-const platformLabel = (name: string) =>
-  name.charAt(0).toUpperCase() + name.slice(1);
-
-const items = await Promise.all(
-  shareLinks.map(async ({ name, url, linkTitle }) => {
-    const mod = await icons[`/src/assets/icons/socials/${name}.svg`]?.();
-    const Icon = mod?.default;
-    const title =
-      linkTitle ??
-      (name === "mail"
-        ? t.post.sharePostViaEmail
-        : tplStr(t.post.sharePostOn, { platform: platformLabel(name) }));
-    return { url, title, Icon };
-  })
-);
+type Props = { title: string };
+const { title } = Astro.props;
 ---
 
-{
-  items.some(({ Icon }) => Icon) && (
-    <div class="flex flex-none flex-col items-center justify-center gap-1 md:items-start">
-      <span class="italic">{t.post.sharePostIntro}</span>
-      <div class="text-center">
-        {items.map(({ url, title, Icon }) =>
-          Icon ? (
-            <LinkButton
-              href={`${url}${pageUrl}`}
-              class="scale-90 p-2 hover:rotate-6 sm:p-1"
-              title={title}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Icon class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" />
-              <span class="sr-only">{title}</span>
-            </LinkButton>
-          ) : null
-        )}
-      </div>
-    </div>
-  )
-}
+<div class="share-actions" data-share-title={title}>
+  <span class="italic">分享文章：</span>
+  <div class="flex flex-wrap gap-2">
+    <button type="button" data-system-share hidden>系统分享</button>
+    <button type="button" data-copy-link>复制链接</button>
+    <span
+      data-copy-status
+      class="text-muted-foreground text-sm"
+      aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+  function setupShareActions() {
+    const root = document.querySelector<HTMLElement>(".share-actions");
+    if (!root) return;
+    const systemShare = root.querySelector<HTMLButtonElement>(
+      "[data-system-share]"
+    );
+    const copyLink = root.querySelector<HTMLButtonElement>("[data-copy-link]");
+    const status = root.querySelector<HTMLElement>("[data-copy-status]");
+    const shareData = {
+      title: root.dataset.shareTitle,
+      url: window.location.href,
+    };
+
+    if (systemShare && navigator.share) {
+      systemShare.hidden = false;
+      systemShare.onclick = () => navigator.share(shareData).catch(() => {});
+    }
+    if (copyLink) {
+      copyLink.onclick = async () => {
+        await navigator.clipboard.writeText(window.location.href);
+        if (status) status.textContent = "已复制";
+        window.setTimeout(() => {
+          if (status) status.textContent = "";
+        }, 1600);
+      };
+    }
+  }
+  setupShareActions();
+  document.addEventListener("astro:page-load", setupShareActions);
+</script>
+
+<style>
+  .share-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  button {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--muted);
+  }
+  button:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+</style>

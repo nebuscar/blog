@@ -9,6 +9,7 @@ import {
 } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createPostSlug } from "../src/utils/postSlug.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -124,6 +125,7 @@ export function syncVault(sourceDir, targetDir) {
   mkdirSync(targetDir, { recursive: true });
 
   const files = walkMarkdown(sourceDir);
+  const redirects = [];
   for (const sourceFile of files) {
     const { data, body } = parseFrontmatter(readFileSync(sourceFile, "utf8"));
     const relativePath = relative(sourceDir, sourceFile);
@@ -139,6 +141,17 @@ export function syncVault(sourceDir, targetDir) {
       data.modDatetime || data.updatedDate || data["date modified"],
       modifiedByGit || pubDatetime
     );
+    const slug = createPostSlug(new Date(pubDatetime), relativePath);
+    const legacySlug = relativePath
+      .replace(/\.md$/i, "")
+      .split(/[\\/]/)
+      .map(segment =>
+        segment.toLowerCase().replace(/[^\p{Letter}\p{Number}-]+/gu, "")
+      )
+      .join("/");
+    redirects.push(
+      `${encodeURI(`/posts/${legacySlug}/`)} /posts/${slug}/ 301`
+    );
     const description =
       typeof data.description === "string" && data.description
         ? data.description
@@ -151,6 +164,8 @@ export function syncVault(sourceDir, targetDir) {
       `description: ${yamlString(description)}`,
       `pubDatetime: ${pubDatetime}`,
       `modDatetime: ${modDatetime}`,
+      `slug: ${slug}`,
+      `legacySlug: ${yamlString(legacySlug)}`,
       ...(tags.length
         ? ["tags:", ...tags.map(tag => `  - ${yamlString(tag)}`)]
         : ["tags: []"]),
@@ -162,6 +177,12 @@ export function syncVault(sourceDir, targetDir) {
     mkdirSync(dirname(targetFile), { recursive: true });
     writeFileSync(targetFile, `${frontmatter}${body.trimStart()}`, "utf8");
   }
+
+  writeFileSync(
+    join(projectRoot, "public", "_redirects.txt"),
+    `${redirects.join("\n")}\n`,
+    "utf8"
+  );
 
   return files.length;
 }

@@ -14,6 +14,18 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import config from "./astro-paper.config";
+import { existsSync, renameSync } from "node:fs";
+
+const cloudflareRedirects = {
+  name: "cloudflare-redirects",
+  hooks: {
+    "astro:build:done": ({ dir }: { dir: URL }) => {
+      const source = new URL("_redirects.txt", dir);
+      const target = new URL("_redirects", dir);
+      if (existsSync(source)) renameSync(source, target);
+    },
+  },
+};
 
 export default defineConfig({
   site: config.site.url,
@@ -23,6 +35,7 @@ export default defineConfig({
       filter: page =>
         config.features?.showArchives !== false || !page.endsWith("/archives/"),
     }),
+    cloudflareRedirects,
   ],
   i18n: {
     locales: ["zh-CN"],

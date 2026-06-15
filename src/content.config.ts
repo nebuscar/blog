@@ -12,6 +12,8 @@ const posts = defineCollection({
       author: z.string().default(config.site.author),
       pubDatetime: z.date(),
       modDatetime: z.date().optional().nullable(),
+      slug: z.string().optional(),
+      legacySlug: z.string().optional(),
       title: z.string(),
       featured: z.boolean().optional(),
       draft: z.boolean().optional(),

@@ -1,4 +1,13 @@
-<section class="waline-comments app-layout" aria-labelledby="comments-title">
+---
+type Props = { commentPath: string };
+const { commentPath } = Astro.props;
+---
+
+<section
+  class="waline-comments app-layout"
+  aria-labelledby="comments-title"
+  data-comment-path={commentPath}
+>
   <hr class="my-8 border-dashed" />
   <h2 id="comments-title" class="mb-6 text-2xl font-bold">评论</h2>
   <div id="waline-comments"></div>
@@ -23,7 +32,8 @@
     walineWindow.__walineInstance = init({
       el: container,
       serverURL: "https://comment.okisama.top",
-      path: window.location.pathname,
+      path: container.closest<HTMLElement>("[data-comment-path]")?.dataset
+        .commentPath,
       lang: "zh-CN",
       dark: "html[data-theme='dark']",
       login: "enable",
