@@ -200,21 +200,23 @@ const config = JSON.stringify(musicPlayerConfig);
       return `${minutes}:${String(remainder).padStart(2, "0")}`;
     };
 
-    const qqUrl = () => {
+    const resourceIds = Array.isArray(settings.id) ? settings.id : [settings.id];
+
+    const qqUrl = (id = resourceIds[0]) => {
       const paths = {
         song: "songDetail",
         playlist: "playlist",
         album: "albumDetail",
         artist: "singer",
       };
-      return `https://y.qq.com/n/ryqq_v2/${paths[settings.type]}/${settings.id}`;
+      return `https://y.qq.com/n/ryqq_v2/${paths[settings.type]}/${id}`;
     };
 
-    const apiUrl = template =>
+    const apiUrl = (template, id) =>
       template
         .replace(":server", settings.server)
         .replace(":type", settings.type)
-        .replace(":id", settings.id)
+        .replace(":id", id)
         .replace(":r", String(Math.random()));
 
     const updateRange = element => {
@@ -310,7 +312,7 @@ const config = JSON.stringify(musicPlayerConfig);
       artist.textContent = track.artist;
       cover.hidden = !track.pic;
       if (track.pic) cover.src = track.pic;
-      source.href = qqUrl();
+      source.href = qqUrl(track.resourceId);
       renderLyrics(track.lrc);
       updateActiveTrack();
       if (shouldPlay) {
@@ -322,28 +324,36 @@ const config = JSON.stringify(musicPlayerConfig);
 
     const fetchPlaylist = async () => {
       status.textContent = "正在加载 QQ 音乐...";
-      for (const template of [settings.api, ...settings.fallbackApis]) {
-        try {
-          const response = await fetch(apiUrl(template));
-          if (!response.ok) continue;
-          const data = await response.json();
-          if (!Array.isArray(data) || !data.length) continue;
-          playlist = data
-            .map(item => ({
-              name: item.title || item.name || "未知歌曲",
-              artist: item.author || item.artist || "未知歌手",
-              url: item.url || "",
-              pic: item.pic || item.cover || "",
-              lrc: item.lrc || item.lyric || "",
-            }))
-            .filter(item => item.url);
-          if (playlist.length) {
-            status.textContent = "";
-            renderPlaylist();
-            loadTrack(0);
-            return;
-          }
-        } catch {}
+      const tracks = [];
+      for (const resourceId of resourceIds) {
+        for (const template of [settings.api, ...settings.fallbackApis]) {
+          try {
+            const response = await fetch(apiUrl(template, resourceId));
+            if (!response.ok) continue;
+            const data = await response.json();
+            if (!Array.isArray(data) || !data.length) continue;
+            tracks.push(
+              ...data
+                .map(item => ({
+                  name: item.title || item.name || "未知歌曲",
+                  artist: item.author || item.artist || "未知歌手",
+                  url: item.url || "",
+                  pic: item.pic || item.cover || "",
+                  lrc: item.lrc || item.lyric || "",
+                  resourceId,
+                }))
+                .filter(item => item.url)
+            );
+            break;
+          } catch {}
+        }
+      }
+      playlist = tracks;
+      if (playlist.length) {
+        status.textContent = "";
+        renderPlaylist();
+        loadTrack(0);
+        return;
       }
       title.textContent = "音乐加载失败";
       artist.textContent = "可前往 QQ 音乐播放";
