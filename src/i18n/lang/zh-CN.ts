@@ -6,6 +6,7 @@ export default {
     posts: "文章",
     tags: "标签",
     about: "关于",
+    guestbook: "留言板",
     archives: "归档",
     search: "搜索",
   },
@@ -48,6 +49,9 @@ export default {
     archivesDesc: "全部归档文章。",
     searchTitle: "搜索",
     searchDesc: "搜索文章",
+
+    guestbookTitle: "留言板",
+    guestbookDesc: "欢迎在这里留言、交流，或告诉我你的想法。",
   },
   a11y: {
     skipToContent: "跳转到正文",

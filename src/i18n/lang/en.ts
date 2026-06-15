@@ -6,6 +6,7 @@ export default {
     posts: "Posts",
     tags: "Tags",
     about: "About",
+    guestbook: "Guestbook",
     archives: "Archives",
     search: "Search",
   },
@@ -52,6 +53,9 @@ export default {
 
     searchTitle: "Search",
     searchDesc: "Search any article ...",
+
+    guestbookTitle: "Guestbook",
+    guestbookDesc: "Leave a message, start a conversation, or share your thoughts.",
   },
   a11y: {
     skipToContent: "Skip to content",

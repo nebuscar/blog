@@ -1,0 +1,49 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import WalineComments from "@/components/WalineComments.astro";
+import Footer from "@/components/Footer.astro";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+const title = t.pages.guestbookTitle;
+const description = t.pages.guestbookDesc;
+const commentPath = "/guestbook/";
+---
+
+<Layout
+  title={`${title} | ${config.site.title}`}
+  description={description}
+>
+  <Breadcrumb />
+
+  <Main pageTitle={title} pageDesc={description}>
+    <section class="guestbook-intro" aria-label="留言板说明">
+      <p>路过这里的话，欢迎留下你的脚印。</p>
+      <p>可以聊聊文章、音乐、生活，也可以提出博客使用建议。</p>
+    </section>
+  </Main>
+
+  <WalineComments {commentPath} />
+  <Footer />
+</Layout>
+
+<style>
+  .guestbook-intro {
+    margin-bottom: 1rem;
+    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+    border-radius: 0.9rem;
+    padding: 1rem 1.1rem;
+    background: color-mix(in srgb, var(--background) 88%, transparent);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 6%);
+    backdrop-filter: blur(12px);
+  }
+
+  .guestbook-intro p + p {
+    margin-top: 0.45rem;
+    color: var(--muted-foreground);
+  }
+</style>
