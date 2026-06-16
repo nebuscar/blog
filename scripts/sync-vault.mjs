@@ -12,11 +12,22 @@ import { fileURLToPath } from "node:url";
 import { createPostSlug } from "../src/utils/postSlug.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const SKIPPED_DIRS = new Set([
+  ".git",
+  ".github",
+  ".obsidian",
+  ".trash",
+  "blog",
+  "node_modules",
+]);
 
 function walkMarkdown(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) return walkMarkdown(path);
+    if (entry.isDirectory()) {
+      if (SKIPPED_DIRS.has(entry.name)) return [];
+      return walkMarkdown(path);
+    }
     return extname(entry.name).toLowerCase() === ".md" ? [path] : [];
   });
 }
@@ -54,9 +65,24 @@ function parseFrontmatter(markdown) {
   return { data, body: markdown.slice(match[0].length) };
 }
 
+function gitRoot(dir) {
+  try {
+    return execFileSync(
+      "git",
+      ["-c", "safe.directory=*", "-C", dir, "rev-parse", "--show-toplevel"],
+      {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }
+    ).trim();
+  } catch {
+    return resolve(dir);
+  }
+}
+
 function gitDate(file, sourceDir, format, reverse = false) {
   try {
-    const repoRoot = resolve(sourceDir, "..");
+    const repoRoot = gitRoot(sourceDir);
     const args = [
       "-c",
       `safe.directory=${repoRoot}`,
@@ -69,12 +95,30 @@ function gitDate(file, sourceDir, format, reverse = false) {
       "--",
       relative(repoRoot, file),
     ];
-    return execFileSync("git", args, { encoding: "utf8" })
+    return execFileSync("git", args, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    })
       .trim()
       .split(/\r?\n/)[0];
   } catch {
     return "";
   }
+}
+
+function isPublishTrue(value) {
+  return value === true || String(value).toLowerCase() === "true";
+}
+
+function isPublicPath(path) {
+  return path.split(/[\\/]/)[0] === "public";
+}
+
+function postRelativePath(sourceDir, sourceFile) {
+  const rawRelativePath = relative(sourceDir, sourceFile);
+  return isPublicPath(rawRelativePath)
+    ? rawRelativePath.replace(/^public[\\/]/, "")
+    : rawRelativePath;
 }
 
 export function normalizeDate(value, fallback) {
@@ -116,19 +160,29 @@ function yamlString(value) {
   return JSON.stringify(String(value));
 }
 
-export function syncVault(sourceDir, targetDir) {
+export function syncVault(
+  sourceDir,
+  targetDir,
+  { redirectsFile = join(projectRoot, "public", "_redirects.txt") } = {}
+) {
+  const vaultRoot = gitRoot(sourceDir);
+
   if (!existsSync(sourceDir)) {
-    throw new Error(`Vault public directory does not exist: ${sourceDir}`);
+    throw new Error(`Vault directory does not exist: ${sourceDir}`);
   }
 
   rmSync(targetDir, { recursive: true, force: true });
   mkdirSync(targetDir, { recursive: true });
 
-  const files = walkMarkdown(sourceDir);
+  const files = walkMarkdown(sourceDir).filter(sourceFile => {
+    const { data } = parseFrontmatter(readFileSync(sourceFile, "utf8"));
+    const relativeToVault = relative(vaultRoot, sourceFile);
+    return isPublicPath(relativeToVault) || isPublishTrue(data.publish);
+  });
   const redirects = [];
   for (const sourceFile of files) {
     const { data, body } = parseFrontmatter(readFileSync(sourceFile, "utf8"));
-    const relativePath = relative(sourceDir, sourceFile);
+    const relativePath = postRelativePath(sourceDir, sourceFile);
     const title = data.title || basename(sourceFile, extname(sourceFile));
     const createdByGit = gitDate(sourceFile, sourceDir, "%aI", true);
     const modifiedByGit = gitDate(sourceFile, sourceDir, "%aI");
@@ -178,11 +232,7 @@ export function syncVault(sourceDir, targetDir) {
     writeFileSync(targetFile, `${frontmatter}${body.trimStart()}`, "utf8");
   }
 
-  writeFileSync(
-    join(projectRoot, "public", "_redirects.txt"),
-    `${redirects.join("\n")}\n`,
-    "utf8"
-  );
+  writeFileSync(redirectsFile, `${redirects.join("\n")}\n`, "utf8");
 
   return files.length;
 }
