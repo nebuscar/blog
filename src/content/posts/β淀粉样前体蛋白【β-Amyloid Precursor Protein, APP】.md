@@ -2,7 +2,7 @@
 title: "β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】"
 description: "阿尔兹海默症是一种常见的痴呆类型，拒《2023 中国阿尔兹海默病数据及防控策略》显示，目前我国约有 1000 万的 AD 患者[^1] [^2] [^3]，随着我国人口老龄化程度加深，发病人数持续增加，社会经济负担日益加重，预计到 2050 年将突破 4000 万，严重影响我国公共健康和社会可持续发展 [^4] 。"
 pubDatetime: 2026-06-16T16:02:36+08:00
-modDatetime: 2026-06-16T16:02:36+08:00
+modDatetime: 2026-06-16T17:41:12+08:00
 slug: 20260616-1602-1veas
 legacySlug: "β淀粉样前体蛋白β-amyloidprecursorproteinapp"
 tags: []
@@ -29,8 +29,8 @@ APP有两种同源蛋白：
 这两个蛋白与APP具有相似的结构和功能
 
 ## 3 APP 的代谢与 Aβ的产生途径
-![file 20260614220043349](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/16/file-20260614220043349.png)
 
+![β淀粉样前体蛋白【β Amyloid Precursor Protein, APP】 2026 06 16 adbfcecf f0e9 41da aabe a3a14bf243da](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/16/β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】_2026-06-16_adbfcecf-f0e9-41da-aabe-a3a14bf243da.png)
 *APP 的代谢与 Aβ的产生途径 。参考图片来源：[^5]】*
 
  [[β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】]] 主要有两条降解途径：
@@ -52,3 +52,4 @@ APP有两种同源蛋白：
 [^3]: [[2026-05-20-中国60岁及以上老年痴呆患者中约1000万人患阿尔茨海默病]]
 [^4]: [[2026-05-20-2023年中国阿尔茨海默病数据与防控策略]]
 [^5]: [[orobetsAmyloidPrecursorProtein2023]]
+
