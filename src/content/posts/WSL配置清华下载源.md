@@ -1,12 +1,11 @@
 ---
-title: "WSL配置清华下载源"
+title: ""
 description: "打开 sources.list："
-pubDatetime: 2026-02-08T09:41:12.000Z
-modDatetime: 2026-04-24T09:41:12.000Z
-slug: 20260208-1741-1n5em
+pubDatetime: 2026-06-16T17:41:12+08:00
+modDatetime: 2026-06-16T17:50:33+08:00
+slug: 20260616-1741-1n5em
 legacySlug: "wsl配置清华下载源"
-tags:
-  - "工具/Linux/WSL"
+tags: []
 ---
 ## WSL 配置清华下载源
 

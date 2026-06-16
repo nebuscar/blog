@@ -1,8 +1,8 @@
 ---
-title: "神经递质【Neurotransmitters】"
+title: ""
 description: "神经元由三个主要结构构成：树突；细胞体；轴突"
 pubDatetime: 2026-06-15T15:25:18+08:00
-modDatetime: 2026-06-15T15:32:04+08:00
+modDatetime: 2026-06-16T17:50:33+08:00
 slug: 20260615-1525-ijdu5
 legacySlug: "神经递质neurotransmitters"
 tags: []

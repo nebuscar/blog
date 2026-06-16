@@ -1,12 +1,11 @@
 ---
-title: "ncbi-genome-download"
+title: ""
 description: "ncbi-genome-download \\"
-pubDatetime: 2026-04-04T09:41:12.000Z
-modDatetime: 2026-04-24T09:41:12.000Z
-slug: 20260404-1741-10ykm
+pubDatetime: 2026-06-16T17:41:12+08:00
+modDatetime: 2026-06-16T17:50:33+08:00
+slug: 20260616-1741-10ykm
 legacySlug: "ncbi-genome-download"
-tags:
-  - "工具/software"
+tags: []
 ---
 ## 1 ncbi-genome-download
 

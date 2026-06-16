@@ -1,8 +1,8 @@
 ---
-title: "HiFi测序"
+title: ""
 description: "PacBio 高保真（High-fidelity, HiFi）测序技术"
 pubDatetime: 2026-06-16T17:41:12+08:00
-modDatetime: 2026-06-16T17:41:12+08:00
+modDatetime: 2026-06-16T17:50:33+08:00
 slug: 20260616-1741-1e798
 legacySlug: "hifi测序"
 tags: []
