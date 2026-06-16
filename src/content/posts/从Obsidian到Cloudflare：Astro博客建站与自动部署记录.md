@@ -1,9 +1,9 @@
 ---
 title: "从Obsidian到Cloudflare：Astro博客建站与自动部署记录"
 description: "记录如何使用 AstroPaper、GitHub Actions 和 Cloudflare Pages，将私有 Obsidian Vault 中的公开笔记自动发布为静态博客。"
-pubDatetime: 2026-06-15T10:33:00.000Z
-modDatetime: 2026-06-16T17:19:00.000Z
-slug: 20260615-1833-1u4qf
+pubDatetime: 2026-06-15T18:33:00.000Z
+modDatetime: 2026-06-17T01:19:00.000Z
+slug: 20260616-0233-1u4qf
 legacySlug: "从obsidian到cloudflareastro博客建站与自动部署记录"
 tags: []
 ---
