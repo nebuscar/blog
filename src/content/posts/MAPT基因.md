@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "MAPT基因"
 description: "17q21.2"
 pubDatetime: 2026-06-16T17:41:12+08:00
-modDatetime: 2026-06-16T17:50:33+08:00
+modDatetime: 2026-06-16T17:53:49+08:00
 slug: 20260616-1741-17vcr
 legacySlug: "mapt基因"
 tags: []

@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "Taxonkit"
 description: "从事生物多样性的研究者对 NCBI Taxonomy 数据库一定不会陌生，它包含了 NCBI 所有核酸和蛋白序列数据库中每条序列对应的物种名称与分类学信息。大多数生态学研究对物种组成的描述都是基于 NCBI Taxonomy 数据库，当然目前也开始使用其他数据库，如 GTDB 等。"
 pubDatetime: 2026-06-16T17:41:12+08:00
-modDatetime: 2026-06-16T17:50:33+08:00
+modDatetime: 2026-06-16T17:53:49+08:00
 slug: 20260616-1741-11bbd
 legacySlug: "taxonkit"
 tags: []

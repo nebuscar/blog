@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "磷酸化【Phosphorylation】"
 description: "磷酸化，是蛋白质翻译后修饰的一种方式；是指在酶的催化下，将 ATP 上的磷酸基团共价连接到特定蛋白质的氨基酸残基上的过程。"
 pubDatetime: 2026-06-16T17:41:12+08:00
-modDatetime: 2026-06-16T17:50:33+08:00
+modDatetime: 2026-06-16T17:53:49+08:00
 slug: 20260616-1741-zxajf
 legacySlug: "磷酸化phosphorylation"
 tags: []

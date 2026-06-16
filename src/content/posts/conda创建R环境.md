@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "conda创建R环境"
 description: "conda create -n r441 -c conda-forge r-base=4.4.1"
 pubDatetime: 2026-06-15T15:32:04+08:00
-modDatetime: 2026-06-16T17:50:33+08:00
+modDatetime: 2026-06-16T17:53:49+08:00
 slug: 20260615-1532-1r3v0
 legacySlug: "conda创建r环境"
 tags: []

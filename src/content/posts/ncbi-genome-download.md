@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "ncbi-genome-download"
 description: "ncbi-genome-download \\"
 pubDatetime: 2026-06-16T17:41:12+08:00
-modDatetime: 2026-06-16T17:50:33+08:00
+modDatetime: 2026-06-16T17:53:49+08:00
 slug: 20260616-1741-10ykm
 legacySlug: "ncbi-genome-download"
 tags: []

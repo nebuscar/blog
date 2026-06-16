@@ -1,15 +1,15 @@
 ---
-title: ""
+title: "WSL配置清华下载源"
 description: "打开 sources.list："
 pubDatetime: 2026-06-16T17:41:12+08:00
-modDatetime: 2026-06-16T17:50:33+08:00
+modDatetime: 2026-06-16T17:53:49+08:00
 slug: 20260616-1741-1n5em
 legacySlug: "wsl配置清华下载源"
 tags: []
 ---
-## WSL 配置清华下载源
+## 1 WSL 配置清华下载源
 
-### 1 彻底替换步骤
+### 1.1 彻底替换步骤
 
 打开 `sources.list`：
 
@@ -33,7 +33,7 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted 
 # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse
 ```
 
-### 2 激活配置
+### 1.2 激活配置
 
 执行以下命令清除旧缓存并重新加载：
 
@@ -42,7 +42,7 @@ sudo apt clean
 sudo apt update
 ```
 
-### 3 测试安装
+### 1.3 测试安装
 
 ```Bash
 sudo apt install aria2

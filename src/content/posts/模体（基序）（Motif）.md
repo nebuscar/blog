@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "模体（基序）（Motif）"
 description: "motif是什么"
 pubDatetime: 2026-06-16T17:41:12+08:00
-modDatetime: 2026-06-16T17:50:33+08:00
+modDatetime: 2026-06-16T17:53:49+08:00
 slug: 20260616-1741-x80ve
 legacySlug: "模体基序motif"
 tags: []
