@@ -1,0 +1,76 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = {
+  mode?: "site" | "page";
+} & HTMLAttributes<"span">;
+
+const { mode = "site", class: className, ...attrs } = Astro.props;
+---
+
+<span
+  class:list={["visitor-stats", className]}
+  data-visitor-stats
+  data-stats-mode={mode}
+  aria-live="polite"
+  {...attrs}
+>
+  <span data-stats-content>统计加载中...</span>
+</span>
+
+<script is:inline data-astro-rerun>
+  (() => {
+    const API_BASE = "https://status.okisama.top";
+    const state = (window.__blogVisitorStats ??= {
+      requests: new Map(),
+    });
+
+    const recordView = path => {
+      if (!state.requests.has(path)) {
+        state.requests.set(
+          path,
+          fetch(`${API_BASE}/api/view`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ path }),
+          }).then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+          })
+        );
+      }
+      return state.requests.get(path);
+    };
+
+    const renderStats = async () => {
+      const elements = document.querySelectorAll("[data-visitor-stats]");
+      if (!elements.length) return;
+
+      try {
+        const stats = await recordView(window.location.pathname);
+        for (const element of elements) {
+          const content = element.querySelector("[data-stats-content]");
+          if (!content) continue;
+          content.textContent =
+            element.dataset.statsMode === "page"
+              ? `阅读 ${stats.pageViews} · 读者 ${stats.pageVisitors}`
+              : `访问 ${stats.siteViews} · 访客 ${stats.siteVisitors}`;
+        }
+      } catch {
+        for (const element of elements) {
+          element.setAttribute("hidden", "");
+        }
+      }
+    };
+
+    renderStats();
+  })();
+</script>
+
+<style>
+  .visitor-stats {
+    color: var(--muted-foreground);
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+</style>

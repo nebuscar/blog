@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import Socials from "./Socials.astro";
+import VisitorStats from "./VisitorStats.astro";
 import { useTranslations } from "@/i18n";
 
 type Props = {
@@ -57,6 +58,7 @@ const technologyBadges = [
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <span>{t.footer.allRightsReserved}</span>
     </div>
+    <VisitorStats mode="site" />
     <div class="technology-badges" aria-label="博客使用的技术">
       {
         technologyBadges.map(badge => (

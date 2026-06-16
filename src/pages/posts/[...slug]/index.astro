@@ -3,6 +3,7 @@ import { type CollectionEntry, getCollection, render } from "astro:content";
 import PostLayout from "@/layouts/PostLayout.astro";
 import Footer from "@/components/Footer.astro";
 import WalineComments from "@/components/WalineComments.astro";
+import VisitorStats from "@/components/VisitorStats.astro";
 import Datetime from "@/components/Datetime.astro";
 import Tag from "@/components/Tag.astro";
 import {
@@ -140,6 +141,8 @@ const commentPath = `${getLegacyPostUrl(
 
     <div class="my-2 flex items-center gap-2">
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+      <span aria-hidden="true" class="text-muted-foreground">|</span>
+      <VisitorStats mode="page" />
       <span
         aria-hidden="true"
         class:list={[
