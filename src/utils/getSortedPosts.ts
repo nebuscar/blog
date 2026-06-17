@@ -16,3 +16,16 @@ export function getSortedPosts(posts: CollectionEntry<"posts">[]) {
     return timeDifference || a.data.title.localeCompare(b.data.title, "zh-CN");
   });
 }
+
+/**
+ * Returns visible posts sorted by original publish time descending.
+ */
+export function getPostsByPublishedDate(posts: CollectionEntry<"posts">[]) {
+  return posts.filter(postFilter).sort((a, b) => {
+    const timeDifference =
+      new Date(b.data.pubDatetime).getTime() -
+      new Date(a.data.pubDatetime).getTime();
+
+    return timeDifference || a.data.title.localeCompare(b.data.title, "zh-CN");
+  });
+}
