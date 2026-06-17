@@ -1,5 +1,11 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -26,7 +32,7 @@ test("keeps the configured day while borrowing the Git timestamp time", () => {
   );
 });
 
-test("publishes public notes and notes marked with publish true", () => {
+test("publishes only notes marked with publish true", () => {
   const root = mkdtempSync(join(tmpdir(), "vault-sync-"));
   const target = join(root, "blog", "src", "content", "posts");
 
@@ -71,12 +77,15 @@ test("publishes public notes and notes marked with publish true", () => {
 
   assert.equal(
     syncVault(root, target, { redirectsFile: join(root, "_redirects.txt") }),
-    2
+    1
   );
-  assert.ok(existsSync(join(target, "Public Note.md")));
+  assert.equal(existsSync(join(target, "Public Note.md")), false);
   assert.ok(existsSync(join(target, "notes", "Published Note.md")));
   assert.equal(existsSync(join(target, "private", "Private Note.md")), false);
 
-  const publicPost = readFileSync(join(target, "Public Note.md"), "utf8");
-  assert.match(publicPost, /legacySlug: "publicnote"/);
+  const publishedPost = readFileSync(
+    join(target, "notes", "Published Note.md"),
+    "utf8"
+  );
+  assert.match(publishedPost, /legacySlug: "notes\/publishednote"/);
 });

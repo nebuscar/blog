@@ -165,8 +165,6 @@ export function syncVault(
   targetDir,
   { redirectsFile = join(projectRoot, "public", "_redirects.txt") } = {}
 ) {
-  const vaultRoot = gitRoot(sourceDir);
-
   if (!existsSync(sourceDir)) {
     throw new Error(`Vault directory does not exist: ${sourceDir}`);
   }
@@ -176,8 +174,7 @@ export function syncVault(
 
   const files = walkMarkdown(sourceDir).filter(sourceFile => {
     const { data } = parseFrontmatter(readFileSync(sourceFile, "utf8"));
-    const relativeToVault = relative(vaultRoot, sourceFile);
-    return isPublicPath(relativeToVault) || isPublishTrue(data.publish);
+    return isPublishTrue(data.publish);
   });
   const redirects = [];
   for (const sourceFile of files) {
@@ -239,7 +236,7 @@ export function syncVault(
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const sourceDir = resolve(
-    process.argv[2] ?? join(projectRoot, "..", "vault", "public")
+    process.argv[2] ?? join(projectRoot, "..", "vault")
   );
   const targetDir = resolve(
     process.argv[3] ?? join(projectRoot, "src", "content", "posts")
