@@ -30,7 +30,7 @@ APP有两种同源蛋白：
 
 ## 3 APP 的代谢与 Aβ的产生途径
 
-![β淀粉样前体蛋白【β Amyloid Precursor Protein, APP】 2026 06 16 adbfcecf f0e9 41da aabe a3a14bf243da](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/16/β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】_2026-06-16_adbfcecf-f0e9-41da-aabe-a3a14bf243da.png)
+![β淀粉样前体蛋白【β Amyloid Precursor Protein, APP】 2026 06 16 adbfcecf f0e9 41da aabe a3a14bf243da](<https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/16/β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】_2026-06-16_adbfcecf-f0e9-41da-aabe-a3a14bf243da.png>)
 *APP 的代谢与 Aβ的产生途径 。参考图片来源：[^5]】*
 
  [[β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】]] 主要有两条降解途径：
