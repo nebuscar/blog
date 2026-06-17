@@ -27,17 +27,21 @@ const {
 
 const t = useTranslations(Astro.currentLocale);
 
-const isModified = modDatetime && modDatetime > pubDatetime;
+const siteTimezone = postTimezone ?? config.site.timezone;
+const publishedDatetime = dayjs(pubDatetime).tz(siteTimezone);
+const updatedDatetime = modDatetime ? dayjs(modDatetime).tz(siteTimezone) : null;
+const isModified =
+  updatedDatetime && updatedDatetime.valueOf() > publishedDatetime.valueOf();
 
-const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
-  postTimezone ?? config.site.timezone
-);
-
-const date = datetime.format("YYYY-MM-DD HH:mm");
+const publishedDate = publishedDatetime.format("YYYY-MM-DD HH:mm");
+const updatedDate = updatedDatetime?.format("YYYY-MM-DD HH:mm");
 ---
 
 <div
-  class:list={["text-muted-foreground flex items-center gap-x-2", className]}
+  class:list={[
+    "text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1",
+    className,
+  ]}
 >
   <IconCalendar
     class:list={[
@@ -45,17 +49,31 @@ const date = datetime.format("YYYY-MM-DD HH:mm");
       { "scale-90": size === "sm" },
     ]}
   />
-  {
-    isModified && (
-      <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
-        {t.post.updatedAt}:
-      </span>
-    )
-  }
+  <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
+    {t.post.publishedAt}:
+  </span>
   <time
     class:list={["text-sm", { "sm:text-base": size === "lg" }]}
-    datetime={datetime.toISOString()}
+    datetime={publishedDatetime.toISOString()}
   >
-    {date}
+    {publishedDate}
   </time>
+  {
+    isModified && (
+      <>
+        <span aria-hidden="true" class="text-sm">
+          ·
+        </span>
+        <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
+          {t.post.updatedAt}:
+        </span>
+        <time
+          class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+          datetime={updatedDatetime.toISOString()}
+        >
+          {updatedDate}
+        </time>
+      </>
+    )
+  }
 </div>
