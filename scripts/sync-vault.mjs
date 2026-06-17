@@ -121,6 +121,19 @@ function postRelativePath(sourceDir, sourceFile) {
     : rawRelativePath;
 }
 
+function normalizeObsidianLocalDate(value) {
+  const match = String(value).match(
+    /^(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?$/
+  );
+  if (!match) return "";
+
+  const [, date, hour, minute, second = "00"] = match;
+  const parsed = new Date(
+    `${date}T${hour.padStart(2, "0")}:${minute}:${second.padStart(2, "0")}+08:00`
+  );
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString();
+}
+
 export function normalizeDate(value, fallback) {
   if (!value || Array.isArray(value)) return fallback;
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -132,6 +145,9 @@ export function normalizeDate(value, fallback) {
       if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
     }
   }
+  const obsidianLocalDate = normalizeObsidianLocalDate(value);
+  if (obsidianLocalDate) return obsidianLocalDate;
+
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? fallback : parsed.toISOString();
 }

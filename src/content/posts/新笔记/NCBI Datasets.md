@@ -1,9 +1,9 @@
 ---
 title: "NCBI Datasets"
 description: "NCBI Datasets 是一个资源，可以让你轻松收集来自各个 NCBI 数据库的数据。您可以使用我们的命令行界面（CLI）工具或 NCBI Datasets Web 界面，查找并下载基因和基因组的序列、注释及元数据。"
-pubDatetime: 2026-06-11T19:04:00.000Z
-modDatetime: 2026-06-17T10:48:00.000Z
-slug: 20260612-0304-y7i74
+pubDatetime: 2026-06-11T11:04:00.000Z
+modDatetime: 2026-06-17T02:48:00.000Z
+slug: 20260611-1904-nh06d
 legacySlug: "新笔记/ncbidatasets"
 tags: []
 ---

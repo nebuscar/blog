@@ -32,6 +32,13 @@ test("keeps the configured day while borrowing the Git timestamp time", () => {
   );
 });
 
+test("treats Obsidian local date-times as Asia Shanghai time", () => {
+  assert.equal(
+    normalizeDate("2026-06-17 16:36", "2026-06-17T08:30:00.000Z"),
+    "2026-06-17T08:36:00.000Z"
+  );
+});
+
 test("publishes only notes marked with publish true", () => {
   const root = mkdtempSync(join(tmpdir(), "vault-sync-"));
   const target = join(root, "blog", "src", "content", "posts");
