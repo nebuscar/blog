@@ -29,6 +29,7 @@ const t = useTranslations(locale);
       aria-label="Post side navigation"
       class="pointer-events-none fixed inset-x-0 top-1/2 z-40 hidden -translate-y-1/2 xl:block"
     >
+      <div class="relative mx-auto max-w-[60rem]">
       {prevPost && (
         <a
           href={getPostUrl(
@@ -39,7 +40,7 @@ const t = useTranslations(locale);
           )}
           aria-label={`${t.post.previousPost}: ${prevPost.title}`}
           title={prevPost.title}
-          class="group pointer-events-auto absolute start-4 flex items-center gap-3 no-underline"
+          class="group pointer-events-auto absolute start-0 flex -translate-x-20 items-center gap-3 no-underline"
         >
           <span class="bg-background/80 text-muted-foreground group-hover:text-accent group-focus-visible:text-accent border-border/60 flex size-11 items-center justify-center rounded-full border shadow-lg backdrop-blur transition">
             <IconArrowLeft class="size-5 rtl:rotate-180" />
@@ -63,7 +64,7 @@ const t = useTranslations(locale);
           )}
           aria-label={`${t.post.nextPost}: ${nextPost.title}`}
           title={nextPost.title}
-          class="group pointer-events-auto absolute end-4 flex items-center gap-3 no-underline"
+          class="group pointer-events-auto absolute end-0 flex translate-x-20 items-center gap-3 no-underline"
         >
           <span class="bg-background/90 text-foreground border-border/60 max-w-64 -translate-x-2 rounded-md border px-3 py-2 text-sm leading-snug opacity-0 shadow-lg backdrop-blur transition group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 rtl:translate-x-2 rtl:group-hover:translate-x-0 rtl:group-focus-visible:translate-x-0">
             <span class="text-muted-foreground block text-xs">
@@ -76,6 +77,7 @@ const t = useTranslations(locale);
           </span>
         </a>
       )}
+      </div>
     </nav>
   )
 }
