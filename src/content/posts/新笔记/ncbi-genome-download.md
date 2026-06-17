@@ -3,7 +3,7 @@ title: "ncbi-genome-download"
 description: "ncbi-genome-download \\"
 pubDatetime: 2026-06-11T11:05:00.000Z
 modDatetime: 2026-06-17T02:48:00.000Z
-slug: 20260611-1905-1hz0y
+slug: 20260611-1905-rkles
 legacySlug: "新笔记/ncbi-genome-download"
 tags: []
 ---

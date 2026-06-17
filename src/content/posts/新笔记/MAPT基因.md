@@ -3,7 +3,7 @@ title: "MAPT基因"
 description: "17q21.2"
 pubDatetime: 2026-06-11T11:04:00.000Z
 modDatetime: 2026-06-17T02:48:00.000Z
-slug: 20260611-1904-11ah9
+slug: 20260611-1904-9e94n
 legacySlug: "新笔记/mapt基因"
 tags: []
 ---
