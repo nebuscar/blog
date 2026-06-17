@@ -34,6 +34,44 @@ const nextMeaningfulIndex = (children, start) => {
   return -1;
 };
 
+const firstImageCaptionPair = children => {
+  for (let index = 0; index < children.length; index += 1) {
+    const image = children[index];
+    if (image?.type !== "element" || image.tagName !== "img") continue;
+
+    const captionIndex = nextMeaningfulIndex(children, index + 1);
+    const caption = children[captionIndex];
+    if (caption?.type === "element" && caption.tagName === "em") {
+      return { imageIndex: index, captionIndex, image, caption };
+    }
+  }
+};
+
+const paragraph = children => ({
+  type: "element",
+  tagName: "p",
+  properties: {},
+  children,
+});
+
+const createFigure = (image, caption, figureNumber) => ({
+  type: "element",
+  tagName: "figure",
+  properties: {},
+  children: [
+    image,
+    {
+      type: "element",
+      tagName: "figcaption",
+      properties: {},
+      children: [
+        { type: "text", value: `图 ${figureNumber}：` },
+        ...caption.children,
+      ],
+    },
+  ],
+});
+
 export default function rehypeAutoFigure() {
   return tree => {
     let figureNumber = 0;
@@ -51,25 +89,38 @@ export default function rehypeAutoFigure() {
 
         if (image && caption) {
           figureNumber += 1;
-          const figure = {
-            type: "element",
-            tagName: "figure",
-            properties: {},
-            children: [
-              image,
-              {
-                type: "element",
-                tagName: "figcaption",
-                properties: {},
-                children: [
-                  { type: "text", value: `图 ${figureNumber}：` },
-                  ...caption.children,
-                ],
-              },
-            ],
-          };
+          const figure = createFigure(image, caption, figureNumber);
 
           parent.children.splice(index, captionIndex - index + 1, figure);
+          continue;
+        }
+
+        const node = parent.children[index];
+        const inlinePair =
+          node?.type === "element" && node.tagName === "p"
+            ? firstImageCaptionPair(node.children ?? [])
+            : undefined;
+
+        if (inlinePair) {
+          figureNumber += 1;
+          const before = node.children.slice(0, inlinePair.imageIndex);
+          const after = node.children.slice(inlinePair.captionIndex + 1);
+          const replacement = [];
+
+          if (meaningfulChildren({ children: before }).length > 0) {
+            replacement.push(paragraph(before));
+          }
+
+          replacement.push(
+            createFigure(inlinePair.image, inlinePair.caption, figureNumber)
+          );
+
+          if (meaningfulChildren({ children: after }).length > 0) {
+            replacement.push(paragraph(after));
+          }
+
+          parent.children.splice(index, 1, ...replacement);
+          index += replacement.length - 1;
           continue;
         }
 

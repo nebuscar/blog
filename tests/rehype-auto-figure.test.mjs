@@ -32,6 +32,20 @@ const captionParagraph = children => ({
 
 const text = value => ({ type: "text", value });
 
+const image = (alt, src) => ({
+  type: "element",
+  tagName: "img",
+  properties: { alt, src },
+  children: [],
+});
+
+const emphasis = children => ({
+  type: "element",
+  tagName: "em",
+  properties: {},
+  children,
+});
+
 const transform = children => {
   const tree = { type: "root", children };
   rehypeAutoFigure()(tree);
@@ -85,4 +99,27 @@ test("preserves inline formatting inside captions", () => {
 
   assert.equal(tree.children[0].children[1].tagName, "figcaption");
   assert.equal(tree.children[0].children[1].children[2], link);
+});
+
+test("wraps image and italic caption when they are in the same paragraph", () => {
+  const tree = transform([
+    {
+      type: "element",
+      tagName: "p",
+      properties: {},
+      children: [
+        text("Intro text."),
+        image("sample", "https://example.com/sample.png"),
+        text("\n"),
+        emphasis([text("Inline caption")]),
+      ],
+    },
+  ]);
+
+  assert.deepEqual(
+    tree.children.map(node => node.tagName),
+    ["p", "figure"]
+  );
+  assert.equal(tree.children[1].children[1].tagName, "figcaption");
+  assert.equal(tree.children[1].children[1].children[1].value, "Inline caption");
 });
