@@ -1,6 +1,6 @@
 ---
 title: "小胶质细胞（Microglia）"
-description: "脑内免疫细胞"
+description: "神经系统免疫细胞"
 pubDatetime: 2026-06-16T07:48:00.000Z
 modDatetime: 2026-06-17T18:14:00.000Z
 slug: 20260616-1548-cg4j1
