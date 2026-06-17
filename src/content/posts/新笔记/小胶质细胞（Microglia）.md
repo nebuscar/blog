@@ -1,8 +1,8 @@
 ---
 title: "小胶质细胞（Microglia）"
-description: "神经系统免疫细胞"
+description: "<font color=\"ffc000\"小胶质细胞</font，又称为<font color=\"ffc000\"微胶细胞</font，是一种存在于脑和脊髓中的神经胶质细胞，约占脑细胞数量的 10%-15%。"
 pubDatetime: 2026-06-16T07:48:00.000Z
-modDatetime: 2026-06-17T18:14:00.000Z
+modDatetime: 2026-06-17T20:48:00.000Z
 slug: 20260616-1548-cg4j1
 legacySlug: "新笔记/小胶质细胞microglia"
 tags: []
