@@ -3,8 +3,8 @@ title: "β-淀粉样蛋白【Aβ】"
 description: "β-淀粉样蛋白，是由 β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】 经过"
 pubDatetime: 2026-06-11T19:03:00.000Z
 modDatetime: 2026-06-17T10:49:00.000Z
-slug: 20260612-0303-11gxf
-legacySlug: "β-淀粉样蛋白aβ"
+slug: 20260612-0303-1h8lx
+legacySlug: "新笔记/β-淀粉样蛋白aβ"
 tags: []
 ---
 ## 1 简介

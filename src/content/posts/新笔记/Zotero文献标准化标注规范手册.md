@@ -3,8 +3,8 @@ title: "Zotero文献标准化标注规范手册"
 description: "建立永久不变的六色标注体系，统一视觉逻辑、检索标签、笔记模板、阅读工作流，"
 pubDatetime: 2026-06-11T19:05:00.000Z
 modDatetime: 2026-06-17T10:49:00.000Z
-slug: 20260612-0305-1ipm7
-legacySlug: "zotero文献标准化标注规范手册"
+slug: 20260612-0305-18wo2
+legacySlug: "新笔记/zotero文献标准化标注规范手册"
 tags: []
 ---
 ## 1 核心原则：固定颜色 + 统一标签 + 结构化笔记

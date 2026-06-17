@@ -3,8 +3,8 @@ title: "conda创建R环境"
 description: "conda create -n r441 -c conda-forge r-base=4.4.1"
 pubDatetime: 2026-06-11T19:05:00.000Z
 modDatetime: 2026-06-17T10:48:00.000Z
-slug: 20260612-0305-1r3v0
-legacySlug: "conda创建r环境"
+slug: 20260612-0305-1402d
+legacySlug: "新笔记/conda创建r环境"
 tags: []
 ---
 ## 1 创建环境 + 安装 R-base

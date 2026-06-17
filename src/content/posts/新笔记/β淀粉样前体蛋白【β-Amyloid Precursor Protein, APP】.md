@@ -3,8 +3,8 @@ title: "β淀粉样前体蛋白【β-Amyloid Precursor Protein, APP】"
 description: "阿尔兹海默症是一种常见的痴呆类型，拒《2023 中国阿尔兹海默病数据及防控策略》显示，目前我国约有 1000 万的 AD 患者[^1] [^2] [^3]，随着我国人口老龄化程度加深，发病人数持续增加，社会经济负担日益加重，预计到 2050 年将突破 4000 万，严重影响我国公共健康和社会可持续发展 [^4] 。"
 pubDatetime: 2026-06-11T19:06:00.000Z
 modDatetime: 2026-06-17T10:49:00.000Z
-slug: 20260612-0306-1veas
-legacySlug: "β淀粉样前体蛋白β-amyloidprecursorproteinapp"
+slug: 20260612-0306-xrbuo
+legacySlug: "新笔记/β淀粉样前体蛋白β-amyloidprecursorproteinapp"
 tags: []
 ---
 ## 1 背景
