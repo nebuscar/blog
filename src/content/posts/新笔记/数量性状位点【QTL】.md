@@ -1,8 +1,8 @@
 ---
 title: "数量性状位点【QTL】"
-description: "<font color=\"ffc000\"数量性状位点（Quantitative trait locus, QTL）</font是指与某个群体中生物体表型数量性状变异相关的一个基因组位点，也就是一段 DNA 区域。QTL 定位通常识别哪些分子标记，例如 SNP 或 AFLP，与观察到的性状相关来完成。这通常是寻找真正导致"
+description: "QTL"
 pubDatetime: 2026-06-18T16:18:00.000Z
-modDatetime: 2026-06-19T04:10:16+08:00
+modDatetime: 2026-06-19T04:29:19+08:00
 slug: 20260619-0018-buve7
 legacySlug: "新笔记/数量性状位点qtl"
 tags: []

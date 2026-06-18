@@ -1,8 +1,8 @@
 ---
-title: "连锁不平衡"
+title: "连锁不平衡【LD】"
 description: "Linkage disequilibrium, LD"
 pubDatetime: 2026-06-18T19:15:00.000Z
-modDatetime: 2026-06-19T04:10:01+08:00
+modDatetime: 2026-06-19T04:29:19+08:00
 slug: 20260619-0315-1uw94
 legacySlug: "新笔记/连锁不平衡ld"
 tags: []

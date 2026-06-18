@@ -1,8 +1,8 @@
 ---
-title: "队列研究【Cohort Study】"
-description: "队列研究是探讨疾病病因的常用方法之一，能够较好地揭示两个事件之间客观存在的因果关系。"
+title: "队列研究【Cohort study】"
+description: "Corhort study"
 pubDatetime: 2026-06-18T15:07:00.000Z
-modDatetime: 2026-06-18T23:44:45+08:00
+modDatetime: 2026-06-19T04:29:19+08:00
 slug: 20260618-2307-g5yny
 legacySlug: "新笔记/队列研究cohortstudy"
 tags: []
