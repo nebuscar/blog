@@ -196,6 +196,7 @@ const config = JSON.stringify(musicPlayerConfig);
     let currentIndex = 0;
     let lyricLines = [];
     let activeLyricIndex = -1;
+    let hasPlaybackStarted = false;
     let playMode = localStorage.getItem("music-play-mode") || "sequence";
     const playModes = ["single", "shuffle", "sequence", "list-loop"];
     const playModeLabels = {
@@ -368,7 +369,7 @@ const config = JSON.stringify(musicPlayerConfig);
         trackArtist.textContent = track.artist;
         text.append(name, trackArtist);
         button.append(artwork, text);
-        button.addEventListener("click", () => loadTrack(index, true));
+        button.addEventListener("click", () => loadTrack(index, !audio.paused));
         item.append(button);
         playlistElement.append(item);
       });
@@ -382,6 +383,13 @@ const config = JSON.stringify(musicPlayerConfig);
       playlistElement
         .querySelector("button[data-active]")
         ?.scrollIntoView({ block: "nearest" });
+    };
+
+    const startPlayback = () => {
+      hasPlaybackStarted = true;
+      return audio.play().catch(() => {
+        status.textContent = "请点击播放按钮开始音乐。";
+      });
     };
 
     const loadTrack = (index, shouldPlay = false) => {
@@ -399,11 +407,7 @@ const config = JSON.stringify(musicPlayerConfig);
       source.href = qqUrl(track.resourceId);
       renderLyrics(track.lrc);
       updateActiveTrack();
-      if (shouldPlay) {
-        audio.play().catch(() => {
-          status.textContent = "浏览器阻止了播放，请再次点击播放。";
-        });
-      }
+      if (shouldPlay && hasPlaybackStarted) startPlayback();
     };
 
     const fetchPlaylist = async () => {
@@ -445,16 +449,16 @@ const config = JSON.stringify(musicPlayerConfig);
     };
 
     play.addEventListener("click", () => {
-      if (audio.paused) audio.play().catch(() => {});
+      if (audio.paused) startPlayback();
       else audio.pause();
     });
     playerToggle.addEventListener("click", () => {
       setCollapsed(!player.hasAttribute("data-collapsed"));
     });
-    prev.addEventListener("click", () => loadTrack(currentIndex - 1, true));
+    prev.addEventListener("click", () => loadTrack(currentIndex - 1, !audio.paused));
     next.addEventListener("click", () => {
       const nextIndex = playMode === "shuffle" ? randomTrackIndex() : currentIndex + 1;
-      loadTrack(nextIndex, true);
+      loadTrack(nextIndex, !audio.paused);
     });
     loop.addEventListener("click", () => {
       const currentModeIndex = playModes.indexOf(playMode);
@@ -501,6 +505,7 @@ const config = JSON.stringify(musicPlayerConfig);
       play.setAttribute("aria-label", "播放");
     });
     audio.addEventListener("ended", () => {
+      if (!hasPlaybackStarted) return;
       const nextIndex = nextTrackIndex();
       if (nextIndex === null) {
         status.textContent = "顺序播放已结束";
