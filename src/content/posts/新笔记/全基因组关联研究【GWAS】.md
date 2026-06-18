@@ -1,9 +1,9 @@
 ---
-title: "未命名"
+title: "全基因组关联研究【GWAS】"
 description: "<font color=\"ffc000\"全基因关联研究</font（Genome-wide association studies, GWAS）是一种 用于识别遗传区域（基因组）和性状/疾病之间关联的方法。"
-pubDatetime: 2026-06-18T15:07:00.000Z
-modDatetime: 2026-06-18T23:38:04+08:00
-slug: 20260618-2307-ltycp
+pubDatetime: 2026-06-18T12:51:00.000Z
+modDatetime: 2026-06-18T23:44:25+08:00
+slug: 20260618-2051-ltycp
 legacySlug: "新笔记/全基因组关联研究gwas"
 tags: []
 ---
