@@ -164,3 +164,59 @@ test("uses Git modified time instead of Obsidian update fields", () => {
   assert.match(publishedPost, /modDatetime: 2026-06-18T09:30:00\+08:00/);
   assert.doesNotMatch(publishedPost, /2099-01-01/);
 });
+
+test("keeps a configured cover image", () => {
+  const root = mkdtempSync(join(tmpdir(), "vault-sync-cover-"));
+  const target = join(root, "blog", "src", "content", "posts");
+
+  writeFileSync(
+    join(root, "Cover Note.md"),
+    [
+      "---",
+      "title: Cover Note",
+      "publish: true",
+      "pubDatetime: 2026-06-18T10:00:00+08:00",
+      "cover: https://example.com/manual-cover.png",
+      "---",
+      "",
+      "![First image](https://example.com/first-image.png)",
+    ].join("\n")
+  );
+
+  syncVault(root, target, { redirectsFile: join(root, "_redirects.txt") });
+
+  const publishedPost = readFileSync(join(target, "Cover Note.md"), "utf8");
+  assert.match(publishedPost, /cover: "https:\/\/example.com\/manual-cover.png"/);
+  assert.doesNotMatch(publishedPost, /cover: "https:\/\/example.com\/first-image.png"/);
+});
+
+test("uses the first Markdown image as cover when cover is not configured", () => {
+  const root = mkdtempSync(join(tmpdir(), "vault-sync-auto-cover-"));
+  const target = join(root, "blog", "src", "content", "posts");
+
+  writeFileSync(
+    join(root, "Auto Cover Note.md"),
+    [
+      "---",
+      "title: Auto Cover Note",
+      "publish: true",
+      "pubDatetime: 2026-06-18T10:00:00+08:00",
+      "---",
+      "",
+      "Intro paragraph.",
+      "",
+      "![First image](https://example.com/first-image.png)",
+      "",
+      "![Second image](https://example.com/second-image.png)",
+    ].join("\n")
+  );
+
+  syncVault(root, target, { redirectsFile: join(root, "_redirects.txt") });
+
+  const publishedPost = readFileSync(
+    join(target, "Auto Cover Note.md"),
+    "utf8"
+  );
+  assert.match(publishedPost, /cover: "https:\/\/example.com\/first-image.png"/);
+  assert.doesNotMatch(publishedPost, /cover: "https:\/\/example.com\/second-image.png"/);
+});

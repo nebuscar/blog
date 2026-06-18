@@ -76,6 +76,7 @@ const {
   title,
   description,
   ogImage: initOgImage,
+  cover: initCover,
   canonicalURL: configuredCanonicalURL,
   pubDatetime,
   modDatetime,
@@ -87,12 +88,21 @@ const {
 const { Content } = await render(post);
 
 let ogImageUrl: string | undefined;
+let coverUrl: string | undefined;
+
+if (typeof initCover === "string") {
+  coverUrl = initCover;
+} else if (initCover?.src) {
+  coverUrl = initCover.src;
+}
 
 if (typeof initOgImage === "string") {
   ogImageUrl = initOgImage;
 } else if (initOgImage?.src) {
   ogImageUrl = initOgImage.src;
 }
+
+ogImageUrl ??= coverUrl;
 
 if (!ogImageUrl && config.features.dynamicOgImage) {
   const postUrl = getPostUrl(
@@ -156,6 +166,20 @@ const commentPath = `${getLegacyPostUrl(
       </span>
       <EditPost {hideEditPost} {post} class="max-sm:hidden" />
     </div>
+
+    {
+      coverUrl && (
+        <figure class="mt-8 max-w-app overflow-hidden rounded-3xl border border-border/60 bg-background/60 shadow-lg">
+          <img
+            src={coverUrl}
+            alt={`${title} 封面图`}
+            class="aspect-video w-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        </figure>
+      )
+    }
 
     <article
       id="article"

@@ -176,6 +176,11 @@ function yamlString(value) {
   return JSON.stringify(String(value));
 }
 
+function firstMarkdownImageUrl(body) {
+  const match = body.match(/!\[[^\]]*]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/);
+  return match?.[1] ?? "";
+}
+
 export function syncVault(
   sourceDir,
   targetDir,
@@ -218,6 +223,10 @@ export function syncVault(
         ? data.description
         : makeDescription(body, title);
     const tags = Array.isArray(data.tags) ? data.tags : [];
+    const cover =
+      typeof data.cover === "string" && data.cover
+        ? data.cover
+        : firstMarkdownImageUrl(body);
 
     const frontmatter = [
       "---",
@@ -227,6 +236,7 @@ export function syncVault(
       `modDatetime: ${modDatetime}`,
       `slug: ${slug}`,
       `legacySlug: ${yamlString(legacySlug)}`,
+      ...(cover ? [`cover: ${yamlString(cover)}`] : []),
       ...(tags.length
         ? ["tags:", ...tags.map(tag => `  - ${yamlString(tag)}`)]
         : ["tags: []"]),
