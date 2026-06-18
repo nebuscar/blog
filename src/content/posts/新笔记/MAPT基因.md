@@ -5,6 +5,7 @@ pubDatetime: 2026-06-11T11:04:00.000Z
 modDatetime: 2026-06-18T15:46:26+08:00
 slug: 20260611-1904-9e94n
 legacySlug: "新笔记/mapt基因"
+cover: "https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/16/MAPT基因_2026-06-16_404604ac-4960-4330-b8b5-7056e9c657a0.png"
 tags: []
 ---
 ## 1 简介

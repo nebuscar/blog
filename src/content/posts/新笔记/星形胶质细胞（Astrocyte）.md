@@ -5,6 +5,7 @@ pubDatetime: 2026-06-11T11:06:00.000Z
 modDatetime: 2026-06-18T15:49:30+08:00
 slug: 20260611-1906-113tw
 legacySlug: "新笔记/星形胶质细胞astrocyte"
+cover: "https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/17/星形胶质细胞（Astrocyte）_2026-06-16_eadedb6d-11d9-41ce-958d-74a897547ba2.png"
 tags: []
 ---
 ## 1 概览

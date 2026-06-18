@@ -5,6 +5,7 @@ pubDatetime: 2026-06-16T07:48:00.000Z
 modDatetime: 2026-06-18T15:49:30+08:00
 slug: 20260616-1548-cg4j1
 legacySlug: "新笔记/小胶质细胞microglia"
+cover: "https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/18/小胶质细胞（Microglia）_2026-06-18_823831e7-6f48-4a8c-8f08-2e1b36518e18.png"
 tags: []
 ---
 ## 1 概览

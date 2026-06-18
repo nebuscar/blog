@@ -5,6 +5,7 @@ pubDatetime: 2026-06-11T11:03:00.000Z
 modDatetime: 2026-06-18T15:46:26+08:00
 slug: 20260611-1903-1h8lx
 legacySlug: "新笔记/β-淀粉样蛋白aβ"
+cover: "https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/14/file-20260521224819847.png"
 tags: []
 ---
 ## 1 简介
