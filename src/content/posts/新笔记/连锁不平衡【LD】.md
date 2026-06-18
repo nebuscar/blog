@@ -2,7 +2,7 @@
 title: "连锁不平衡【LD】"
 description: "Linkage disequilibrium, LD"
 pubDatetime: 2026-06-18T19:15:00.000Z
-modDatetime: 2026-06-19T04:29:19+08:00
+modDatetime: 2026-06-19T04:44:37+08:00
 slug: 20260619-0315-1uw94
 legacySlug: "新笔记/连锁不平衡ld"
 tags: []
@@ -54,7 +54,7 @@ $$
 文献中一般用的也是 $r^2$
 ![连锁不平衡 2026 06 19 1fc2748c 399a 4fba 8a65 36baf9f4a2b2](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/19/连锁不平衡_2026-06-19_1fc2748c-399a-4fba-8a65-36baf9f4a2b2.png)
 *Fig 3. Genome-wide association analyses.
-Manhattan plots and accompanying linkage disequilibrium heat maps are depicted for the **(A) e ro interval** and **(B) y v interval** for lines with standard karyotypes.A significance threshold of $P \leq 10^{-5}$ is denoted for Manhattan plots. Each point is a tested genetic variant in the DGRP, and points above this threshold, shown in **black** and enlarged to aid visualization, indicate significantly associating variants.Additionally, the surveyed interval for each chromosome, either **e ro** or **y v**, is bracketed in **red**.The triangular heat map displays the amount of linkage disequilibrium (**LD**, measured here as $r^2$) between variants.**Red** denotes complete LD, and **blue** denotes absence of LD.
+Manhattan plots and accompanying linkage disequilibrium heat maps are depicted for the **(A) e ro interval** and **(B) y v interval** for lines with standard karyotypes.A significance threshold of $P \leq 10^{-5}$ is denoted for Manhattan plots. Each point is a tested genetic variant in the DGRP, and points above this threshold, shown in **black** and enlarged to aid visualization, indicate significantly associating variants.Additionally, the surveyed interval for each chromosome, either **e ro** or **y v**, is bracketed in **red**.The triangular heat map displays the amount of linkage disequilibrium (**LD**, measured here as $r^2$) between variants.**Red** denotes complete LD, and **blue** denotes absence of LD.  
 图片来源：https://doi.org/10.1371/journal.pgen.1005951*
 
 ### 1.1 结果描述
