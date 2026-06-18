@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -95,4 +96,71 @@ test("publishes only notes marked with publish true", () => {
     "utf8"
   );
   assert.match(publishedPost, /legacySlug: "notes\/publishednote"/);
+});
+
+test("uses Git modified time instead of Obsidian update fields", () => {
+  const root = mkdtempSync(join(tmpdir(), "vault-sync-git-date-"));
+  const target = join(root, "blog", "src", "content", "posts");
+  const note = join(root, "Published Note.md");
+
+  execFileSync("git", ["init"], { cwd: root, stdio: "ignore" });
+  execFileSync("git", ["config", "user.name", "Test Bot"], { cwd: root });
+  execFileSync("git", ["config", "user.email", "test@example.com"], {
+    cwd: root,
+  });
+
+  writeFileSync(
+    note,
+    [
+      "---",
+      "title: Published Note",
+      "publish: true",
+      "pubDatetime: 2026-06-16T11:00:00+08:00",
+      "updatedDate: 2099-01-01T00:00:00+08:00",
+      "---",
+      "",
+      "First version.",
+    ].join("\n")
+  );
+  execFileSync("git", ["add", "Published Note.md"], { cwd: root });
+  execFileSync("git", ["commit", "-m", "Initial note"], {
+    cwd: root,
+    env: {
+      ...process.env,
+      GIT_AUTHOR_DATE: "2026-06-16T11:00:00+08:00",
+      GIT_COMMITTER_DATE: "2026-06-16T11:00:00+08:00",
+    },
+    stdio: "ignore",
+  });
+
+  writeFileSync(
+    note,
+    [
+      "---",
+      "title: Published Note",
+      "publish: true",
+      "pubDatetime: 2026-06-16T11:00:00+08:00",
+      "updatedDate: 2099-01-01T00:00:00+08:00",
+      "---",
+      "",
+      "Second version.",
+    ].join("\n")
+  );
+  execFileSync("git", ["add", "Published Note.md"], { cwd: root });
+  execFileSync("git", ["commit", "-m", "Update note"], {
+    cwd: root,
+    env: {
+      ...process.env,
+      GIT_AUTHOR_DATE: "2026-06-18T09:30:00+08:00",
+      GIT_COMMITTER_DATE: "2026-06-18T09:30:00+08:00",
+    },
+    stdio: "ignore",
+  });
+
+  syncVault(root, target, { redirectsFile: join(root, "_redirects.txt") });
+
+  const publishedPost = readFileSync(join(target, "Published Note.md"), "utf8");
+  assert.match(publishedPost, /pubDatetime: 2026-06-16T03:00:00.000Z/);
+  assert.match(publishedPost, /modDatetime: 2026-06-18T09:30:00\+08:00/);
+  assert.doesNotMatch(publishedPost, /2099-01-01/);
 });

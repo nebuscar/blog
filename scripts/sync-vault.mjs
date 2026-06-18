@@ -200,14 +200,8 @@ export function syncVault(
     const createdByGit = gitDate(sourceFile, sourceDir, "%aI", true);
     const modifiedByGit = gitDate(sourceFile, sourceDir, "%aI");
     const fallbackDate = createdByGit || new Date().toISOString();
-    const pubDatetime = normalizeDate(
-      data.pubDatetime || data.pubDate || data["date created"],
-      fallbackDate
-    );
-    const modDatetime = normalizeDate(
-      data.modDatetime || data.updatedDate || data["date modified"],
-      modifiedByGit || pubDatetime
-    );
+    const pubDatetime = normalizeDate(data.pubDatetime, fallbackDate);
+    const modDatetime = modifiedByGit || pubDatetime;
     const slug = createPostSlug(new Date(pubDatetime), relativePath);
     const legacySlug = relativePath
       .replace(/\.md$/i, "")
