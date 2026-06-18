@@ -1,9 +1,9 @@
 ---
-title: "小胶质细胞（Microglia）"
+title: "小胶质细胞【Microglia】"
 description: "神经系统免疫细胞"
 pubDatetime: 2026-06-16T07:48:00.000Z
-modDatetime: 2026-06-18T15:49:30+08:00
-slug: 20260616-1548-cg4j1
+modDatetime: 2026-06-19T04:11:32+08:00
+slug: 20260616-1548-1cn84
 legacySlug: "新笔记/小胶质细胞microglia"
 tags: []
 ---
