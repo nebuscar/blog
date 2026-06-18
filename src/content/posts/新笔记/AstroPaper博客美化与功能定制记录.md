@@ -1,9 +1,9 @@
 ---
 title: "AstroPaper博客美化与功能定制记录"
 description: "记录 AstroPaper 博客的随机壁纸、导航栏、主题色、QQ 音乐播放器、技术栈页脚和图片自动图注等定制功能。"
-pubDatetime: 2026-06-17T15:01:44+08:00
-modDatetime: 2026-06-17T15:01:44+08:00
-slug: 20260617-1501-atrqv
+pubDatetime: 2026-06-15T10:33:00.000Z
+modDatetime: 2026-06-18T15:46:26+08:00
+slug: 20260615-1833-atrqv
 legacySlug: "新笔记/astropaper博客美化与功能定制记录"
 tags: []
 ---
