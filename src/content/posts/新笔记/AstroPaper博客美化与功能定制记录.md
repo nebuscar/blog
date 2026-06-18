@@ -5,7 +5,6 @@ pubDatetime: 2026-06-15T10:33:00.000Z
 modDatetime: 2026-06-18T15:46:26+08:00
 slug: 20260615-1833-atrqv
 legacySlug: "新笔记/astropaper博客美化与功能定制记录"
-cover: "https://example.com/image.png"
 tags: []
 ---
 > 本文属于「个人博客搭建记录」系列：
