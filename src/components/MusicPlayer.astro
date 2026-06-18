@@ -184,6 +184,13 @@ const config = JSON.stringify(musicPlayerConfig);
     let currentIndex = 0;
     let lyricLines = [];
     let activeLyricIndex = -1;
+    let playMode = localStorage.getItem("music-play-mode") || "sequence";
+    const playModes = ["sequence", "loop", "shuffle"];
+    const playModeLabels = {
+      sequence: "顺序播放",
+      loop: "循环播放",
+      shuffle: "随机播放",
+    };
 
     const setCollapsed = collapsed => {
       player.toggleAttribute("data-collapsed", collapsed);
@@ -200,6 +207,34 @@ const config = JSON.stringify(musicPlayerConfig);
       const minutes = Math.floor(seconds / 60);
       const remainder = Math.floor(seconds % 60);
       return `${minutes}:${String(remainder).padStart(2, "0")}`;
+    };
+
+    const updatePlayModeButton = (shouldAnnounce = false) => {
+      if (!playModes.includes(playMode)) playMode = "sequence";
+      const label = playModeLabels[playMode];
+      audio.loop = false;
+      loop.dataset.mode = playMode;
+      loop.dataset.modeLabel = label.replace("播放", "");
+      loop.toggleAttribute("data-active", playMode !== "sequence");
+      loop.setAttribute("aria-label", label);
+      loop.setAttribute("title", label);
+      if (shouldAnnounce) status.textContent = `已切换为${label}`;
+    };
+
+    const randomTrackIndex = () => {
+      if (playlist.length <= 1) return currentIndex;
+      let nextIndex = currentIndex;
+      while (nextIndex === currentIndex) {
+        nextIndex = Math.floor(Math.random() * playlist.length);
+      }
+      return nextIndex;
+    };
+
+    const nextTrackIndex = () => {
+      if (!playlist.length) return null;
+      if (playMode === "shuffle") return randomTrackIndex();
+      if (playMode === "loop") return (currentIndex + 1) % playlist.length;
+      return currentIndex + 1 < playlist.length ? currentIndex + 1 : null;
     };
 
     const resourceIds = Array.isArray(settings.id) ? settings.id : [settings.id];
@@ -404,10 +439,15 @@ const config = JSON.stringify(musicPlayerConfig);
       setCollapsed(!player.hasAttribute("data-collapsed"));
     });
     prev.addEventListener("click", () => loadTrack(currentIndex - 1, true));
-    next.addEventListener("click", () => loadTrack(currentIndex + 1, true));
+    next.addEventListener("click", () => {
+      const nextIndex = playMode === "shuffle" ? randomTrackIndex() : currentIndex + 1;
+      loadTrack(nextIndex, true);
+    });
     loop.addEventListener("click", () => {
-      audio.loop = !audio.loop;
-      loop.toggleAttribute("data-active", audio.loop);
+      const currentModeIndex = playModes.indexOf(playMode);
+      playMode = playModes[(currentModeIndex + 1) % playModes.length];
+      localStorage.setItem("music-play-mode", playMode);
+      updatePlayModeButton(true);
     });
     mute.addEventListener("click", () => {
       audio.muted = !audio.muted;
@@ -448,7 +488,12 @@ const config = JSON.stringify(musicPlayerConfig);
       play.setAttribute("aria-label", "播放");
     });
     audio.addEventListener("ended", () => {
-      if (!audio.loop) loadTrack(currentIndex + 1, true);
+      const nextIndex = nextTrackIndex();
+      if (nextIndex === null) {
+        status.textContent = "顺序播放已结束";
+        return;
+      }
+      loadTrack(nextIndex, true);
     });
     audio.addEventListener("timeupdate", () => {
       seek.value = audio.duration
@@ -473,6 +518,7 @@ const config = JSON.stringify(musicPlayerConfig);
     const savedVolume = localStorage.getItem("music-volume");
     audio.volume = savedVolume === null ? settings.volume : Number(savedVolume);
     volume.value = String(audio.volume);
+    updatePlayModeButton();
     updateRange(volume);
     updateRange(seek);
     fetchPlaylist();
@@ -703,6 +749,27 @@ const config = JSON.stringify(musicPlayerConfig);
   button:hover,
   button[data-active] {
     color: var(--accent);
+  }
+
+  #music-loop {
+    position: relative;
+  }
+
+  #music-loop::after {
+    position: absolute;
+    right: -0.35rem;
+    bottom: -0.45rem;
+    min-width: 1.25rem;
+    border-radius: 999px;
+    padding: 0.05rem 0.28rem;
+    color: var(--background);
+    background: var(--accent);
+    content: attr(data-mode-label);
+    font-size: 0.58rem;
+    font-weight: 700;
+    line-height: 1.2;
+    opacity: 0.9;
+    transform: scale(0.92);
   }
 
   button svg {
