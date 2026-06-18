@@ -30,8 +30,7 @@ const t = useTranslations(Astro.currentLocale);
 const siteTimezone = postTimezone ?? config.site.timezone;
 const publishedDatetime = dayjs(pubDatetime).tz(siteTimezone);
 const updatedDatetime = modDatetime ? dayjs(modDatetime).tz(siteTimezone) : null;
-const isModified =
-  updatedDatetime && updatedDatetime.valueOf() > publishedDatetime.valueOf();
+const shouldShowUpdatedDatetime = Boolean(updatedDatetime);
 
 const publishedDate = publishedDatetime.format("YYYY-MM-DD HH:mm");
 const updatedDate = updatedDatetime?.format("YYYY-MM-DD HH:mm");
@@ -59,7 +58,7 @@ const updatedDate = updatedDatetime?.format("YYYY-MM-DD HH:mm");
     {publishedDate}
   </time>
   {
-    isModified && (
+    shouldShowUpdatedDatetime && updatedDatetime && (
       <>
         <span aria-hidden="true" class="text-sm">
           ·
