@@ -1,9 +1,9 @@
 ---
 title: "Zotero文献标准化标注规范手册"
 description: "建立永久不变的六色标注体系，统一视觉逻辑、检索标签、笔记模板、阅读工作流，"
-pubDatetime: 2026-06-11T11:05:00.000Z
-modDatetime: 2026-06-17T02:49:00.000Z
-slug: 20260611-1905-18wo2
+pubDatetime: 2026-06-17T15:01:44+08:00
+modDatetime: 2026-06-17T15:01:44+08:00
+slug: 20260617-1501-18wo2
 legacySlug: "新笔记/zotero文献标准化标注规范手册"
 tags: []
 ---
