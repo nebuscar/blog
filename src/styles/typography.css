@@ -59,6 +59,14 @@
       @apply mt-2 text-center text-sm opacity-75;
     }
 
+    .katex-display {
+      @apply overflow-x-auto overflow-y-hidden py-2 text-center;
+    }
+
+    .katex {
+      @apply text-foreground;
+    }
+
     figure {
       @apply my-8;
 
