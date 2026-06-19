@@ -2,7 +2,7 @@
 title: "全基因组关联研究【GWAS】"
 description: "<font color=\"ffc000\"全基因关联研究</font（Genome-wide association studies, GWAS）是一种 用于识别遗传区域（基因组）和性状/疾病之间关联的方法。"
 pubDatetime: 2026-06-18T12:51:00.000Z
-modDatetime: 2026-06-19T04:44:37+08:00
+modDatetime: 2026-06-20T01:45:22+08:00
 slug: 20260618-2051-ltycp
 legacySlug: "新笔记/全基因组关联研究gwas"
 tags: []
@@ -16,4 +16,10 @@ tags: []
 ![全基因组关联研究【GWAS】 2026 06 18 81082b51 5cef 460a a224 88b410adc8a2](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/18/全基因组关联研究【GWAS】_2026-06-18_81082b51-5cef-460a-a224-88b410adc8a2.png)
 *GWAS 的分析流程*
 
+## 2 可视化
+
+### 2.1 曼哈顿图
+### 2.2 QQ 图
+### 2.3 LocusZoom 图
+### 2.4 风险位点汇总表
 - [GWAS系列 | 带你读懂全基因组关联研究(一) - 知乎](https://zhuanlan.zhihu.com/p/667352071)
