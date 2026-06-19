@@ -67,6 +67,14 @@
       @apply text-foreground;
     }
 
+    .mermaid-diagram {
+      @apply border-border bg-background my-6 overflow-x-auto rounded-lg border p-4 text-center;
+    }
+
+    .mermaid-diagram svg {
+      @apply mx-auto h-auto max-w-none;
+    }
+
     figure {
       @apply my-8;
 
