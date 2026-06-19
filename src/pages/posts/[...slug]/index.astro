@@ -244,12 +244,19 @@ const commentPath = `${getLegacyPostUrl(
   function attachCopyButtons() {
     const copyButtonLabel = "Copy";
     const codeBlocks = Array.from(document.querySelectorAll("pre"));
+    const isMermaidCode = codeBlock => {
+      const text = codeBlock.querySelector("code")?.textContent?.trim() ?? "";
+      return /^(---\s*\n[\s\S]*?\n---\s*)?(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|gitGraph|mindmap|timeline|quadrantChart|requirementDiagram|C4Context|C4Container|C4Component|C4Dynamic|sankey-beta|xychart-beta|block-beta|packet-beta|architecture-beta)\b/i.test(
+        text
+      );
+    };
 
     for (const codeBlock of codeBlocks) {
       if (
         codeBlock.querySelector(
           "code.language-mermaid, code[data-language='mermaid']"
-        )
+        ) ||
+        isMermaidCode(codeBlock)
       ) {
         continue;
       }

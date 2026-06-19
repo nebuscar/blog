@@ -23,16 +23,24 @@ function initMermaid(mermaid: MermaidApi) {
   initializedTheme = theme;
 }
 
-function findMermaidBlocks() {
-  const codes = Array.from(
-    document.querySelectorAll<HTMLElement>(
-      "pre code.language-mermaid, pre code[data-language='mermaid']"
-    )
-  );
+function getCodeText(block: HTMLElement) {
+  return block.querySelector("code")?.textContent?.trim() ?? "";
+}
 
-  return codes
-    .map(code => code.closest<HTMLElement>("pre"))
-    .filter((block): block is HTMLElement => Boolean(block));
+function isMermaidDefinition(value: string) {
+  return /^(---\s*\n[\s\S]*?\n---\s*)?(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|gitGraph|mindmap|timeline|quadrantChart|requirementDiagram|C4Context|C4Container|C4Component|C4Dynamic|sankey-beta|xychart-beta|block-beta|packet-beta|architecture-beta)\b/i.test(
+    value.trim()
+  );
+}
+
+function findMermaidBlocks() {
+  const blocks = Array.from(document.querySelectorAll<HTMLElement>("pre"));
+
+  return blocks.filter(
+    block =>
+      block.querySelector("code.language-mermaid, code[data-language='mermaid']") ||
+      isMermaidDefinition(getCodeText(block))
+  );
 }
 
 async function renderMermaidBlocks() {
@@ -46,8 +54,7 @@ async function renderMermaidBlocks() {
     blocks.map(async (block, index) => {
       if (block.dataset.mermaidRendered === "true") return;
 
-      const code = block.querySelector("code");
-      const graphDefinition = code?.textContent?.trim();
+      const graphDefinition = getCodeText(block);
       if (!graphDefinition) return;
 
       const wrapper = document.createElement("div");
