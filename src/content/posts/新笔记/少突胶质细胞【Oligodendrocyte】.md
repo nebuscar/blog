@@ -1,8 +1,8 @@
 ---
-title: "少突胶质细胞"
+title: "少突胶质细胞【Oligodendrocyte】"
 description: "Oligodendrocyte"
 pubDatetime: 2026-06-19T17:45:00.000Z
-modDatetime: 2026-06-20T01:52:34+08:00
+modDatetime: 2026-06-20T10:50:15+08:00
 slug: 20260620-0145-1yk6j
 legacySlug: "新笔记/少突胶质细胞oligodendrocyte"
 tags: []
