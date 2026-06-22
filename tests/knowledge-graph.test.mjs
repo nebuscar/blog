@@ -68,10 +68,17 @@ test("creates a one-hop local graph including backlinks", () => {
   assert.equal(local.links.length, 1);
 });
 
-test("hides the local graph for an isolated post", () => {
+test("shows the current node for an isolated post", () => {
   const graph = buildKnowledgeGraph(posts);
   assert.deepEqual(getLocalKnowledgeGraph(graph, "新笔记/补体系统"), {
-    nodes: [],
+    nodes: [
+      {
+        id: "新笔记/补体系统",
+        title: "补体系统",
+        url: "#",
+        tags: [],
+      },
+    ],
     links: [],
   });
 });

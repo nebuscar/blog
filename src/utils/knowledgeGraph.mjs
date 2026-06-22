@@ -117,8 +117,6 @@ export function getLocalKnowledgeGraph(graph, currentId) {
     if (link.target === currentId) relatedIds.add(link.source);
   }
 
-  if (relatedIds.size === 1) return { nodes: [], links: [] };
-
   return {
     nodes: graph.nodes.filter(node => relatedIds.has(node.id)),
     links: graph.links.filter(
