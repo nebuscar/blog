@@ -7,9 +7,21 @@ const componentUrl = new URL(
   import.meta.url
 );
 
-test("positions desktop post navigation outside the full detail layout", async () => {
+test("anchors desktop post navigation to viewport edges", async () => {
   const source = await readFile(componentUrl, "utf8");
 
-  assert.match(source, /max-w-\[70rem\]/);
-  assert.doesNotMatch(source, /max-w-\[60rem\]/);
+  assert.match(source, /data-side-post-prev/);
+  assert.match(source, /data-side-post-next/);
+  assert.match(source, /start-4/);
+  assert.match(source, /end-4/);
+  assert.doesNotMatch(source, /max-w-\[(60|70)rem\]/);
+});
+
+test("provides mobile and keyboard article navigation", async () => {
+  const source = await readFile(componentUrl, "utf8");
+
+  assert.match(source, /data-mobile-post-nav/);
+  assert.match(source, /event\.altKey/);
+  assert.match(source, /ArrowLeft/);
+  assert.match(source, /ArrowRight/);
 });

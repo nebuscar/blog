@@ -1,0 +1,123 @@
+<div
+  class="post-sidebar-resizer"
+  role="separator"
+  aria-label="调整目录宽度"
+  aria-orientation="vertical"
+  aria-valuemin="220"
+  aria-valuemax="420"
+  aria-valuenow="280"
+  tabindex="0"
+  data-post-sidebar-resizer
+  title="拖动调整目录宽度，双击恢复默认宽度"
+>
+  <span aria-hidden="true"></span>
+</div>
+
+<script>
+  import { DEFAULT_TOC_WIDTH, clampTocWidth } from "@/utils/postLayout.mjs";
+
+  const STORAGE_KEY = "post-toc-width";
+
+  function setupPostSidebarResizers() {
+    document
+      .querySelectorAll<HTMLElement>("[data-post-sidebar-resizer]")
+      .forEach(resizer => {
+        if (resizer.dataset.resizerReady === "true") return;
+        resizer.dataset.resizerReady = "true";
+
+        const layout = resizer.closest<HTMLElement>(".post-detail-layout");
+        if (!layout) return;
+
+        const setWidth = (value: number, persist = true) => {
+          const width = clampTocWidth(value);
+          layout.style.setProperty("--post-toc-width", `${width}px`);
+          resizer.setAttribute("aria-valuenow", String(width));
+          if (persist) localStorage.setItem(STORAGE_KEY, String(width));
+        };
+
+        const storedWidth = Number(localStorage.getItem(STORAGE_KEY));
+        setWidth(
+          Number.isFinite(storedWidth) && storedWidth > 0
+            ? storedWidth
+            : DEFAULT_TOC_WIDTH,
+          false
+        );
+
+        resizer.addEventListener("pointerdown", event => {
+          event.preventDefault();
+          const startX = event.clientX;
+          const startWidth = Number(resizer.getAttribute("aria-valuenow"));
+          resizer.setPointerCapture(event.pointerId);
+          resizer.toggleAttribute("data-dragging", true);
+
+          const move = (moveEvent: PointerEvent) => {
+            setWidth(startWidth + moveEvent.clientX - startX, false);
+          };
+
+          const finish = (upEvent: PointerEvent) => {
+            resizer.releasePointerCapture(upEvent.pointerId);
+            resizer.removeAttribute("data-dragging");
+            resizer.removeEventListener("pointermove", move);
+            resizer.removeEventListener("pointerup", finish);
+            localStorage.setItem(
+              STORAGE_KEY,
+              resizer.getAttribute("aria-valuenow") ?? String(DEFAULT_TOC_WIDTH)
+            );
+          };
+
+          resizer.addEventListener("pointermove", move);
+          resizer.addEventListener("pointerup", finish);
+        });
+
+        resizer.addEventListener("dblclick", () => setWidth(DEFAULT_TOC_WIDTH));
+
+        resizer.addEventListener("keydown", event => {
+          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+          event.preventDefault();
+          const current = Number(resizer.getAttribute("aria-valuenow"));
+          setWidth(current + (event.key === "ArrowRight" ? 10 : -10));
+        });
+      });
+  }
+
+  setupPostSidebarResizers();
+  document.addEventListener("astro:page-load", setupPostSidebarResizers);
+</script>
+
+<style>
+  .post-sidebar-resizer {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    .post-sidebar-resizer {
+      position: sticky;
+      top: 5.5rem;
+      display: grid;
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      width: 0.5rem;
+      height: calc(100dvh - 7rem);
+      place-items: center;
+      cursor: col-resize;
+      touch-action: none;
+    }
+
+    .post-sidebar-resizer span {
+      width: 2px;
+      height: 3.5rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--border) 85%, transparent);
+      transition:
+        width 140ms ease,
+        background-color 140ms ease;
+    }
+
+    .post-sidebar-resizer:hover span,
+    .post-sidebar-resizer:focus-visible span,
+    .post-sidebar-resizer[data-dragging] span {
+      width: 4px;
+      background: var(--accent);
+    }
+  }
+</style>

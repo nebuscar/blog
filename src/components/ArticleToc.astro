@@ -1,30 +1,84 @@
 ---
 import type { MarkdownHeading } from "astro";
+import { buildArticleTocTree } from "@/utils/articleToc.mjs";
 
 type Props = {
   headings: MarkdownHeading[];
+};
+
+type TocNode = MarkdownHeading & {
+  children: TocNode[];
+};
+
+type FlatTocNode = TocNode & {
+  parent: string;
+  treeDepth: number;
 };
 
 const { headings } = Astro.props;
 const tocHeadings = headings.filter(
   ({ depth, slug }) => depth >= 2 && depth <= 4 && slug !== "footnote-label"
 );
+const tocTree = buildArticleTocTree(tocHeadings) as TocNode[];
+const flatNodes: FlatTocNode[] = [];
+
+function flattenNodes(nodes: TocNode[], parent = "", treeDepth = 0) {
+  for (const node of nodes) {
+    flatNodes.push({ ...node, parent, treeDepth });
+    flattenNodes(node.children, node.slug, treeDepth + 1);
+  }
+}
+
+flattenNodes(tocTree);
 ---
 
 {
-  tocHeadings.length > 0 && (
+  flatNodes.length > 0 && (
     <nav class="article-toc" aria-label="目录导览" data-article-toc>
       <details open>
         <summary>
           <span>目录导览</span>
-          <span>{tocHeadings.length} 个章节</span>
+          <span>{flatNodes.length} 个章节</span>
         </summary>
-        <ol>
-          {tocHeadings.map(heading => (
-            <li style={`--toc-depth: ${heading.depth - 2}`}>
-              <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
-                {heading.text}
-              </a>
+
+        <div class="toc-toolbar" aria-label="目录树控制">
+          <button type="button" data-toc-expand-all>
+            全部展开
+          </button>
+          <button type="button" data-toc-collapse-all>
+            全部收起
+          </button>
+        </div>
+
+        <ol class="toc-tree">
+          {flatNodes.map(node => (
+            <li
+              data-toc-node={node.slug}
+              data-toc-parent={node.parent}
+              data-toc-depth={node.treeDepth}
+              data-toc-has-children={
+                node.children.length > 0 ? "true" : "false"
+              }
+              style={`--toc-depth: ${node.treeDepth}`}
+            >
+              <div class="toc-row">
+                {node.children.length > 0 ? (
+                  <button
+                    type="button"
+                    class="toc-toggle"
+                    data-toc-toggle={node.slug}
+                    aria-label={`收起 ${node.text}`}
+                    aria-expanded="true"
+                  >
+                    <span aria-hidden="true">›</span>
+                  </button>
+                ) : (
+                  <span class="toc-toggle-placeholder" aria-hidden="true" />
+                )}
+                <a href={`#${node.slug}`} data-toc-link={node.slug}>
+                  {node.text}
+                </a>
+              </div>
             </li>
           ))}
         </ol>
@@ -35,45 +89,147 @@ const tocHeadings = headings.filter(
 
 <script>
   function setupArticleToc() {
+    const globalWindow = window as Window & {
+      __articleTocController?: AbortController;
+    };
+    globalWindow.__articleTocController?.abort();
+    const controller = new AbortController();
+    globalWindow.__articleTocController = controller;
+
     document
       .querySelectorAll<HTMLElement>("[data-article-toc]")
       .forEach(root => {
-        if (root.dataset.tocReady === "true") return;
-        root.dataset.tocReady = "true";
-
         const details = root.querySelector("details");
+        const tree = root.querySelector<HTMLOListElement>(".toc-tree");
         const links = Array.from(
           root.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")
         );
-        const headings = links
-          .map(link => document.getElementById(link.dataset.tocLink ?? ""))
-          .filter((heading): heading is HTMLElement => Boolean(heading));
+        const nodes = new Map(
+          Array.from(
+            root.querySelectorAll<HTMLLIElement>("[data-toc-node]")
+          ).map(node => [node.dataset.tocNode ?? "", node])
+        );
+        const collapsed = new Set<string>();
 
-        if (window.matchMedia("(max-width: 1179px)").matches) {
+        if (window.matchMedia("(max-width: 1279px)").matches) {
           details?.removeAttribute("open");
         }
+
+        const getAncestors = (slug: string) => {
+          const ancestors: string[] = [];
+          let parent = nodes.get(slug)?.dataset.tocParent ?? "";
+          while (parent) {
+            ancestors.unshift(parent);
+            parent = nodes.get(parent)?.dataset.tocParent ?? "";
+          }
+          return ancestors;
+        };
+
+        const applyTreeState = () => {
+          for (const [slug, node] of nodes) {
+            const hidden = getAncestors(slug).some(parent =>
+              collapsed.has(parent)
+            );
+            node.hidden = hidden;
+            node.toggleAttribute("data-collapsed", collapsed.has(slug));
+
+            const toggle = node.querySelector<HTMLButtonElement>(
+              `:scope [data-toc-toggle="${CSS.escape(slug)}"]`
+            );
+            if (toggle) {
+              const expanded = !collapsed.has(slug);
+              toggle.setAttribute("aria-expanded", String(expanded));
+              toggle.setAttribute(
+                "aria-label",
+                `${expanded ? "收起" : "展开"}目录分支`
+              );
+            }
+          }
+        };
 
         const setActive = (id: string) => {
           for (const link of links) {
             link.toggleAttribute("data-active", link.dataset.tocLink === id);
           }
+
+          for (const ancestor of getAncestors(id)) collapsed.delete(ancestor);
+          applyTreeState();
+
+          const activeLink = root.querySelector<HTMLAnchorElement>(
+            `[data-toc-link="${CSS.escape(id)}"]`
+          );
+          if (activeLink && tree) {
+            const linkTop = activeLink.offsetTop;
+            const linkBottom = linkTop + activeLink.offsetHeight;
+            if (linkTop < tree.scrollTop) tree.scrollTop = linkTop;
+            if (linkBottom > tree.scrollTop + tree.clientHeight) {
+              tree.scrollTop = linkBottom - tree.clientHeight;
+            }
+          }
         };
 
-        const observer = new IntersectionObserver(
-          entries => {
-            const visible = entries
-              .filter(entry => entry.isIntersecting)
-              .sort(
-                (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
-              );
-            const active = visible[0]?.target as HTMLElement | undefined;
-            if (active) setActive(active.id);
-          },
-          { rootMargin: "-15% 0px -72% 0px", threshold: [0, 1] }
-        );
+        root
+          .querySelectorAll<HTMLButtonElement>("[data-toc-toggle]")
+          .forEach(button => {
+            button.addEventListener(
+              "click",
+              () => {
+                const slug = button.dataset.tocToggle ?? "";
+                if (collapsed.has(slug)) collapsed.delete(slug);
+                else collapsed.add(slug);
+                applyTreeState();
+              },
+              { signal: controller.signal }
+            );
+          });
 
-        headings.forEach(heading => observer.observe(heading));
-        if (headings[0]) setActive(headings[0].id);
+        root
+          .querySelector<HTMLButtonElement>("[data-toc-expand-all]")
+          ?.addEventListener(
+            "click",
+            () => {
+              collapsed.clear();
+              applyTreeState();
+            },
+            { signal: controller.signal }
+          );
+
+        root
+          .querySelector<HTMLButtonElement>("[data-toc-collapse-all]")
+          ?.addEventListener(
+            "click",
+            () => {
+              for (const [slug, node] of nodes) {
+                if (node.dataset.tocHasChildren === "true") collapsed.add(slug);
+              }
+              applyTreeState();
+            },
+            { signal: controller.signal }
+          );
+
+        const articleHeadings = links
+          .map(link => document.getElementById(link.dataset.tocLink ?? ""))
+          .filter((heading): heading is HTMLElement => Boolean(heading));
+
+        const updateActiveHeading = () => {
+          const threshold = window.innerHeight * 0.24;
+          let active = articleHeadings[0];
+          for (const heading of articleHeadings) {
+            if (heading.getBoundingClientRect().top <= threshold) {
+              active = heading;
+            } else {
+              break;
+            }
+          }
+          if (active) setActive(active.id);
+        };
+
+        document.addEventListener("scroll", updateActiveHeading, {
+          passive: true,
+          signal: controller.signal,
+        });
+        applyTreeState();
+        updateActiveHeading();
       });
   }
 
@@ -111,47 +267,114 @@ const tocHeadings = headings.filter(
     font-weight: 400;
   }
 
-  ol {
-    max-height: min(42vh, 24rem);
+  .toc-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+    padding: 0.45rem 0.6rem;
+  }
+
+  .toc-toolbar button {
+    border-radius: 0.4rem;
+    padding: 0.22rem 0.42rem;
+    color: var(--muted-foreground);
+    font-size: 0.68rem;
+  }
+
+  .toc-toolbar button:hover {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  .toc-tree {
+    max-height: calc(100dvh - 13rem);
     margin: 0;
     overflow-y: auto;
-    border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
-    padding: 0.55rem 0.5rem 0.7rem;
+    padding: 0.45rem 0.45rem 0.7rem;
     list-style: none;
     scrollbar-width: thin;
   }
 
   li {
+    position: relative;
     margin: 0;
-    padding-left: calc(var(--toc-depth) * 0.75rem);
+    padding-left: calc(var(--toc-depth) * 0.8rem);
+  }
+
+  li[data-toc-depth]:not([data-toc-depth="0"])::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc((var(--toc-depth) - 1) * 0.8rem + 0.45rem);
+    width: 1px;
+    background: color-mix(in srgb, var(--border) 80%, transparent);
+    content: "";
+  }
+
+  .toc-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .toc-toggle,
+  .toc-toggle-placeholder {
+    width: 1.1rem;
+    height: 1.8rem;
+  }
+
+  .toc-toggle {
+    display: grid;
+    place-items: center;
+    color: var(--muted-foreground);
+  }
+
+  .toc-toggle span {
+    display: block;
+    font-size: 1.05rem;
+    transform: rotate(90deg);
+    transition: transform 140ms ease;
+  }
+
+  li[data-collapsed] > .toc-row .toc-toggle span {
+    transform: rotate(0deg);
   }
 
   a {
     display: block;
+    min-width: 0;
     border-radius: 0.5rem;
-    padding: 0.38rem 0.5rem;
+    padding: 0.34rem 0.42rem;
     color: var(--muted-foreground);
     font-size: 0.78rem;
-    line-height: 1.35;
+    line-height: 1.4;
     text-decoration: none;
+    overflow-wrap: anywhere;
     transition:
       color 140ms ease,
       background-color 140ms ease;
   }
 
+  li[data-toc-depth="0"] a {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+
   a:hover,
   a[data-active] {
     color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
   }
 
-  @media (max-width: 1179px) {
+  @media (max-width: 1279px) {
     .article-toc {
       margin-block: 1rem;
     }
 
-    ol {
-      max-height: 20rem;
+    .toc-tree {
+      max-height: 22rem;
     }
   }
 </style>

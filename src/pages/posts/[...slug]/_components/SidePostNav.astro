@@ -20,64 +20,286 @@ type Props = {
 const { prevPost, nextPost } = Astro.props;
 const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(locale);
+const prevHref = prevPost
+  ? getPostUrl(prevPost.slug, prevPost.id, prevPost.filePath, locale)
+  : "";
+const nextHref = nextPost
+  ? getPostUrl(nextPost.slug, nextPost.id, nextPost.filePath, locale)
+  : "";
 ---
 
 {
   (prevPost || nextPost) && (
-    <nav
-      data-pagefind-ignore
-      aria-label="Post side navigation"
-      class="pointer-events-none fixed inset-x-0 top-1/2 z-40 hidden -translate-y-1/2 xl:block"
-    >
-      <div class="relative mx-auto max-w-[70rem]">
+    <>
+      <nav
+        data-pagefind-ignore
+        aria-label="文章快速翻页"
+        class="pointer-events-none fixed inset-0 z-40 hidden xl:block"
+      >
         {prevPost && (
           <a
-            href={getPostUrl(
-              prevPost.slug,
-              prevPost.id,
-              prevPost.filePath,
-              locale
-            )}
+            href={prevHref}
+            data-side-post-prev
             aria-label={`${t.post.previousPost}: ${prevPost.title}`}
-            title={prevPost.title}
-            class="group pointer-events-auto absolute start-0 flex -translate-x-20 items-center gap-3 no-underline"
+            class="group pointer-events-auto fixed start-4 top-1/2 flex -translate-y-1/2 items-center no-underline"
           >
-            <span class="bg-background/80 text-muted-foreground group-hover:text-accent group-focus-visible:text-accent border-border/60 flex size-11 items-center justify-center rounded-full border shadow-lg backdrop-blur transition">
+            <span class="edge-nav-button">
               <IconArrowLeft class="size-5 rtl:rotate-180" />
             </span>
-            <span class="bg-background/90 text-foreground border-border/60 max-w-64 translate-x-2 rounded-md border px-3 py-2 text-sm leading-snug opacity-0 shadow-lg backdrop-blur transition group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 rtl:-translate-x-2 rtl:group-hover:translate-x-0 rtl:group-focus-visible:translate-x-0">
-              <span class="text-muted-foreground block text-xs">
-                {t.post.previousPost}
-              </span>
-              <span class="line-clamp-2">{prevPost.title}</span>
+            <span class="edge-nav-label edge-nav-label-prev">
+              <small>{t.post.previousPost}</small>
+              <strong>{prevPost.title}</strong>
             </span>
           </a>
         )}
 
         {nextPost && (
           <a
-            href={getPostUrl(
-              nextPost.slug,
-              nextPost.id,
-              nextPost.filePath,
-              locale
-            )}
+            href={nextHref}
+            data-side-post-next
             aria-label={`${t.post.nextPost}: ${nextPost.title}`}
-            title={nextPost.title}
-            class="group pointer-events-auto absolute end-0 flex translate-x-20 items-center gap-3 no-underline"
+            class="group pointer-events-auto fixed end-4 top-1/2 flex -translate-y-1/2 items-center no-underline"
           >
-            <span class="bg-background/90 text-foreground border-border/60 max-w-64 -translate-x-2 rounded-md border px-3 py-2 text-sm leading-snug opacity-0 shadow-lg backdrop-blur transition group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 rtl:translate-x-2 rtl:group-hover:translate-x-0 rtl:group-focus-visible:translate-x-0">
-              <span class="text-muted-foreground block text-xs">
-                {t.post.nextPost}
-              </span>
-              <span class="line-clamp-2">{nextPost.title}</span>
+            <span class="edge-nav-label edge-nav-label-next">
+              <small>{t.post.nextPost}</small>
+              <strong>{nextPost.title}</strong>
             </span>
-            <span class="bg-background/80 text-muted-foreground group-hover:text-accent group-focus-visible:text-accent border-border/60 flex size-11 items-center justify-center rounded-full border shadow-lg backdrop-blur transition">
+            <span class="edge-nav-button">
               <IconArrowRight class="size-5 rtl:rotate-180" />
             </span>
           </a>
         )}
-      </div>
-    </nav>
+      </nav>
+
+      <details
+        class="mobile-post-nav"
+        data-mobile-post-nav
+        data-pagefind-ignore
+      >
+        <summary aria-label="打开文章导航">
+          <span aria-hidden="true">↔</span>
+          <span>文章导航</span>
+        </summary>
+        <div class="mobile-post-nav-panel">
+          {prevPost && (
+            <a href={prevHref}>
+              <IconArrowLeft class="size-4 rtl:rotate-180" />
+              <span>
+                <small>{t.post.previousPost}</small>
+                <strong>{prevPost.title}</strong>
+              </span>
+            </a>
+          )}
+          {nextPost && (
+            <a href={nextHref}>
+              <span>
+                <small>{t.post.nextPost}</small>
+                <strong>{nextPost.title}</strong>
+              </span>
+              <IconArrowRight class="size-4 rtl:rotate-180" />
+            </a>
+          )}
+        </div>
+      </details>
+    </>
   )
 }
+
+<script>
+  function setupPostNavigationShortcuts() {
+    const globalWindow = window as Window & {
+      __postNavigationController?: AbortController;
+    };
+    globalWindow.__postNavigationController?.abort();
+
+    const controller = new AbortController();
+    globalWindow.__postNavigationController = controller;
+    const previous = document.querySelector<HTMLAnchorElement>(
+      "[data-side-post-prev]"
+    );
+    const next = document.querySelector<HTMLAnchorElement>(
+      "[data-side-post-next]"
+    );
+
+    document.addEventListener(
+      "keydown",
+      event => {
+        if (!event.altKey) return;
+        if (event.key === "ArrowLeft" && previous) {
+          event.preventDefault();
+          window.location.href = previous.href;
+        }
+        if (event.key === "ArrowRight" && next) {
+          event.preventDefault();
+          window.location.href = next.href;
+        }
+      },
+      { signal: controller.signal }
+    );
+  }
+
+  setupPostNavigationShortcuts();
+  document.addEventListener("astro:page-load", setupPostNavigationShortcuts);
+</script>
+
+<style>
+  .edge-nav-button {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: none;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    border-radius: 999px;
+    color: var(--muted-foreground);
+    background: color-mix(in srgb, var(--background) 88%, transparent);
+    box-shadow: 0 8px 22px rgb(0 0 0 / 12%);
+    backdrop-filter: blur(14px);
+    transition:
+      color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  a:hover .edge-nav-button,
+  a:focus-visible .edge-nav-button {
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+    color: var(--accent);
+    transform: scale(1.05);
+  }
+
+  .edge-nav-label {
+    display: grid;
+    width: 0;
+    max-width: 0;
+    gap: 0.08rem;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    opacity: 0;
+    background: color-mix(in srgb, var(--background) 92%, transparent);
+    box-shadow: 0 8px 22px rgb(0 0 0 / 10%);
+    backdrop-filter: blur(14px);
+    transition:
+      width 180ms ease,
+      max-width 180ms ease,
+      padding 180ms ease,
+      margin 180ms ease,
+      opacity 140ms ease,
+      border-color 180ms ease;
+  }
+
+  a:hover .edge-nav-label,
+  a:focus-visible .edge-nav-label {
+    width: 15rem;
+    max-width: 15rem;
+    border-color: color-mix(in srgb, var(--border) 65%, transparent);
+    padding: 0.55rem 0.7rem;
+    opacity: 1;
+  }
+
+  a:hover .edge-nav-label-prev,
+  a:focus-visible .edge-nav-label-prev {
+    margin-left: 0.5rem;
+  }
+
+  a:hover .edge-nav-label-next,
+  a:focus-visible .edge-nav-label-next {
+    margin-right: 0.5rem;
+  }
+
+  .edge-nav-label small,
+  .mobile-post-nav-panel small {
+    color: var(--muted-foreground);
+    font-size: 0.68rem;
+  }
+
+  .edge-nav-label strong {
+    overflow: hidden;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .edge-nav-label-next {
+    text-align: right;
+  }
+
+  .mobile-post-nav {
+    position: fixed;
+    right: 1rem;
+    bottom: 5rem;
+    z-index: 55;
+  }
+
+  .mobile-post-nav summary {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    border-radius: 999px;
+    padding: 0.55rem 0.75rem;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--background) 90%, transparent);
+    box-shadow: 0 8px 22px rgb(0 0 0 / 14%);
+    font-size: 0.75rem;
+    font-weight: 600;
+    list-style: none;
+    backdrop-filter: blur(14px);
+  }
+
+  .mobile-post-nav summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobile-post-nav-panel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 0.55rem);
+    display: grid;
+    width: min(18rem, calc(100vw - 2rem));
+    gap: 0.45rem;
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    border-radius: 1rem;
+    padding: 0.55rem;
+    background: color-mix(in srgb, var(--background) 94%, transparent);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 16%);
+    backdrop-filter: blur(18px);
+  }
+
+  .mobile-post-nav-panel a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    border-radius: 0.7rem;
+    padding: 0.55rem;
+    text-decoration: none;
+  }
+
+  .mobile-post-nav-panel a:hover {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  .mobile-post-nav-panel span {
+    display: grid;
+    min-width: 0;
+  }
+
+  .mobile-post-nav-panel strong {
+    overflow: hidden;
+    font-size: 0.78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 1280px) {
+    .mobile-post-nav {
+      display: none;
+    }
+  }
+</style>
