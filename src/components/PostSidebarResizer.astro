@@ -13,10 +13,32 @@
   <span aria-hidden="true"></span>
 </div>
 
+<div
+  class="post-graph-resizer"
+  role="separator"
+  aria-label="调整关联栏宽度"
+  aria-orientation="vertical"
+  aria-valuemin="48"
+  aria-valuemax="420"
+  aria-valuenow="288"
+  tabindex="0"
+  data-post-graph-resizer
+  title="拖动调整关联栏宽度，双击折叠或展开"
+>
+  <span aria-hidden="true"></span>
+</div>
+
 <script>
-  import { DEFAULT_TOC_WIDTH, clampTocWidth } from "@/utils/postLayout.mjs";
+  import {
+    DEFAULT_GRAPH_WIDTH,
+    DEFAULT_TOC_WIDTH,
+    clampGraphWidth,
+    clampTocWidth,
+  } from "@/utils/postLayout.mjs";
 
   const STORAGE_KEY = "post-toc-width";
+  const GRAPH_WIDTH_STORAGE_KEY = "post-graph-width";
+  const GRAPH_COLLAPSED_STORAGE_KEY = "post-graph-collapsed";
 
   function setupPostSidebarResizers() {
     document
@@ -82,19 +104,143 @@
 
   setupPostSidebarResizers();
   document.addEventListener("astro:page-load", setupPostSidebarResizers);
+
+  function setupPostGraphResizers() {
+    document
+      .querySelectorAll<HTMLElement>("[data-post-graph-resizer]")
+      .forEach(resizer => {
+        if (resizer.dataset.graphResizerReady === "true") return;
+        resizer.dataset.graphResizerReady = "true";
+
+        const layout = resizer.closest<HTMLElement>(".post-detail-layout");
+        if (!layout) return;
+
+        const collapseButton = layout.querySelector<HTMLButtonElement>(
+          "[data-post-graph-collapse]"
+        );
+
+        const setCollapsed = (collapsed: boolean, persist = true) => {
+          layout.dataset.graphCollapsed = String(collapsed);
+          resizer.setAttribute(
+            "aria-valuenow",
+            collapsed
+              ? "48"
+              : (resizer.dataset.currentWidth ?? String(DEFAULT_GRAPH_WIDTH))
+          );
+          collapseButton?.setAttribute("aria-expanded", String(!collapsed));
+          collapseButton?.setAttribute(
+            "aria-label",
+            collapsed ? "展开关联栏" : "折叠关联栏"
+          );
+          if (collapseButton) {
+            collapseButton.title = collapsed ? "展开关联栏" : "折叠关联栏";
+          }
+          if (persist) {
+            localStorage.setItem(
+              GRAPH_COLLAPSED_STORAGE_KEY,
+              String(collapsed)
+            );
+          }
+        };
+
+        const setWidth = (value: number, persist = true) => {
+          const width = clampGraphWidth(value);
+          layout.style.setProperty("--post-graph-width", `${width}px`);
+          resizer.dataset.currentWidth = String(width);
+          if (layout.dataset.graphCollapsed !== "true") {
+            resizer.setAttribute("aria-valuenow", String(width));
+          }
+          if (persist)
+            localStorage.setItem(GRAPH_WIDTH_STORAGE_KEY, String(width));
+        };
+
+        const storedWidth = Number(
+          localStorage.getItem(GRAPH_WIDTH_STORAGE_KEY)
+        );
+        setWidth(
+          Number.isFinite(storedWidth) && storedWidth > 0
+            ? storedWidth
+            : DEFAULT_GRAPH_WIDTH,
+          false
+        );
+        setCollapsed(
+          localStorage.getItem(GRAPH_COLLAPSED_STORAGE_KEY) === "true",
+          false
+        );
+
+        resizer.addEventListener("pointerdown", event => {
+          event.preventDefault();
+          setCollapsed(false);
+          const startX = event.clientX;
+          const startWidth = Number(
+            resizer.dataset.currentWidth ?? DEFAULT_GRAPH_WIDTH
+          );
+          resizer.setPointerCapture(event.pointerId);
+          resizer.toggleAttribute("data-dragging", true);
+
+          const move = (moveEvent: PointerEvent) => {
+            setWidth(startWidth - (moveEvent.clientX - startX), false);
+          };
+
+          const finish = (upEvent: PointerEvent) => {
+            resizer.releasePointerCapture(upEvent.pointerId);
+            resizer.removeAttribute("data-dragging");
+            resizer.removeEventListener("pointermove", move);
+            resizer.removeEventListener("pointerup", finish);
+            localStorage.setItem(
+              GRAPH_WIDTH_STORAGE_KEY,
+              resizer.dataset.currentWidth ?? String(DEFAULT_GRAPH_WIDTH)
+            );
+          };
+
+          resizer.addEventListener("pointermove", move);
+          resizer.addEventListener("pointerup", finish);
+        });
+
+        resizer.addEventListener("dblclick", () => {
+          setCollapsed(layout.dataset.graphCollapsed !== "true");
+        });
+
+        resizer.addEventListener("keydown", event => {
+          if (
+            event.key !== "ArrowLeft" &&
+            event.key !== "ArrowRight" &&
+            event.key !== "Enter" &&
+            event.key !== " "
+          )
+            return;
+          event.preventDefault();
+          if (event.key === "Enter" || event.key === " ") {
+            setCollapsed(layout.dataset.graphCollapsed !== "true");
+            return;
+          }
+          setCollapsed(false);
+          const current = Number(resizer.dataset.currentWidth);
+          setWidth(current + (event.key === "ArrowLeft" ? 10 : -10));
+        });
+
+        collapseButton?.addEventListener("click", () => {
+          setCollapsed(layout.dataset.graphCollapsed !== "true");
+        });
+      });
+  }
+
+  setupPostGraphResizers();
+  document.addEventListener("astro:page-load", setupPostGraphResizers);
 </script>
 
 <style>
-  .post-sidebar-resizer {
+  .post-sidebar-resizer,
+  .post-graph-resizer {
     display: none;
   }
 
   @media (min-width: 1280px) {
-    .post-sidebar-resizer {
+    .post-sidebar-resizer,
+    .post-graph-resizer {
       position: sticky;
       top: 5.5rem;
       display: grid;
-      grid-column: 2;
       grid-row: 1 / span 2;
       width: 0.5rem;
       height: calc(100dvh - 7rem);
@@ -103,7 +249,16 @@
       touch-action: none;
     }
 
-    .post-sidebar-resizer span {
+    .post-sidebar-resizer {
+      grid-column: 2;
+    }
+
+    .post-graph-resizer {
+      grid-column: 4;
+    }
+
+    .post-sidebar-resizer span,
+    .post-graph-resizer span {
       width: 2px;
       height: 3.5rem;
       border-radius: 999px;
@@ -115,7 +270,10 @@
 
     .post-sidebar-resizer:hover span,
     .post-sidebar-resizer:focus-visible span,
-    .post-sidebar-resizer[data-dragging] span {
+    .post-sidebar-resizer[data-dragging] span,
+    .post-graph-resizer:hover span,
+    .post-graph-resizer:focus-visible span,
+    .post-graph-resizer[data-dragging] span {
       width: 4px;
       background: var(--accent);
     }

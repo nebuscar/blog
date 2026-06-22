@@ -181,6 +181,19 @@ const isActive = (path: string) => {
   </div>
 </header>
 
+<button
+  id="header-visibility-toggle"
+  type="button"
+  aria-controls="site-header"
+  aria-expanded="true"
+  aria-label="隐藏导航栏"
+  title="隐藏导航栏"
+  data-label-hide="隐藏导航栏"
+  data-label-show="显示导航栏"
+>
+  <span aria-hidden="true"></span>
+</button>
+
 <script>
   type HeaderWindow = Window & {
     __headerAutoHideController?: AbortController;
@@ -193,8 +206,19 @@ const isActive = (path: string) => {
     const menuIcon = document.querySelector("#menu-icon");
     const closeIcon = document.querySelector("#close-icon");
     const header = document.querySelector<HTMLElement>("#site-header");
+    const visibilityToggle = document.querySelector<HTMLButtonElement>(
+      "#header-visibility-toggle"
+    );
 
-    if (!menuBtn || !menuItems || !menuIcon || !closeIcon || !header) return;
+    if (
+      !menuBtn ||
+      !menuItems ||
+      !menuIcon ||
+      !closeIcon ||
+      !header ||
+      !visibilityToggle
+    )
+      return;
 
     const headerWindow = window as HeaderWindow;
     headerWindow.__headerAutoHideController?.abort();
@@ -209,8 +233,18 @@ const isActive = (path: string) => {
 
     const openLabel = menuBtn.dataset.labelOpen ?? "Open menu";
     const closeLabel = menuBtn.dataset.labelClose ?? "Close menu";
+    const hideHeaderLabel = visibilityToggle.dataset.labelHide ?? "隐藏导航栏";
+    const showHeaderLabel = visibilityToggle.dataset.labelShow ?? "显示导航栏";
 
     const menuIsOpen = () => menuBtn.getAttribute("aria-expanded") === "true";
+    const setToggleState = (expanded: boolean) => {
+      visibilityToggle.setAttribute("aria-expanded", String(expanded));
+      visibilityToggle.setAttribute(
+        "aria-label",
+        expanded ? hideHeaderLabel : showHeaderLabel
+      );
+      visibilityToggle.title = expanded ? hideHeaderLabel : showHeaderLabel;
+    };
 
     const clearHideTimer = () => {
       if (headerWindow.__headerAutoHideTimer) {
@@ -220,6 +254,15 @@ const isActive = (path: string) => {
 
     const showHeader = () => {
       header.classList.remove("is-hidden");
+      document.documentElement.classList.remove("site-header-hidden");
+      setToggleState(true);
+    };
+
+    const hideHeader = () => {
+      clearHideTimer();
+      header.classList.add("is-hidden");
+      document.documentElement.classList.add("site-header-hidden");
+      setToggleState(false);
     };
 
     const scheduleHide = () => {
@@ -228,7 +271,7 @@ const isActive = (path: string) => {
 
       headerWindow.__headerAutoHideTimer = window.setTimeout(() => {
         if (pointerOverHeader || headerHasFocus || menuIsOpen()) return;
-        header.classList.add("is-hidden");
+        hideHeader();
       }, 3000);
     };
 
@@ -250,6 +293,18 @@ const isActive = (path: string) => {
         menuIcon.classList.toggle("hidden");
         closeIcon.classList.toggle("hidden");
         revealAndSchedule();
+      },
+      { signal }
+    );
+
+    visibilityToggle.addEventListener(
+      "click",
+      () => {
+        if (header.classList.contains("is-hidden")) {
+          revealAndSchedule();
+        } else {
+          hideHeader();
+        }
       },
       { signal }
     );

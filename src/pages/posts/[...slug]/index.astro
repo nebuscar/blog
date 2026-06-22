@@ -207,14 +207,27 @@ const commentPath = `${getLegacyPostUrl(
     <PostSidebarResizer />
 
     <aside class="post-graph-sidebar" aria-label="关联文档">
-      <SidePostNav {prevPost} {nextPost} />
-      <KnowledgeGraph
-        graph={knowledgeGraph}
-        currentId={post.id}
-        compact
-        sidebar
-        collapsible
-      />
+      <div class="post-graph-sidebar-controls">
+        <button
+          type="button"
+          data-post-graph-collapse
+          aria-label="折叠关联栏"
+          aria-expanded="true"
+          title="折叠关联栏"
+        >
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="post-graph-sidebar-content">
+        <SidePostNav {prevPost} {nextPost} />
+        <KnowledgeGraph
+          graph={knowledgeGraph}
+          currentId={post.id}
+          compact
+          sidebar
+          collapsible
+        />
+      </div>
     </aside>
 
     <div class="post-after-content">
@@ -242,6 +255,7 @@ const commentPath = `${getLegacyPostUrl(
 <style>
   .post-detail-layout {
     --post-toc-width: 280px;
+    --post-graph-width: 18rem;
 
     display: grid;
     width: 100%;
@@ -267,12 +281,16 @@ const commentPath = `${getLegacyPostUrl(
   @media (min-width: 1280px) {
     .post-detail-layout {
       grid-template-columns:
-        var(--post-toc-width) 0.5rem minmax(0, 48rem)
-        minmax(16rem, 18rem);
-      column-gap: 1.25rem;
-      width: calc(100% - 8rem);
-      max-width: calc(var(--post-toc-width) + 70.25rem);
+        var(--post-toc-width) 0.5rem minmax(0, 54rem) 0.5rem
+        var(--post-graph-width);
+      column-gap: 1rem;
+      width: calc(100% - 6rem);
+      max-width: calc(var(--post-toc-width) + var(--post-graph-width) + 62rem);
       padding-inline: 0;
+    }
+
+    .post-detail-layout[data-graph-collapsed="true"] {
+      --post-graph-width: 3.25rem;
     }
 
     .post-toc-sidebar {
@@ -298,13 +316,68 @@ const commentPath = `${getLegacyPostUrl(
     .post-graph-sidebar {
       position: sticky;
       top: 5.5rem;
-      grid-column: 4;
+      grid-column: 5;
       grid-row: 1 / span 2;
       max-height: calc(100dvh - 7rem);
       margin-top: 0;
       overflow-y: auto;
       padding-right: 0.25rem;
       scrollbar-width: thin;
+    }
+
+    .post-graph-sidebar-controls {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: flex-end;
+      padding-bottom: 0.4rem;
+      background: linear-gradient(
+        to bottom,
+        var(--background) 70%,
+        transparent
+      );
+    }
+
+    .post-graph-sidebar-controls button {
+      display: grid;
+      width: 2rem;
+      height: 2rem;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 0.65rem;
+      color: var(--muted-foreground);
+      background: var(--background);
+    }
+
+    .post-graph-sidebar-controls button:hover,
+    .post-graph-sidebar-controls button:focus-visible {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .post-graph-sidebar-controls span {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-top: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .post-detail-layout[data-graph-collapsed="true"]
+      .post-graph-sidebar-controls {
+      justify-content: center;
+    }
+
+    .post-detail-layout[data-graph-collapsed="true"]
+      .post-graph-sidebar-controls
+      span {
+      transform: rotate(-135deg);
+    }
+
+    .post-detail-layout[data-graph-collapsed="true"]
+      .post-graph-sidebar-content {
+      display: none;
     }
   }
 </style>
@@ -378,21 +451,16 @@ const commentPath = `${getLegacyPostUrl(
 
     function setCodeWrap(enabled) {
       codeWrapEnabled = enabled;
-      document.documentElement.classList.toggle(
-        "code-wrap-enabled",
-        enabled
-      );
-      document
-        .querySelectorAll("[data-code-wrap-toggle]")
-        .forEach(button => {
-          button.setAttribute("aria-pressed", String(enabled));
-          button.classList.toggle("bg-accent", enabled);
-          button.classList.toggle("text-background", enabled);
-          button.classList.toggle("border-accent", enabled);
-          button.classList.toggle("bg-muted", !enabled);
-          button.classList.toggle("text-foreground", !enabled);
-          button.classList.toggle("border-muted", !enabled);
-        });
+      document.documentElement.classList.toggle("code-wrap-enabled", enabled);
+      document.querySelectorAll("[data-code-wrap-toggle]").forEach(button => {
+        button.setAttribute("aria-pressed", String(enabled));
+        button.classList.toggle("bg-accent", enabled);
+        button.classList.toggle("text-background", enabled);
+        button.classList.toggle("border-accent", enabled);
+        button.classList.toggle("bg-muted", !enabled);
+        button.classList.toggle("text-foreground", !enabled);
+        button.classList.toggle("border-muted", !enabled);
+      });
       try {
         localStorage.setItem(codeWrapStorageKey, String(enabled));
       } catch {
