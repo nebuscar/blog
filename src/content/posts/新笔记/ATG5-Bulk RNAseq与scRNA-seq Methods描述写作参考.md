@@ -2,7 +2,7 @@
 title: "ATG5-Bulk RNAseq与scRNA-seq Methods描述写作参考"
 description: "RNA-seq and Single-cell Methods Writing References"
 pubDatetime: 2026-06-22T15:01:00.000Z
-modDatetime: 2026-06-23T01:46:28+08:00
+modDatetime: 2026-06-23T01:51:36+08:00
 slug: 20260622-2301-zgrvy
 legacySlug: "新笔记/atg5-bulkrnaseq与scrna-seqmethods描述写作参考"
 tags: []
@@ -73,6 +73,9 @@ References:
 ### 2.1 *Source： [^1]*
 文章跳转：[MARCO+ macrophages drive immunosuppressive remodeling and metastasis in chemotherapy-associated steatohepatitis - Journal of Hepatology](https://www.journal-of-hepatology.eu/article/S0168-8278\(25\)02624-8/abstract)
 #### 2.1.1 Single-Cell Sequencing
+```
+Single cell suspensions collected from CASH samples were stained with antibodies against CD45 for FACS sorting. scRNA-seq libraries were prepared by NovelBio Bio-Pharm Technology Co., Ltd (Shanghai, China). using Chromium Next GEM Single Cell 5' V2 kit (10X Genomics, Pleasanton, CA) according to the manufacturer's protocol. Count matrices were qualified and analyzed using Seurat, a R package (version 5.10). Other details are supplied in the supplementary materials and methods.
+```
 ![ATG5 Bulk RNAseq与scRNA seq Methods描述写作参考 2026 06 23 c5949ff7 d2b0 4fbd b18b a201e62d49da](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/23/ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-23_c5949ff7-d2b0-4fbd-b18b-a201e62d49da.png)
 #### 2.1.2 Single-Cell Data Processing
 ![ATG5 Bulk RNAseq与scRNA seq Methods描述写作参考 2026 06 23 92f770fc 4d25 4c64 8e02 fb149b0a3537](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/23/ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-23_92f770fc-4d25-4c64-8e02-fb149b0a3537.png)
