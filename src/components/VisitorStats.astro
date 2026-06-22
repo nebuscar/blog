@@ -25,29 +25,52 @@ const { mode = "site", class: className, ...attrs } = Astro.props;
       requests: new Map(),
     });
 
+    const normalizePath = path => {
+      const normalized = `/${String(path).replace(/^\/+|\/+$/g, "")}`;
+      return normalized === "/" ? "/" : `${normalized}/`;
+    };
+
     const recordView = path => {
       if (!state.requests.has(path)) {
-        state.requests.set(
-          path,
-          fetch(`${API_BASE}/api/view`, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ path }),
-          }).then(response => {
+        const request = fetch(`${API_BASE}/api/view`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ path }),
+        })
+          .then(response => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
           })
-        );
+          .catch(error => {
+            state.requests.delete(path);
+            throw error;
+          });
+        state.requests.set(path, request);
       }
       return state.requests.get(path);
+    };
+
+    const requestStats = async path => {
+      try {
+        return await recordView(path);
+      } catch {
+        await new Promise(resolve => setTimeout(resolve, 600));
+        return recordView(path);
+      }
     };
 
     const renderStats = async () => {
       const elements = document.querySelectorAll("[data-visitor-stats]");
       if (!elements.length) return;
 
+      for (const element of elements) {
+        element.removeAttribute("hidden");
+      }
+
       try {
-        const stats = await recordView(window.location.pathname);
+        const stats = await requestStats(
+          normalizePath(window.location.pathname)
+        );
         for (const element of elements) {
           const content = element.querySelector("[data-stats-content]");
           if (!content) continue;
@@ -58,7 +81,8 @@ const { mode = "site", class: className, ...attrs } = Astro.props;
         }
       } catch {
         for (const element of elements) {
-          element.setAttribute("hidden", "");
+          const content = element.querySelector("[data-stats-content]");
+          if (content) content.textContent = "统计暂不可用";
         }
       }
     };

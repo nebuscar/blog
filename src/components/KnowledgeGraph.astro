@@ -18,6 +18,7 @@ type Props = {
   };
   currentId?: string;
   compact?: boolean;
+  sidebar?: boolean;
   title?: string;
   collapsible?: boolean;
 };
@@ -26,6 +27,7 @@ const {
   graph,
   currentId,
   compact = false,
+  sidebar = false,
   title = "关联文档图谱",
   collapsible = false,
 } = Astro.props;
@@ -41,7 +43,10 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
     <section
       class:list={[
         "knowledge-graph-shell",
-        { "knowledge-graph-compact": compact },
+        {
+          "knowledge-graph-compact": compact,
+          "knowledge-graph-sidebar": sidebar,
+        },
       ]}
       data-knowledge-graph
       data-collapsible={String(collapsible)}
@@ -55,15 +60,17 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
         </summary>
 
         <div class="knowledge-graph-toolbar">
-          <label>
-            <span class="sr-only">搜索图谱中的文章</span>
-            <input
-              type="search"
-              placeholder="搜索文章"
-              data-graph-search
-              autocomplete="off"
-            />
-          </label>
+          {!sidebar && (
+            <label>
+              <span class="sr-only">搜索图谱中的文章</span>
+              <input
+                type="search"
+                placeholder="搜索文章"
+                data-graph-search
+                autocomplete="off"
+              />
+            </label>
+          )}
           <button type="button" data-graph-reset>
             重置视图
           </button>
@@ -167,9 +174,12 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
     if (!payload.nodes?.length) return;
 
     root.dataset.graphReady = "true";
+    const expandedViewport = root.classList.contains("knowledge-graph-sidebar")
+      ? "(min-width: 1180px)"
+      : "(min-width: 640px)";
     if (
       root.dataset.collapsible === "true" &&
-      window.matchMedia("(min-width: 640px)").matches
+      window.matchMedia(expandedViewport).matches
     ) {
       details?.setAttribute("open", "");
     }
@@ -577,6 +587,41 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
   .knowledge-graph-compact .knowledge-graph-canvas {
     height: 390px;
     min-height: 340px;
+  }
+
+  .knowledge-graph-sidebar {
+    margin-block: 0;
+  }
+
+  .knowledge-graph-sidebar .knowledge-graph-details {
+    border-radius: 0.85rem;
+  }
+
+  .knowledge-graph-sidebar summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.85rem 0.95rem;
+  }
+
+  .knowledge-graph-sidebar .knowledge-graph-toolbar {
+    padding: 0.55rem 0.7rem;
+  }
+
+  .knowledge-graph-sidebar .knowledge-graph-toolbar button,
+  .knowledge-graph-sidebar .knowledge-graph-full-link {
+    flex: 1;
+    padding: 0.35rem 0.45rem;
+    text-align: center;
+  }
+
+  .knowledge-graph-sidebar .knowledge-graph-canvas {
+    height: 250px;
+    min-height: 220px;
+  }
+
+  .knowledge-graph-sidebar .knowledge-graph-hint {
+    display: none;
   }
 
   svg {

@@ -1,0 +1,157 @@
+---
+import type { MarkdownHeading } from "astro";
+
+type Props = {
+  headings: MarkdownHeading[];
+};
+
+const { headings } = Astro.props;
+const tocHeadings = headings.filter(
+  ({ depth, slug }) => depth >= 2 && depth <= 4 && slug !== "footnote-label"
+);
+---
+
+{
+  tocHeadings.length > 0 && (
+    <nav class="article-toc" aria-label="目录导览" data-article-toc>
+      <details open>
+        <summary>
+          <span>目录导览</span>
+          <span>{tocHeadings.length} 个章节</span>
+        </summary>
+        <ol>
+          {tocHeadings.map(heading => (
+            <li style={`--toc-depth: ${heading.depth - 2}`}>
+              <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </details>
+    </nav>
+  )
+}
+
+<script>
+  function setupArticleToc() {
+    document
+      .querySelectorAll<HTMLElement>("[data-article-toc]")
+      .forEach(root => {
+        if (root.dataset.tocReady === "true") return;
+        root.dataset.tocReady = "true";
+
+        const details = root.querySelector("details");
+        const links = Array.from(
+          root.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")
+        );
+        const headings = links
+          .map(link => document.getElementById(link.dataset.tocLink ?? ""))
+          .filter((heading): heading is HTMLElement => Boolean(heading));
+
+        if (window.matchMedia("(max-width: 1179px)").matches) {
+          details?.removeAttribute("open");
+        }
+
+        const setActive = (id: string) => {
+          for (const link of links) {
+            link.toggleAttribute("data-active", link.dataset.tocLink === id);
+          }
+        };
+
+        const observer = new IntersectionObserver(
+          entries => {
+            const visible = entries
+              .filter(entry => entry.isIntersecting)
+              .sort(
+                (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
+              );
+            const active = visible[0]?.target as HTMLElement | undefined;
+            if (active) setActive(active.id);
+          },
+          { rootMargin: "-15% 0px -72% 0px", threshold: [0, 1] }
+        );
+
+        headings.forEach(heading => observer.observe(heading));
+        if (headings[0]) setActive(headings[0].id);
+      });
+  }
+
+  setupArticleToc();
+  document.addEventListener("astro:page-load", setupArticleToc);
+</script>
+
+<style>
+  .article-toc {
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    border-radius: 0.85rem;
+    background: color-mix(in srgb, var(--background) 94%, transparent);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 6%);
+    overflow: hidden;
+  }
+
+  summary {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 0.95rem;
+    font-weight: 700;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary span:last-child {
+    color: var(--muted-foreground);
+    font-size: 0.7rem;
+    font-weight: 400;
+  }
+
+  ol {
+    max-height: min(42vh, 24rem);
+    margin: 0;
+    overflow-y: auto;
+    border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+    padding: 0.55rem 0.5rem 0.7rem;
+    list-style: none;
+    scrollbar-width: thin;
+  }
+
+  li {
+    margin: 0;
+    padding-left: calc(var(--toc-depth) * 0.75rem);
+  }
+
+  a {
+    display: block;
+    border-radius: 0.5rem;
+    padding: 0.38rem 0.5rem;
+    color: var(--muted-foreground);
+    font-size: 0.78rem;
+    line-height: 1.35;
+    text-decoration: none;
+    transition:
+      color 140ms ease,
+      background-color 140ms ease;
+  }
+
+  a:hover,
+  a[data-active] {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+  }
+
+  @media (max-width: 1179px) {
+    .article-toc {
+      margin-block: 1rem;
+    }
+
+    ol {
+      max-height: 20rem;
+    }
+  }
+</style>
