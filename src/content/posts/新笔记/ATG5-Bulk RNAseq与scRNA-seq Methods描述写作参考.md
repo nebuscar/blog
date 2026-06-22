@@ -2,7 +2,7 @@
 title: "ATG5-Bulk RNAseq与scRNA-seq Methods描述写作参考"
 description: "RNA-seq and Single-cell Methods Writing References"
 pubDatetime: 2026-06-22T15:01:00.000Z
-modDatetime: 2026-06-22T23:35:58+08:00
+modDatetime: 2026-06-22T23:40:30+08:00
 slug: 20260622-2301-zgrvy
 legacySlug: "新笔记/atg5-bulkrnaseq与scrna-seqmethods描述写作参考"
 tags: []
@@ -10,6 +10,7 @@ tags: []
 ## 1 转录组 RNA-seq
 
 ### 1.1 DESeq2 Differential Expression Analysis
+![500x155](ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_c7af50c8-08f8-4ce6-b5cb-64bdf0cfe837.png)
 English example:
 ```
 Differential expression analysis of RNA-seq data was performed using the DESeq2 R package. Raw read count matrices were used as input, and DESeq2 was applied to identify genes differentially expressed between experimental groups. P values were adjusted for multiple testing using the Benjamini-Hochberg method. Genes with adjusted p values below the preset threshold and fold changes exceeding the cutoff were considered differentially expressed. Pairwise comparisons were conducted according to the experimental design, including AD versus control, intervention versus control, and intervention versus AD groups.
@@ -23,7 +24,9 @@ References:
 2. Karthivashan et al., 2026. 5xFAD AD model; Methods 2.6 describes mRNA RNA-seq and DESeq2-based analysis. [https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/](https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/)
 3. Baker et al., 2026. Bulk RNA-seq; Methods describes featureCounts input to DESeq2, FDR correction, and log2FC threshold. [https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/)
 
-### 1.2 GO Enrichment Analysis
+### 1.2 Functional analysis of DEGs
+![500x67](ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_7c3ce50a-fd19-4f6d-81d4-226ab103fb2b.png)
+#### 1.2.1 GO Enrichment Analysis
 English example:
 ```
 To investigate the potential biological functions of differentially expressed genes, Gene Ontology enrichment analysis was performed using clusterProfiler or related enrichment tools. GO terms were analyzed across biological process, cellular component, and molecular function categories. The DEG list was compared with the background gene set, and enrichment significance was evaluated using multiple-testing-adjusted p values. GO terms with adjusted p value or FDR below 0.05 were considered significantly enriched.
@@ -37,7 +40,7 @@ References:
 2. Karthivashan et al., 2026. Methods 2.6 describes GO analysis of DEGs using clusterProfiler. [https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/](https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/)
 3. Coburn et al., 2025. Methods 2.13 describes GO biological process enrichment/network analysis from single-cell pseudobulk DEGs; useful as GO phrasing reference. [https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/)
 
-### 1.3 KEGG Pathway Enrichment Analysis
+#### 1.2.2 KEGG Pathway Enrichment Analysis
 English example:
 ```
 To further characterize signaling pathways and biological processes associated with differentially expressed genes, KEGG pathway enrichment analysis was performed using the clusterProfiler package. Differentially expressed genes identified from group comparisons were used as input, and enriched pathways were selected according to adjusted p values. KEGG pathways with adjusted p value below 0.05 were considered statistically significant and were used to interpret AD-related molecular alterations.
@@ -51,7 +54,8 @@ References:
 2. Baker et al., 2026. Methods describes KEGG pathway over-representation analysis, background genes, and padj threshold. [https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/)
 3. Siregar et al., 2026. Methods 2.5 describes GO/KEGG/GSEA integrative pathway enrichment analysis. [https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/](https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/)
 
-### 1.4 Gene Set Enrichment Analysis
+### 1.3 Gene Set Enrichment Analysis
+![500x99](ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_3e52a31e-76a7-4b41-a88a-9d4320c1034b.png)
 English example:
 ```
 To avoid information loss caused by arbitrary DEG cutoffs, Gene Set Enrichment Analysis was performed using a ranked list of all genes. Genes were ranked according to differential expression statistics, log2 fold change, or other ranking metrics, and were tested against predefined gene sets from KEGG, GO, or MSigDB. Enrichment results were evaluated using normalized enrichment score and FDR q value to determine the direction and significance of pathway-level changes between groups.
@@ -65,7 +69,7 @@ References:
 2. Karthivashan et al., 2026. Methods 2.6 describes GSEA v4.2.3, MSigDB v7.5.1, and C2/C5 gene sets. [https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/](https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/)
 3. Siregar et al., 2026. Methods includes GSEA together with GO/KEGG pathway analysis. [https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/](https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/)
 
-## 2 二、单细胞 scRNA-seq / snRNA-seq
+## 2 单细胞 scRNA-seq / snRNA-seq
 ### 2.1 Clustering and UMAP Visualization
 English example:
 ```
@@ -168,8 +172,8 @@ References:
 
 ## 3 Methodological References
 
-1. Love MI, Huber W, Anders S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology. 2014. [https://bioconductor.org/packages/release/bioc/html/DESeq2.html](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
-2. Yu G, Wang LG, Han Y, He QY. clusterProfiler: an R package for comparing biological themes among gene clusters. OMICS. 2012. [https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html)
-3. Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. PNAS. 2005. [https://www.gsea-msigdb.org/gsea/index.jsp](https://www.gsea-msigdb.org/gsea/index.jsp)
-4. Stuart T, Butler A, Hoffman P, et al. Comprehensive integration of single-cell data. Cell. 2019. [https://satijalab.org/seurat/](https://satijalab.org/seurat/)
-5. McInnes L, Healy J, Melville J. UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction. [https://arxiv.org/abs/1802.03426](https://arxiv.org/abs/1802.03426)
+1. DESeq2：Love et al., 2014, _Genome Biology_. [Bioconductor DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
+2. clusterProfiler：Yu et al., 2012, _OMICS_. [Bioconductor clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html)[https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html)
+3. GSEA：Subramanian et al., 2005, _PNAS_. [GSEA](https://www.gsea-msigdb.org/gsea/index.jsp)
+4. Seurat：Stuart et al., 2019, _Cell_. [Seurat](https://satijalab.org/seurat/)
+5. UMAP：McInnes et al. [UMAP paper](https://arxiv.org/abs/1802.03426)
