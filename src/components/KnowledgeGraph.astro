@@ -36,6 +36,9 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
   /</g,
   "\\u003c"
 );
+const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
+  (first, second) => first.localeCompare(second, "zh-CN")
+);
 ---
 
 {
@@ -74,12 +77,143 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
           <button type="button" data-graph-reset>
             重置视图
           </button>
+          {!compact && (
+            <button
+              type="button"
+              data-graph-settings-toggle
+              aria-expanded="false"
+              aria-controls="knowledge-graph-settings"
+            >
+              图谱设置
+            </button>
+          )}
           {compact && (
             <a href="/graph/" class="knowledge-graph-full-link">
               查看全站图谱
             </a>
           )}
         </div>
+
+        {!compact && (
+          <aside
+            id="knowledge-graph-settings"
+            class="knowledge-graph-settings"
+            data-graph-settings-panel
+            hidden
+          >
+            <header>
+              <strong>图谱设置</strong>
+              <div>
+                <button type="button" data-graph-settings-reset>
+                  恢复默认
+                </button>
+                <button
+                  type="button"
+                  data-graph-settings-close
+                  aria-label="关闭设置"
+                >
+                  ×
+                </button>
+              </div>
+            </header>
+
+            <details open>
+              <summary>筛选</summary>
+              <label class="graph-switch">
+                <span>显示孤立文章</span>
+                <input type="checkbox" data-graph-show-orphans checked />
+              </label>
+              {graphTags.length > 0 && (
+                <fieldset class="graph-tag-filter" data-graph-tag-filter>
+                  <legend>标签</legend>
+                  {graphTags.map(tag => (
+                    <label>
+                      <input type="checkbox" value={tag} />
+                      <span>{tag}</span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
+            </details>
+
+            <details open>
+              <summary>外观</summary>
+              <label class="graph-range">
+                <span>标题透明度</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value="0"
+                  data-graph-label-opacity
+                />
+              </label>
+              <label class="graph-range">
+                <span>节点大小</span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.1"
+                  value="1"
+                  data-graph-node-size
+                />
+              </label>
+              <label class="graph-range">
+                <span>连线粗细</span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="4"
+                  step="0.25"
+                  value="1"
+                  data-graph-link-width
+                />
+              </label>
+              <button type="button" data-graph-animation>
+                暂停动画
+              </button>
+            </details>
+
+            <details open>
+              <summary>力度</summary>
+              <label class="graph-range">
+                <span>图谱向心力</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="2"
+                  step="0.1"
+                  value="1"
+                  data-graph-center-force
+                />
+              </label>
+              <label class="graph-range">
+                <span>节点排斥力</span>
+                <input
+                  type="range"
+                  min="0.25"
+                  max="2"
+                  step="0.05"
+                  value="1"
+                  data-graph-repel-force
+                />
+              </label>
+              <label class="graph-range">
+                <span>关联吸引力</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value="1"
+                  data-graph-link-force
+                />
+              </label>
+            </details>
+          </aside>
+        )}
 
         <div
           class="knowledge-graph-canvas"
@@ -111,6 +245,11 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
 
 <script>
   import { getConnectedNodeIds } from "@/utils/knowledgeGraphInteraction.mjs";
+  import {
+    DEFAULT_GRAPH_SETTINGS,
+    filterGraphNodes,
+    normalizeGraphSettings,
+  } from "@/utils/knowledgeGraphSettings.mjs";
 
   type GraphNode = {
     id: string;
@@ -135,6 +274,18 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
     currentId?: string;
   };
 
+  type GraphSettings = {
+    labelOpacity: number;
+    nodeSize: number;
+    linkWidth: number;
+    centerForce: number;
+    repelForce: number;
+    linkForce: number;
+    showOrphans: boolean;
+    selectedTags: string[];
+    animation: boolean;
+  };
+
   const svgNamespace = "http://www.w3.org/2000/svg";
 
   function hash(value: string) {
@@ -157,6 +308,45 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
     const nodesLayer = svg?.querySelector<SVGGElement>("[data-graph-nodes]");
     const search = root.querySelector<HTMLInputElement>("[data-graph-search]");
     const reset = root.querySelector<HTMLButtonElement>("[data-graph-reset]");
+    const settingsToggle = root.querySelector<HTMLButtonElement>(
+      "[data-graph-settings-toggle]"
+    );
+    const settingsPanel = root.querySelector<HTMLElement>(
+      "[data-graph-settings-panel]"
+    );
+    const settingsClose = root.querySelector<HTMLButtonElement>(
+      "[data-graph-settings-close]"
+    );
+    const settingsReset = root.querySelector<HTMLButtonElement>(
+      "[data-graph-settings-reset]"
+    );
+    const showOrphans = root.querySelector<HTMLInputElement>(
+      "[data-graph-show-orphans]"
+    );
+    const tagFilter = root.querySelector<HTMLElement>(
+      "[data-graph-tag-filter]"
+    );
+    const labelOpacity = root.querySelector<HTMLInputElement>(
+      "[data-graph-label-opacity]"
+    );
+    const nodeSize = root.querySelector<HTMLInputElement>(
+      "[data-graph-node-size]"
+    );
+    const linkWidth = root.querySelector<HTMLInputElement>(
+      "[data-graph-link-width]"
+    );
+    const animationToggle = root.querySelector<HTMLButtonElement>(
+      "[data-graph-animation]"
+    );
+    const centerForce = root.querySelector<HTMLInputElement>(
+      "[data-graph-center-force]"
+    );
+    const repelForce = root.querySelector<HTMLInputElement>(
+      "[data-graph-repel-force]"
+    );
+    const linkForce = root.querySelector<HTMLInputElement>(
+      "[data-graph-link-force]"
+    );
     const details = root.querySelector<HTMLDetailsElement>(
       ".knowledge-graph-details"
     );
@@ -248,7 +438,7 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
       group.append(circle, label);
       nodesLayer.append(group);
 
-      return { node, group };
+      return { node, group, circle, label, radius };
     });
 
     let scale = 1;
@@ -265,6 +455,14 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
     let panStartY = 0;
     let panOriginX = 0;
     let panOriginY = 0;
+    const settingsStorageKey = "knowledge-graph-settings";
+    let settings: GraphSettings = {
+      ...DEFAULT_GRAPH_SETTINGS,
+      selectedTags: [],
+    };
+    let visibleNodeIds = new Set(nodes.map(node => node.id));
+    let animationPlaying = true;
+    const availableTags = new Set(nodes.flatMap(node => node.tags.map(String)));
 
     const applyViewport = () => {
       viewport.setAttribute(
@@ -277,6 +475,10 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
       for (const { link, line } of linkElements) {
         const source = nodeById.get(link.source)!;
         const target = nodeById.get(link.target)!;
+        const visible =
+          visibleNodeIds.has(link.source) && visibleNodeIds.has(link.target);
+        line.toggleAttribute("hidden", !visible);
+        if (!visible) continue;
         line.setAttribute("x1", String(source.x));
         line.setAttribute("y1", String(source.y));
         line.setAttribute("x2", String(target.x));
@@ -284,6 +486,8 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
       }
 
       for (const { node, group } of nodeElements) {
+        group.toggleAttribute("hidden", !visibleNodeIds.has(node.id));
+        if (!visibleNodeIds.has(node.id)) continue;
         group.setAttribute("transform", `translate(${node.x} ${node.y})`);
       }
     };
@@ -299,7 +503,7 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
           let dy = second.y - first.y;
           const distanceSquared = Math.max(dx * dx + dy * dy, 80);
           const distance = Math.sqrt(distanceSquared);
-          const force = 850 / distanceSquared;
+          const force = (850 * settings.repelForce) / distanceSquared;
           dx /= distance;
           dy /= distance;
           first.vx -= dx * force;
@@ -320,7 +524,7 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
         )
           ? 105
           : 135;
-        const force = (distance - targetDistance) * 0.0018;
+        const force = (distance - targetDistance) * 0.0018 * settings.linkForce;
         source.vx += (dx / distance) * force;
         source.vy += (dy / distance) * force;
         target.vx -= (dx / distance) * force;
@@ -329,8 +533,8 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
 
       for (const node of nodes) {
         if (node === draggedNode) continue;
-        node.vx += (width / 2 - node.x) * 0.0007;
-        node.vy += (height / 2 - node.y) * 0.0007;
+        node.vx += (width / 2 - node.x) * 0.0007 * settings.centerForce;
+        node.vy += (height / 2 - node.y) * 0.0007 * settings.centerForce;
         node.vx *= 0.9;
         node.vy *= 0.9;
         node.x = Math.min(width - 30, Math.max(30, node.x + node.vx));
@@ -338,14 +542,77 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
       }
 
       render();
-      if (ticks < 420 || draggedNode)
+      if (animationPlaying && (ticks < 420 || draggedNode))
         animationFrame = requestAnimationFrame(tick);
     };
 
     const restart = () => {
       cancelAnimationFrame(animationFrame);
       ticks = 0;
-      animationFrame = requestAnimationFrame(tick);
+      if (animationPlaying) animationFrame = requestAnimationFrame(tick);
+    };
+
+    const getSelectedTags = () =>
+      Array.from(
+        tagFilter?.querySelectorAll<HTMLInputElement>(
+          'input[type="checkbox"]:checked'
+        ) ?? []
+      ).map(input => input.value);
+
+    const updateFilters = () => {
+      visibleNodeIds = filterGraphNodes(nodes, {
+        query: search?.value ?? "",
+        selectedTags: settings.selectedTags,
+        showOrphans: settings.showOrphans,
+      });
+      render();
+    };
+
+    const applySettings = (nextSettings: Partial<GraphSettings>) => {
+      settings = normalizeGraphSettings(
+        nextSettings,
+        availableTags
+      ) as GraphSettings;
+      animationPlaying = settings.animation;
+      root.style.setProperty(
+        "--graph-label-opacity",
+        String(settings.labelOpacity)
+      );
+      root.style.setProperty("--graph-node-scale", String(settings.nodeSize));
+      root.style.setProperty("--graph-link-width", String(settings.linkWidth));
+
+      showOrphans && (showOrphans.checked = settings.showOrphans);
+      labelOpacity && (labelOpacity.value = String(settings.labelOpacity));
+      nodeSize && (nodeSize.value = String(settings.nodeSize));
+      linkWidth && (linkWidth.value = String(settings.linkWidth));
+      centerForce && (centerForce.value = String(settings.centerForce));
+      repelForce && (repelForce.value = String(settings.repelForce));
+      linkForce && (linkForce.value = String(settings.linkForce));
+      animationToggle &&
+        (animationToggle.textContent = animationPlaying
+          ? "暂停动画"
+          : "播放动画");
+      tagFilter
+        ?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
+        .forEach(
+          input => (input.checked = settings.selectedTags.includes(input.value))
+        );
+
+      for (const { circle, label, radius } of nodeElements) {
+        circle.setAttribute("r", String(radius * settings.nodeSize));
+        label.setAttribute("x", String(radius * settings.nodeSize + 5));
+      }
+      updateFilters();
+      animationPlaying ? restart() : cancelAnimationFrame(animationFrame);
+    };
+
+    const persistSettings = () => {
+      localStorage.setItem(settingsStorageKey, JSON.stringify(settings));
+    };
+
+    const updateSetting = (patch: Partial<GraphSettings>) => {
+      applySettings({ ...settings, ...patch });
+      persistSettings();
     };
 
     const clientToGraph = (clientX: number, clientY: number) => {
@@ -497,11 +764,59 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
     search?.addEventListener("input", () => {
       const query = search.value.trim().toLocaleLowerCase();
       for (const { node, group } of nodeElements) {
-        const matches =
-          !query || node.title.toLocaleLowerCase().includes(query);
-        group.toggleAttribute("data-search-match", Boolean(query && matches));
-        group.toggleAttribute("data-search-dim", Boolean(query && !matches));
+        group.toggleAttribute(
+          "data-search-match",
+          Boolean(query && node.title.toLocaleLowerCase().includes(query))
+        );
       }
+      updateFilters();
+    });
+
+    settingsToggle?.addEventListener("click", () => {
+      if (!settingsPanel) return;
+      settingsPanel.hidden = !settingsPanel.hidden;
+      settingsToggle.setAttribute(
+        "aria-expanded",
+        String(!settingsPanel.hidden)
+      );
+    });
+
+    settingsClose?.addEventListener("click", () => {
+      if (!settingsPanel) return;
+      settingsPanel.hidden = true;
+      settingsToggle?.setAttribute("aria-expanded", "false");
+    });
+
+    showOrphans?.addEventListener("change", () =>
+      updateSetting({ showOrphans: showOrphans.checked })
+    );
+    tagFilter?.addEventListener("change", () =>
+      updateSetting({ selectedTags: getSelectedTags() })
+    );
+    labelOpacity?.addEventListener("input", () =>
+      updateSetting({ labelOpacity: Number(labelOpacity.value) })
+    );
+    nodeSize?.addEventListener("input", () =>
+      updateSetting({ nodeSize: Number(nodeSize.value) })
+    );
+    linkWidth?.addEventListener("input", () =>
+      updateSetting({ linkWidth: Number(linkWidth.value) })
+    );
+    centerForce?.addEventListener("input", () =>
+      updateSetting({ centerForce: Number(centerForce.value) })
+    );
+    repelForce?.addEventListener("input", () =>
+      updateSetting({ repelForce: Number(repelForce.value) })
+    );
+    linkForce?.addEventListener("input", () =>
+      updateSetting({ linkForce: Number(linkForce.value) })
+    );
+    animationToggle?.addEventListener("click", () =>
+      updateSetting({ animation: !animationPlaying })
+    );
+    settingsReset?.addEventListener("click", () => {
+      localStorage.removeItem(settingsStorageKey);
+      applySettings({ ...DEFAULT_GRAPH_SETTINGS });
     });
 
     reset?.addEventListener("click", () => {
@@ -521,9 +836,21 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
       }
     });
 
+    if (settingsPanel) {
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem(settingsStorageKey) ?? "null"
+        );
+        applySettings(stored ?? { ...DEFAULT_GRAPH_SETTINGS });
+      } catch {
+        localStorage.removeItem(settingsStorageKey);
+        applySettings({ ...DEFAULT_GRAPH_SETTINGS });
+      }
+    }
+
     render();
     applyViewport();
-    restart();
+    if (!settingsPanel) restart();
   }
 
   function setupKnowledgeGraphs() {
@@ -542,6 +869,7 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
   }
 
   .knowledge-graph-details {
+    position: relative;
     border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
     border-radius: 1rem;
     background: color-mix(in srgb, var(--background) 92%, transparent);
@@ -606,6 +934,135 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
   .knowledge-graph-full-link:hover {
     color: var(--accent);
     border-color: var(--accent);
+  }
+
+  .knowledge-graph-settings {
+    position: absolute;
+    top: 4.2rem;
+    right: 1rem;
+    z-index: 12;
+    width: min(22rem, calc(100% - 2rem));
+    max-height: calc(100% - 5.2rem);
+    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--background) 96%, transparent);
+    box-shadow: 0 18px 48px rgb(0 0 0 / 18%);
+    overflow-y: auto;
+    backdrop-filter: blur(18px);
+  }
+
+  .knowledge-graph-settings[hidden] {
+    display: none;
+  }
+
+  .knowledge-graph-settings > header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 1rem;
+    background: color-mix(in srgb, var(--background) 96%, transparent);
+  }
+
+  .knowledge-graph-settings > header div {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .knowledge-graph-settings button {
+    border: 1px solid var(--border);
+    border-radius: 0.55rem;
+    padding: 0.35rem 0.6rem;
+    background: var(--background);
+    font-size: 0.78rem;
+  }
+
+  .knowledge-graph-settings > details {
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .knowledge-graph-settings > details > summary {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .knowledge-graph-settings > details > :not(summary) {
+    margin-inline: 1rem;
+  }
+
+  .graph-switch,
+  .graph-range {
+    display: grid;
+    gap: 0.45rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.86rem;
+  }
+
+  .graph-switch {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+
+  .graph-switch input {
+    width: 2.4rem;
+    height: 1.3rem;
+    accent-color: var(--accent);
+  }
+
+  .graph-range input {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .graph-tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
+    border: 0;
+    padding: 0;
+  }
+
+  .graph-tag-filter legend {
+    width: 100%;
+    margin-bottom: 0.25rem;
+    font-size: 0.86rem;
+  }
+
+  .graph-tag-filter label {
+    cursor: pointer;
+  }
+
+  .graph-tag-filter input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .graph-tag-filter span {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.25rem 0.55rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+
+  .graph-tag-filter input:checked + span {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+
+  [data-graph-animation] {
+    width: calc(100% - 2rem);
+    margin: 0 1rem 1rem;
+    color: var(--accent);
   }
 
   .knowledge-graph-canvas {
@@ -687,7 +1144,7 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
 
   :global(.knowledge-graph-link) {
     stroke: color-mix(in srgb, var(--muted-foreground) 38%, transparent);
-    stroke-width: 1.25;
+    stroke-width: calc(1.25 * var(--graph-link-width, 1));
     transition:
       opacity 140ms ease,
       stroke 140ms ease,
@@ -727,7 +1184,7 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
   :global(.knowledge-graph-node text) {
     fill: currentColor;
     font-size: 11px;
-    opacity: 0;
+    opacity: var(--graph-label-opacity, 0);
     paint-order: stroke;
     stroke: var(--background);
     stroke-width: 3px;
@@ -738,6 +1195,11 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
   :global(.knowledge-graph-node[data-label-visible] text),
   :global(.knowledge-graph-node[data-search-match] text) {
     opacity: 1;
+  }
+
+  :global(.knowledge-graph-node[hidden]),
+  :global(.knowledge-graph-link[hidden]) {
+    display: none;
   }
 
   :global(.knowledge-graph-node[data-focused]) {
@@ -786,6 +1248,15 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
 
     .knowledge-graph-hint {
       display: none;
+    }
+
+    .knowledge-graph-settings {
+      position: fixed;
+      top: 5rem;
+      right: 0.75rem;
+      bottom: 1rem;
+      width: calc(100% - 1.5rem);
+      max-height: none;
     }
   }
 </style>
