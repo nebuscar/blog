@@ -7,6 +7,7 @@ export default {
     tags: "标签",
     about: "关于",
     guestbook: "留言板",
+    graph: "图谱",
     archives: "归档",
     search: "搜索",
   },

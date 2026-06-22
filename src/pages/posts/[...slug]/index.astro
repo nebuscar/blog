@@ -4,6 +4,7 @@ import PostLayout from "@/layouts/PostLayout.astro";
 import Footer from "@/components/Footer.astro";
 import WalineComments from "@/components/WalineComments.astro";
 import VisitorStats from "@/components/VisitorStats.astro";
+import KnowledgeGraph from "@/components/KnowledgeGraph.astro";
 import Datetime from "@/components/Datetime.astro";
 import Tag from "@/components/Tag.astro";
 import {
@@ -12,6 +13,10 @@ import {
   getPostUrl,
 } from "@/utils/getPostPaths";
 import { getSortedPosts } from "@/utils/getSortedPosts";
+import {
+  buildKnowledgeGraph,
+  getLocalKnowledgeGraph,
+} from "@/utils/knowledgeGraph.mjs";
 import { slugifyStr } from "@/utils/slugify";
 import { toTransitionName } from "@/utils/toTransitionName";
 import EditPost from "./_components/EditPost.astro";
@@ -25,6 +30,14 @@ import config from "@/config";
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
   const sortedPosts = getSortedPosts(posts);
+  const graph = buildKnowledgeGraph(sortedPosts, graphPost =>
+    getPostUrl(
+      graphPost.data.slug,
+      graphPost.id,
+      graphPost.filePath,
+      config.site.lang
+    )
+  );
 
   return sortedPosts.map((post, index) => {
     const slug = getPostSlug(post.data.slug, post.id, post.filePath);
@@ -32,6 +45,7 @@ export async function getStaticPaths() {
       params: { slug },
       props: {
         post,
+        knowledgeGraph: getLocalKnowledgeGraph(graph, post.id),
         prevPost:
           index > 0
             ? {
@@ -64,11 +78,25 @@ type AdjacentPost = {
 
 type Props = {
   post?: CollectionEntry<"posts">;
+  knowledgeGraph?: {
+    nodes: {
+      id: string;
+      title: string;
+      url: string;
+      tags: string[];
+    }[];
+    links: { source: string; target: string }[];
+  };
   prevPost?: AdjacentPost;
   nextPost?: AdjacentPost;
 };
 
-const { post, prevPost = null, nextPost = null } = Astro.props;
+const {
+  post,
+  knowledgeGraph = { nodes: [], links: [] },
+  prevPost = null,
+  nextPost = null,
+} = Astro.props;
 if (!post) return Astro.redirect("/404", 302);
 const locale = Astro.currentLocale ?? config.site.lang;
 
@@ -167,6 +195,13 @@ const commentPath = `${getLegacyPostUrl(
     >
       <Content />
     </article>
+
+    <KnowledgeGraph
+      graph={knowledgeGraph}
+      currentId={post.id}
+      compact
+      collapsible
+    />
 
     <hr class="my-8 border-dashed" />
 
