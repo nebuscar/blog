@@ -8,8 +8,11 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --font-app:
-    ui-monospace, "Cascadia Code", "Microsoft YaHei", "PingFang SC",
-    "Noto Sans CJK SC", monospace;
+    Inter, "Segoe UI", Arial, "Microsoft YaHei", "PingFang SC",
+    "Noto Sans CJK SC", sans-serif;
+  --font-code:
+    ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas,
+    "Liberation Mono", monospace;
 }
 
 /* Light theme values */
