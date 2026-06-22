@@ -14,6 +14,12 @@ test("renders article context controls in the right sidebar", async () => {
   assert.match(source, /data-post-context-prev/);
   assert.match(source, /data-post-context-top/);
   assert.match(source, /data-post-context-next/);
+  assert.match(source, /top:\s*50%/);
+  assert.match(source, /right:\s*4\.75rem/);
+  assert.match(source, /transform:\s*translateY\(-50%\)/);
+  assert.match(source, /IconArrowBarToUp/);
+  assert.doesNotMatch(source, /IconArrowLeft class="size-5 rotate-90"/);
+  assert.doesNotMatch(source, /IconArrowRight class="size-5 rotate-90"/);
   assert.doesNotMatch(source, /fixed inset-0/);
 });
 

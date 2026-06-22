@@ -1,7 +1,9 @@
 ---
 import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
-import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
+import IconArrowBarToUp from "@/assets/icons/IconArrowBarToUp.svg";
+import IconChevronDown from "@/assets/icons/IconChevronDown.svg";
+import IconChevronUp from "@/assets/icons/IconChevronUp.svg";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -43,7 +45,7 @@ const nextHref = nextPost
         aria-label={`${t.post.previousPost}: ${prevPost.title}`}
         title={`${t.post.previousPost}: ${prevPost.title}`}
       >
-        <IconArrowLeft class="size-5 rotate-90" />
+        <IconChevronUp class="size-5" />
       </a>
     ) : (
       <span class="context-control-placeholder" aria-hidden="true" />
@@ -56,7 +58,7 @@ const nextHref = nextPost
     aria-label={t.post.backToTop}
     title={t.post.backToTop}
   >
-    <IconArrowNarrowUp class="size-5" />
+    <IconArrowBarToUp class="size-5" />
   </button>
 
   {
@@ -67,7 +69,7 @@ const nextHref = nextPost
         aria-label={`${t.post.nextPost}: ${nextPost.title}`}
         title={`${t.post.nextPost}: ${nextPost.title}`}
       >
-        <IconArrowRight class="size-5 rotate-90" />
+        <IconChevronDown class="size-5" />
       </a>
     ) : (
       <span class="context-control-placeholder" aria-hidden="true" />
@@ -93,7 +95,7 @@ const nextHref = nextPost
       )
     }
     <button type="button" data-mobile-post-top>
-      <IconArrowNarrowUp class="size-4" />
+      <IconArrowBarToUp class="size-4" />
       <span>{t.post.backToTop}</span>
     </button>
     {
@@ -247,24 +249,29 @@ const nextHref = nextPost
 
   @media (min-width: 1280px) {
     .post-context-controls {
+      position: fixed;
+      top: 50%;
+      right: 4.75rem;
+      z-index: 45;
       display: grid;
-      grid-template-columns: repeat(3, 2.35rem);
+      grid-template-rows: repeat(3, 2.5rem);
       justify-content: center;
       gap: 0.4rem;
-      margin-bottom: 0.75rem;
       border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-      border-radius: 0.85rem;
+      border-radius: 1rem;
       padding: 0.55rem;
       background: color-mix(in srgb, var(--background) 94%, transparent);
-      box-shadow: 0 8px 22px rgb(0 0 0 / 7%);
+      box-shadow: 0 10px 30px rgb(0 0 0 / 12%);
+      backdrop-filter: blur(16px);
+      transform: translateY(-50%);
     }
 
     .post-context-controls a,
     .post-context-controls button,
     .context-control-placeholder {
       display: grid;
-      width: 2.35rem;
-      height: 2.35rem;
+      width: 2.5rem;
+      height: 2.5rem;
       place-items: center;
       border-radius: 0.65rem;
     }
@@ -273,12 +280,17 @@ const nextHref = nextPost
     .post-context-controls button {
       color: var(--muted-foreground);
       background: color-mix(in srgb, var(--muted) 45%, transparent);
+      transition:
+        color 160ms ease,
+        background-color 160ms ease,
+        transform 160ms ease;
     }
 
     .post-context-controls a:hover,
     .post-context-controls button:hover {
       color: var(--accent);
       background: color-mix(in srgb, var(--accent) 10%, transparent);
+      transform: scale(1.06);
     }
 
     .context-control-placeholder {
