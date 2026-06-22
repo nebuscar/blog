@@ -1,6 +1,7 @@
 ---
 import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -28,85 +29,89 @@ const nextHref = nextPost
   : "";
 ---
 
-{
-  (prevPost || nextPost) && (
-    <>
-      <nav
-        data-pagefind-ignore
-        aria-label="文章快速翻页"
-        class="pointer-events-none fixed inset-0 z-40 hidden xl:block"
+<nav
+  class="post-context-controls"
+  data-post-context-controls
+  data-pagefind-ignore
+  aria-label="文章上下文导航"
+>
+  {
+    prevPost ? (
+      <a
+        href={prevHref}
+        data-post-context-prev
+        aria-label={`${t.post.previousPost}: ${prevPost.title}`}
+        title={`${t.post.previousPost}: ${prevPost.title}`}
       >
-        {prevPost && (
-          <a
-            href={prevHref}
-            data-side-post-prev
-            aria-label={`${t.post.previousPost}: ${prevPost.title}`}
-            class="group pointer-events-auto fixed start-4 top-1/2 flex -translate-y-1/2 items-center no-underline"
-          >
-            <span class="edge-nav-button">
-              <IconArrowLeft class="size-5 rtl:rotate-180" />
-            </span>
-            <span class="edge-nav-label edge-nav-label-prev">
-              <small>{t.post.previousPost}</small>
-              <strong>{prevPost.title}</strong>
-            </span>
-          </a>
-        )}
+        <IconArrowLeft class="size-5 rotate-90" />
+      </a>
+    ) : (
+      <span class="context-control-placeholder" aria-hidden="true" />
+    )
+  }
 
-        {nextPost && (
-          <a
-            href={nextHref}
-            data-side-post-next
-            aria-label={`${t.post.nextPost}: ${nextPost.title}`}
-            class="group pointer-events-auto fixed end-4 top-1/2 flex -translate-y-1/2 items-center no-underline"
-          >
-            <span class="edge-nav-label edge-nav-label-next">
-              <small>{t.post.nextPost}</small>
-              <strong>{nextPost.title}</strong>
-            </span>
-            <span class="edge-nav-button">
-              <IconArrowRight class="size-5 rtl:rotate-180" />
-            </span>
-          </a>
-        )}
-      </nav>
+  <button
+    type="button"
+    data-post-context-top
+    aria-label={t.post.backToTop}
+    title={t.post.backToTop}
+  >
+    <IconArrowNarrowUp class="size-5" />
+  </button>
 
-      <details
-        class="mobile-post-nav"
-        data-mobile-post-nav
-        data-pagefind-ignore
+  {
+    nextPost ? (
+      <a
+        href={nextHref}
+        data-post-context-next
+        aria-label={`${t.post.nextPost}: ${nextPost.title}`}
+        title={`${t.post.nextPost}: ${nextPost.title}`}
       >
-        <summary aria-label="打开文章导航">
-          <span aria-hidden="true">↔</span>
-          <span>文章导航</span>
-        </summary>
-        <div class="mobile-post-nav-panel">
-          {prevPost && (
-            <a href={prevHref}>
-              <IconArrowLeft class="size-4 rtl:rotate-180" />
-              <span>
-                <small>{t.post.previousPost}</small>
-                <strong>{prevPost.title}</strong>
-              </span>
-            </a>
-          )}
-          {nextPost && (
-            <a href={nextHref}>
-              <span>
-                <small>{t.post.nextPost}</small>
-                <strong>{nextPost.title}</strong>
-              </span>
-              <IconArrowRight class="size-4 rtl:rotate-180" />
-            </a>
-          )}
-        </div>
-      </details>
-    </>
-  )
-}
+        <IconArrowRight class="size-5 rotate-90" />
+      </a>
+    ) : (
+      <span class="context-control-placeholder" aria-hidden="true" />
+    )
+  }
+</nav>
+
+<details class="mobile-post-nav" data-mobile-post-nav data-pagefind-ignore>
+  <summary aria-label="打开文章导航">
+    <span aria-hidden="true">↕</span>
+    <span>文章导航</span>
+  </summary>
+  <div class="mobile-post-nav-panel">
+    {
+      prevPost && (
+        <a href={prevHref}>
+          <IconArrowLeft class="size-4 rtl:rotate-180" />
+          <span>
+            <small>{t.post.previousPost}</small>
+            <strong>{prevPost.title}</strong>
+          </span>
+        </a>
+      )
+    }
+    <button type="button" data-mobile-post-top>
+      <IconArrowNarrowUp class="size-4" />
+      <span>{t.post.backToTop}</span>
+    </button>
+    {
+      nextPost && (
+        <a href={nextHref}>
+          <span>
+            <small>{t.post.nextPost}</small>
+            <strong>{nextPost.title}</strong>
+          </span>
+          <IconArrowRight class="size-4 rtl:rotate-180" />
+        </a>
+      )
+    }
+  </div>
+</details>
 
 <script>
-  function setupPostNavigationShortcuts() {
+  function setupPostContextControls() {
     const globalWindow = window as Window & {
       __postNavigationController?: AbortController;
     };
@@ -115,11 +120,22 @@ const nextHref = nextPost
     const controller = new AbortController();
     globalWindow.__postNavigationController = controller;
     const previous = document.querySelector<HTMLAnchorElement>(
-      "[data-side-post-prev]"
+      "[data-post-context-prev]"
     );
     const next = document.querySelector<HTMLAnchorElement>(
-      "[data-side-post-next]"
+      "[data-post-context-next]"
     );
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+    document
+      .querySelectorAll<HTMLButtonElement>(
+        "[data-post-context-top], [data-mobile-post-top]"
+      )
+      .forEach(button =>
+        button.addEventListener("click", scrollToTop, {
+          signal: controller.signal,
+        })
+      );
 
     document.addEventListener(
       "keydown",
@@ -133,98 +149,22 @@ const nextHref = nextPost
           event.preventDefault();
           window.location.href = next.href;
         }
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          scrollToTop();
+        }
       },
       { signal: controller.signal }
     );
   }
 
-  setupPostNavigationShortcuts();
-  document.addEventListener("astro:page-load", setupPostNavigationShortcuts);
+  setupPostContextControls();
+  document.addEventListener("astro:page-load", setupPostContextControls);
 </script>
 
 <style>
-  .edge-nav-button {
-    display: grid;
-    width: 2.75rem;
-    height: 2.75rem;
-    flex: none;
-    place-items: center;
-    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    border-radius: 999px;
-    color: var(--muted-foreground);
-    background: color-mix(in srgb, var(--background) 88%, transparent);
-    box-shadow: 0 8px 22px rgb(0 0 0 / 12%);
-    backdrop-filter: blur(14px);
-    transition:
-      color 160ms ease,
-      border-color 160ms ease,
-      transform 160ms ease;
-  }
-
-  a:hover .edge-nav-button,
-  a:focus-visible .edge-nav-button {
-    border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
-    color: var(--accent);
-    transform: scale(1.05);
-  }
-
-  .edge-nav-label {
-    display: grid;
-    width: 0;
-    max-width: 0;
-    gap: 0.08rem;
-    overflow: hidden;
-    border: 1px solid transparent;
-    border-radius: 0.75rem;
-    opacity: 0;
-    background: color-mix(in srgb, var(--background) 92%, transparent);
-    box-shadow: 0 8px 22px rgb(0 0 0 / 10%);
-    backdrop-filter: blur(14px);
-    transition:
-      width 180ms ease,
-      max-width 180ms ease,
-      padding 180ms ease,
-      margin 180ms ease,
-      opacity 140ms ease,
-      border-color 180ms ease;
-  }
-
-  a:hover .edge-nav-label,
-  a:focus-visible .edge-nav-label {
-    width: 15rem;
-    max-width: 15rem;
-    border-color: color-mix(in srgb, var(--border) 65%, transparent);
-    padding: 0.55rem 0.7rem;
-    opacity: 1;
-  }
-
-  a:hover .edge-nav-label-prev,
-  a:focus-visible .edge-nav-label-prev {
-    margin-left: 0.5rem;
-  }
-
-  a:hover .edge-nav-label-next,
-  a:focus-visible .edge-nav-label-next {
-    margin-right: 0.5rem;
-  }
-
-  .edge-nav-label small,
-  .mobile-post-nav-panel small {
-    color: var(--muted-foreground);
-    font-size: 0.68rem;
-  }
-
-  .edge-nav-label strong {
-    overflow: hidden;
-    font-size: 0.78rem;
-    font-weight: 600;
-    line-height: 1.35;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .edge-nav-label-next {
-    text-align: right;
+  .post-context-controls {
+    display: none;
   }
 
   .mobile-post-nav {
@@ -270,17 +210,20 @@ const nextHref = nextPost
     backdrop-filter: blur(18px);
   }
 
-  .mobile-post-nav-panel a {
+  .mobile-post-nav-panel a,
+  .mobile-post-nav-panel button {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.6rem;
     border-radius: 0.7rem;
     padding: 0.55rem;
+    text-align: left;
     text-decoration: none;
   }
 
-  .mobile-post-nav-panel a:hover {
+  .mobile-post-nav-panel a:hover,
+  .mobile-post-nav-panel button:hover {
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 8%, transparent);
   }
@@ -288,6 +231,11 @@ const nextHref = nextPost
   .mobile-post-nav-panel span {
     display: grid;
     min-width: 0;
+  }
+
+  .mobile-post-nav-panel small {
+    color: var(--muted-foreground);
+    font-size: 0.68rem;
   }
 
   .mobile-post-nav-panel strong {
@@ -298,6 +246,46 @@ const nextHref = nextPost
   }
 
   @media (min-width: 1280px) {
+    .post-context-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 2.35rem);
+      justify-content: center;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+      border-radius: 0.85rem;
+      padding: 0.55rem;
+      background: color-mix(in srgb, var(--background) 94%, transparent);
+      box-shadow: 0 8px 22px rgb(0 0 0 / 7%);
+    }
+
+    .post-context-controls a,
+    .post-context-controls button,
+    .context-control-placeholder {
+      display: grid;
+      width: 2.35rem;
+      height: 2.35rem;
+      place-items: center;
+      border-radius: 0.65rem;
+    }
+
+    .post-context-controls a,
+    .post-context-controls button {
+      color: var(--muted-foreground);
+      background: color-mix(in srgb, var(--muted) 45%, transparent);
+    }
+
+    .post-context-controls a:hover,
+    .post-context-controls button:hover {
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+
+    .context-control-placeholder {
+      opacity: 0.25;
+      background: color-mix(in srgb, var(--muted) 35%, transparent);
+    }
+
     .mobile-post-nav {
       display: none;
     }

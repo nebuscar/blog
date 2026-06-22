@@ -24,7 +24,6 @@ import { toTransitionName } from "@/utils/toTransitionName";
 import EditPost from "./_components/EditPost.astro";
 import ShareLinks from "./_components/ShareLinks.astro";
 import BackButton from "./_components/BackButton.astro";
-import BackToTopButton from "./_components/BackToTopButton.astro";
 import AdjacentPostNav from "./_components/AdjacentPostNav.astro";
 import SidePostNav from "./_components/SidePostNav.astro";
 import config from "@/config";
@@ -157,7 +156,6 @@ const commentPath = `${getLegacyPostUrl(
   modDatetime={modDatetime}
 >
   <BackButton />
-  <SidePostNav {prevPost} {nextPost} />
 
   <main
     id="main-content"
@@ -209,6 +207,7 @@ const commentPath = `${getLegacyPostUrl(
     <PostSidebarResizer />
 
     <aside class="post-graph-sidebar" aria-label="关联文档">
+      <SidePostNav {prevPost} {nextPost} />
       <KnowledgeGraph
         graph={knowledgeGraph}
         currentId={post.id}
@@ -222,8 +221,6 @@ const commentPath = `${getLegacyPostUrl(
       <hr class="my-8 border-dashed" />
 
       <EditPost class="sm:hidden" {hideEditPost} {post} />
-
-      <BackToTopButton />
 
       <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
         {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}

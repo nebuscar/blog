@@ -18,49 +18,49 @@ const { mode = "site", class: className, ...attrs } = Astro.props;
   <span data-stats-content>统计加载中...</span>
 </span>
 
-<script is:inline data-astro-rerun>
-  (() => {
+<script>
+  import { fetchVisitorStats } from "@/utils/visitorStatsClient.mjs";
+
+  type Stats = {
+    siteViews: number;
+    siteVisitors: number;
+    pageViews: number;
+    pageVisitors: number;
+  };
+
+  function setupVisitorStats() {
     const API_BASE = "https://status.okisama.top";
-    const state = (window.__blogVisitorStats ??= {
+    const globalWindow = window as Window & {
+      __blogVisitorStats?: {
+        requests: Map<string, Promise<Stats>>;
+      };
+    };
+    const state = (globalWindow.__blogVisitorStats ??= {
       requests: new Map(),
     });
 
-    const normalizePath = path => {
+    const normalizePath = (path: string) => {
       const normalized = `/${String(path).replace(/^\/+|\/+$/g, "")}`;
       return normalized === "/" ? "/" : `${normalized}/`;
     };
 
-    const recordView = path => {
+    const recordView = (path: string) => {
       if (!state.requests.has(path)) {
-        const request = fetch(`${API_BASE}/api/view`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ path }),
-        })
-          .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.json();
-          })
-          .catch(error => {
+        const request = fetchVisitorStats(fetch, API_BASE, path).catch(
+          error => {
             state.requests.delete(path);
             throw error;
-          });
+          }
+        );
         state.requests.set(path, request);
       }
       return state.requests.get(path);
     };
 
-    const requestStats = async path => {
-      try {
-        return await recordView(path);
-      } catch {
-        await new Promise(resolve => setTimeout(resolve, 600));
-        return recordView(path);
-      }
-    };
-
     const renderStats = async () => {
-      const elements = document.querySelectorAll("[data-visitor-stats]");
+      const elements = document.querySelectorAll<HTMLElement>(
+        "[data-visitor-stats]"
+      );
       if (!elements.length) return;
 
       for (const element of elements) {
@@ -68,9 +68,7 @@ const { mode = "site", class: className, ...attrs } = Astro.props;
       }
 
       try {
-        const stats = await requestStats(
-          normalizePath(window.location.pathname)
-        );
+        const stats = await recordView(normalizePath(window.location.pathname));
         for (const element of elements) {
           const content = element.querySelector("[data-stats-content]");
           if (!content) continue;
@@ -88,7 +86,10 @@ const { mode = "site", class: className, ...attrs } = Astro.props;
     };
 
     renderStats();
-  })();
+  }
+
+  setupVisitorStats();
+  document.addEventListener("astro:page-load", setupVisitorStats);
 </script>
 
 <style>

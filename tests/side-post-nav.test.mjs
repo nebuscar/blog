@@ -7,14 +7,14 @@ const componentUrl = new URL(
   import.meta.url
 );
 
-test("anchors desktop post navigation to viewport edges", async () => {
+test("renders article context controls in the right sidebar", async () => {
   const source = await readFile(componentUrl, "utf8");
 
-  assert.match(source, /data-side-post-prev/);
-  assert.match(source, /data-side-post-next/);
-  assert.match(source, /start-4/);
-  assert.match(source, /end-4/);
-  assert.doesNotMatch(source, /max-w-\[(60|70)rem\]/);
+  assert.match(source, /data-post-context-controls/);
+  assert.match(source, /data-post-context-prev/);
+  assert.match(source, /data-post-context-top/);
+  assert.match(source, /data-post-context-next/);
+  assert.doesNotMatch(source, /fixed inset-0/);
 });
 
 test("provides mobile and keyboard article navigation", async () => {

@@ -15,7 +15,7 @@ test("uses separate left directory and right graph columns", async () => {
   assert.match(source, /post-graph-sidebar/);
   assert.match(source, /PostSidebarResizer/);
   assert.match(source, /--post-toc-width/);
-  assert.match(source, /width:\s*calc\(100% - 8rem\)/);
+  assert.doesNotMatch(source, /<BackToTopButton \/>/);
 });
 
 test("renders tree directory controls", async () => {
