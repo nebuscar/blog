@@ -110,6 +110,8 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
 }
 
 <script>
+  import { getConnectedNodeIds } from "@/utils/knowledgeGraphInteraction.mjs";
+
   type GraphNode = {
     id: string;
     title: string;
@@ -237,6 +239,12 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
       label.setAttribute("x", String(radius + 5));
       label.setAttribute("y", "4");
       label.textContent = node.title;
+      if (
+        root.classList.contains("knowledge-graph-sidebar") &&
+        node.id === payload.currentId
+      ) {
+        group.dataset.labelVisible = "true";
+      }
       group.append(circle, label);
       nodesLayer.append(group);
 
@@ -352,6 +360,50 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
       window.location.href = node.url;
     };
 
+    const clearFocus = () => {
+      delete root.dataset.highlightNode;
+
+      for (const { group } of nodeElements) {
+        group.removeAttribute("data-focused");
+        group.removeAttribute("data-related");
+        group.removeAttribute("data-focus-dim");
+        group.toggleAttribute(
+          "data-label-visible",
+          root.classList.contains("knowledge-graph-sidebar") &&
+            group.dataset.nodeId === payload.currentId
+        );
+      }
+
+      for (const { line } of linkElements) {
+        line.removeAttribute("data-highlight");
+        line.removeAttribute("data-focus-dim");
+      }
+    };
+
+    const focusNode = (node: GraphNode) => {
+      root.dataset.highlightNode = node.id;
+      const connectedIds = getConnectedNodeIds(links, node.id);
+
+      for (const { node: candidate, group } of nodeElements) {
+        group.toggleAttribute("data-focused", candidate.id === node.id);
+        group.toggleAttribute(
+          "data-related",
+          candidate.id !== node.id && connectedIds.has(candidate.id)
+        );
+        group.toggleAttribute(
+          "data-focus-dim",
+          !connectedIds.has(candidate.id)
+        );
+        group.toggleAttribute("data-label-visible", candidate.id === node.id);
+      }
+
+      for (const { link, line } of linkElements) {
+        const highlighted = link.source === node.id || link.target === node.id;
+        line.toggleAttribute("data-highlight", highlighted);
+        line.toggleAttribute("data-focus-dim", !highlighted);
+      }
+    };
+
     for (const { node, group } of nodeElements) {
       group.addEventListener("pointerdown", event => {
         event.preventDefault();
@@ -392,22 +444,10 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
         }
       });
 
-      group.addEventListener("mouseenter", () => {
-        root.dataset.highlightNode = node.id;
-        for (const { link, line } of linkElements) {
-          line.toggleAttribute(
-            "data-highlight",
-            link.source === node.id || link.target === node.id
-          );
-        }
-      });
-
-      group.addEventListener("mouseleave", () => {
-        delete root.dataset.highlightNode;
-        for (const { line } of linkElements) {
-          line.removeAttribute("data-highlight");
-        }
-      });
+      group.addEventListener("mouseenter", () => focusNode(node));
+      group.addEventListener("mouseleave", clearFocus);
+      group.addEventListener("focus", () => focusNode(node));
+      group.addEventListener("blur", clearFocus);
     }
 
     svg.addEventListener(
@@ -659,6 +699,10 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
     stroke-width: 2.2;
   }
 
+  :global(.knowledge-graph-link[data-focus-dim]) {
+    opacity: 0.1;
+  }
+
   :global(.knowledge-graph-node) {
     color: var(--foreground);
     cursor: pointer;
@@ -683,15 +727,35 @@ const graphJson = JSON.stringify({ ...graph, currentId }).replace(
   :global(.knowledge-graph-node text) {
     fill: currentColor;
     font-size: 11px;
+    opacity: 0;
     paint-order: stroke;
     stroke: var(--background);
     stroke-width: 3px;
     stroke-linejoin: round;
+    transition: opacity 140ms ease;
   }
 
-  :global(.knowledge-graph-node:hover),
-  :global(.knowledge-graph-node:focus-visible) {
+  :global(.knowledge-graph-node[data-label-visible] text),
+  :global(.knowledge-graph-node[data-search-match] text) {
+    opacity: 1;
+  }
+
+  :global(.knowledge-graph-node[data-focused]) {
     color: var(--accent);
+  }
+
+  :global(.knowledge-graph-node[data-focused] circle) {
+    fill: var(--accent);
+    stroke: color-mix(in srgb, var(--accent) 32%, var(--background));
+    stroke-width: 5;
+  }
+
+  :global(.knowledge-graph-node[data-related] circle) {
+    fill: color-mix(in srgb, var(--accent) 58%, var(--background));
+  }
+
+  :global(.knowledge-graph-node[data-focus-dim]) {
+    opacity: 0.12;
   }
 
   :global(.knowledge-graph-node[data-search-dim]) {

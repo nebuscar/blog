@@ -5,6 +5,7 @@ import {
   extractWikiLinks,
   getLocalKnowledgeGraph,
 } from "../src/utils/knowledgeGraph.mjs";
+import { getConnectedNodeIds } from "../src/utils/knowledgeGraphInteraction.mjs";
 
 const posts = [
   {
@@ -81,4 +82,22 @@ test("shows the current node for an isolated post", () => {
     ],
     links: [],
   });
+});
+
+test("finds only the focused node and its one-hop neighbours", () => {
+  const links = [
+    { source: "a", target: "b" },
+    { source: "c", target: "a" },
+    { source: "c", target: "d" },
+  ];
+
+  assert.deepEqual([...getConnectedNodeIds(links, "a")].sort(), [
+    "a",
+    "b",
+    "c",
+  ]);
+});
+
+test("keeps an isolated focused node visible", () => {
+  assert.deepEqual([...getConnectedNodeIds([], "isolated")], ["isolated"]);
 });
