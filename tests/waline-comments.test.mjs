@@ -16,6 +16,7 @@ test("disables image uploads and gif search", async () => {
 
   assert.match(source, /imageUploader:\s*false/);
   assert.match(source, /search:\s*false/);
+  assert.match(source, /reaction:\s*false/);
 });
 
 test("uses only emoji and bilibili image presets", async () => {
