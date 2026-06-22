@@ -126,6 +126,18 @@
     @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
   }
 
+  html.code-wrap-enabled .app-prose pre {
+    @apply whitespace-pre-wrap overflow-x-hidden;
+  }
+
+  html.code-wrap-enabled .app-prose pre code {
+    @apply whitespace-pre-wrap wrap-anywhere;
+  }
+
+  html.code-wrap-enabled .astro-code .line {
+    @apply whitespace-pre-wrap wrap-anywhere;
+  }
+
   /* Styles for Shiki transformers */
   /* https://shiki.style/packages/transformers */
   .astro-code {
