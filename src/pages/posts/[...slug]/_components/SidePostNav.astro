@@ -4,6 +4,7 @@ import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import IconArrowBarToUp from "@/assets/icons/IconArrowBarToUp.svg";
 import IconChevronDown from "@/assets/icons/IconChevronDown.svg";
 import IconChevronUp from "@/assets/icons/IconChevronUp.svg";
+import IconMessageCircle from "@/assets/icons/IconMessageCircle.svg";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -61,6 +62,15 @@ const nextHref = nextPost
     <IconArrowBarToUp class="size-5" />
   </button>
 
+  <button
+    type="button"
+    data-post-context-comments
+    aria-label="跳转到评论区"
+    title="跳转到评论区"
+  >
+    <IconMessageCircle class="size-5" />
+  </button>
+
   {
     nextPost ? (
       <a
@@ -98,6 +108,10 @@ const nextHref = nextPost
       <IconArrowBarToUp class="size-4" />
       <span>{t.post.backToTop}</span>
     </button>
+    <button type="button" data-mobile-post-comments>
+      <IconMessageCircle class="size-4" />
+      <span>跳转到评论区</span>
+    </button>
     {
       nextPost && (
         <a href={nextHref}>
@@ -128,6 +142,10 @@ const nextHref = nextPost
       "[data-post-context-next]"
     );
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+    const scrollToComments = () =>
+      document
+        .querySelector("#comments-title")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
 
     document
       .querySelectorAll<HTMLButtonElement>(
@@ -135,6 +153,16 @@ const nextHref = nextPost
       )
       .forEach(button =>
         button.addEventListener("click", scrollToTop, {
+          signal: controller.signal,
+        })
+      );
+
+    document
+      .querySelectorAll<HTMLButtonElement>(
+        "[data-post-context-comments], [data-mobile-post-comments]"
+      )
+      .forEach(button =>
+        button.addEventListener("click", scrollToComments, {
           signal: controller.signal,
         })
       );
@@ -254,7 +282,7 @@ const nextHref = nextPost
       right: 4.75rem;
       z-index: 45;
       display: grid;
-      grid-template-rows: repeat(3, 2.5rem);
+      grid-template-rows: repeat(4, 2.5rem);
       justify-content: center;
       gap: 0.4rem;
       border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
