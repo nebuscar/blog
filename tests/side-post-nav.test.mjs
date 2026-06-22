@@ -11,6 +11,7 @@ test("renders article context controls in the right sidebar", async () => {
   const source = await readFile(componentUrl, "utf8");
 
   assert.match(source, /data-post-context-controls/);
+  assert.match(source, /data-post-context-drag-handle/);
   assert.match(source, /data-post-context-prev/);
   assert.match(source, /data-post-context-top/);
   assert.match(source, /data-post-context-comments/);
@@ -20,6 +21,9 @@ test("renders article context controls in the right sidebar", async () => {
   assert.match(source, /transform:\s*translateY\(-50%\)/);
   assert.match(source, /IconArrowBarToUp/);
   assert.match(source, /IconMessageCircle/);
+  assert.match(source, /localStorage/);
+  assert.match(source, /pointerdown/);
+  assert.match(source, /dblclick/);
   assert.match(source, /#comments-title/);
   assert.match(source, /scrollIntoView\(\{\s*behavior:\s*"smooth"/);
   assert.doesNotMatch(source, /IconArrowLeft class="size-5 rotate-90"/);

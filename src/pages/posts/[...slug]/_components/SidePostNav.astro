@@ -38,6 +38,16 @@ const nextHref = nextPost
   data-pagefind-ignore
   aria-label="文章上下文导航"
 >
+  <button
+    type="button"
+    class="post-context-drag-handle"
+    data-post-context-drag-handle
+    aria-label="拖动文章工具条"
+    title="拖动调整位置，双击恢复默认"
+  >
+    <span aria-hidden="true"></span>
+  </button>
+
   {
     prevPost ? (
       <a
@@ -127,6 +137,11 @@ const nextHref = nextPost
 </details>
 
 <script>
+  import {
+    clampContextPosition,
+    getDefaultContextPosition,
+  } from "@/utils/postContextPosition.mjs";
+
   function setupPostContextControls() {
     const globalWindow = window as Window & {
       __postNavigationController?: AbortController;
@@ -141,6 +156,13 @@ const nextHref = nextPost
     const next = document.querySelector<HTMLAnchorElement>(
       "[data-post-context-next]"
     );
+    const toolbar = document.querySelector<HTMLElement>(
+      "[data-post-context-controls]"
+    );
+    const dragHandle = toolbar?.querySelector<HTMLButtonElement>(
+      "[data-post-context-drag-handle]"
+    );
+    const storageKey = "post-context-position";
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
     const scrollToComments = () =>
       document
@@ -166,6 +188,109 @@ const nextHref = nextPost
           signal: controller.signal,
         })
       );
+
+    if (
+      toolbar &&
+      dragHandle &&
+      window.matchMedia("(min-width: 1280px)").matches
+    ) {
+      const getViewport = () => ({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      const getToolbarSize = () => {
+        const rect = toolbar.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      };
+      const applyPosition = (
+        position: { x: number; y: number },
+        persist = false
+      ) => {
+        const nextPosition = clampContextPosition(
+          position,
+          getViewport(),
+          getToolbarSize()
+        );
+        toolbar.style.left = `${nextPosition.x}px`;
+        toolbar.style.top = `${nextPosition.y}px`;
+        toolbar.style.right = "auto";
+        toolbar.style.transform = "none";
+        if (persist) {
+          localStorage.setItem(storageKey, JSON.stringify(nextPosition));
+        }
+        return nextPosition;
+      };
+      const resetPosition = () => {
+        localStorage.removeItem(storageKey);
+        applyPosition(
+          getDefaultContextPosition(getViewport(), getToolbarSize())
+        );
+      };
+
+      requestAnimationFrame(() => {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
+          if (Number.isFinite(saved?.x) && Number.isFinite(saved?.y)) {
+            applyPosition(saved);
+            return;
+          }
+        } catch {
+          localStorage.removeItem(storageKey);
+        }
+        resetPosition();
+      });
+
+      dragHandle.addEventListener(
+        "pointerdown",
+        event => {
+          event.preventDefault();
+          const startRect = toolbar.getBoundingClientRect();
+          const startPointer = { x: event.clientX, y: event.clientY };
+          dragHandle.setPointerCapture(event.pointerId);
+          toolbar.toggleAttribute("data-dragging", true);
+
+          const move = (moveEvent: PointerEvent) => {
+            applyPosition({
+              x: startRect.left + moveEvent.clientX - startPointer.x,
+              y: startRect.top + moveEvent.clientY - startPointer.y,
+            });
+          };
+          const finish = (finishEvent: PointerEvent) => {
+            if (dragHandle.hasPointerCapture(finishEvent.pointerId)) {
+              dragHandle.releasePointerCapture(finishEvent.pointerId);
+            }
+            toolbar.removeAttribute("data-dragging");
+            dragHandle.removeEventListener("pointermove", move);
+            dragHandle.removeEventListener("pointerup", finish);
+            dragHandle.removeEventListener("pointercancel", finish);
+            applyPosition(
+              {
+                x: toolbar.offsetLeft,
+                y: toolbar.offsetTop,
+              },
+              true
+            );
+          };
+
+          dragHandle.addEventListener("pointermove", move);
+          dragHandle.addEventListener("pointerup", finish);
+          dragHandle.addEventListener("pointercancel", finish);
+        },
+        { signal: controller.signal }
+      );
+      dragHandle.addEventListener("dblclick", resetPosition, {
+        signal: controller.signal,
+      });
+      window.addEventListener(
+        "resize",
+        () =>
+          applyPosition({
+            x: toolbar.offsetLeft,
+            y: toolbar.offsetTop,
+          }),
+        { signal: controller.signal }
+      );
+    }
 
     document.addEventListener(
       "keydown",
@@ -282,7 +407,7 @@ const nextHref = nextPost
       right: 4.75rem;
       z-index: 45;
       display: grid;
-      grid-template-rows: repeat(4, 2.5rem);
+      grid-template-rows: 1.1rem repeat(4, 2.5rem);
       justify-content: center;
       gap: 0.4rem;
       border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
@@ -312,6 +437,50 @@ const nextHref = nextPost
         color 160ms ease,
         background-color 160ms ease,
         transform 160ms ease;
+    }
+
+    .post-context-controls .post-context-drag-handle {
+      width: 2.5rem;
+      height: 1.1rem;
+      cursor: grab;
+      touch-action: none;
+      background: transparent;
+    }
+
+    .post-context-controls .post-context-drag-handle:active,
+    .post-context-controls[data-dragging] .post-context-drag-handle {
+      cursor: grabbing;
+    }
+
+    .post-context-drag-handle span,
+    .post-context-drag-handle span::before,
+    .post-context-drag-handle span::after {
+      width: 0.2rem;
+      height: 0.2rem;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0.35rem 0 currentColor;
+    }
+
+    .post-context-drag-handle span {
+      position: relative;
+      display: block;
+      margin-right: 0.35rem;
+    }
+
+    .post-context-drag-handle span::before,
+    .post-context-drag-handle span::after {
+      position: absolute;
+      left: 0;
+      content: "";
+    }
+
+    .post-context-drag-handle span::before {
+      top: -0.35rem;
+    }
+
+    .post-context-drag-handle span::after {
+      top: 0.35rem;
     }
 
     .post-context-controls a:hover,
