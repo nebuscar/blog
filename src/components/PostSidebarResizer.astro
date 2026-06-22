@@ -3,7 +3,7 @@
   role="separator"
   aria-label="调整目录宽度"
   aria-orientation="vertical"
-  aria-valuemin="220"
+  aria-valuemin="48"
   aria-valuemax="420"
   aria-valuenow="280"
   tabindex="0"
@@ -37,6 +37,7 @@
   } from "@/utils/postLayout.mjs";
 
   const STORAGE_KEY = "post-toc-width";
+  const TOC_COLLAPSED_STORAGE_KEY = "post-toc-collapsed";
   const GRAPH_WIDTH_STORAGE_KEY = "post-graph-width";
   const GRAPH_COLLAPSED_STORAGE_KEY = "post-graph-collapsed";
 
@@ -50,10 +51,38 @@
         const layout = resizer.closest<HTMLElement>(".post-detail-layout");
         if (!layout) return;
 
+        const collapseButton = layout.querySelector<HTMLButtonElement>(
+          "[data-post-toc-collapse]"
+        );
+
+        const setCollapsed = (collapsed: boolean, persist = true) => {
+          layout.dataset.tocCollapsed = String(collapsed);
+          resizer.setAttribute(
+            "aria-valuenow",
+            collapsed
+              ? "48"
+              : (resizer.dataset.currentWidth ?? String(DEFAULT_TOC_WIDTH))
+          );
+          collapseButton?.setAttribute("aria-expanded", String(!collapsed));
+          collapseButton?.setAttribute(
+            "aria-label",
+            collapsed ? "展开目录栏" : "折叠目录栏"
+          );
+          if (collapseButton) {
+            collapseButton.title = collapsed ? "展开目录栏" : "折叠目录栏";
+          }
+          if (persist) {
+            localStorage.setItem(TOC_COLLAPSED_STORAGE_KEY, String(collapsed));
+          }
+        };
+
         const setWidth = (value: number, persist = true) => {
           const width = clampTocWidth(value);
           layout.style.setProperty("--post-toc-width", `${width}px`);
-          resizer.setAttribute("aria-valuenow", String(width));
+          resizer.dataset.currentWidth = String(width);
+          if (layout.dataset.tocCollapsed !== "true") {
+            resizer.setAttribute("aria-valuenow", String(width));
+          }
           if (persist) localStorage.setItem(STORAGE_KEY, String(width));
         };
 
@@ -64,11 +93,18 @@
             : DEFAULT_TOC_WIDTH,
           false
         );
+        setCollapsed(
+          localStorage.getItem(TOC_COLLAPSED_STORAGE_KEY) === "true",
+          false
+        );
 
         resizer.addEventListener("pointerdown", event => {
           event.preventDefault();
+          setCollapsed(false);
           const startX = event.clientX;
-          const startWidth = Number(resizer.getAttribute("aria-valuenow"));
+          const startWidth = Number(
+            resizer.dataset.currentWidth ?? DEFAULT_TOC_WIDTH
+          );
           resizer.setPointerCapture(event.pointerId);
           resizer.toggleAttribute("data-dragging", true);
 
@@ -83,7 +119,7 @@
             resizer.removeEventListener("pointerup", finish);
             localStorage.setItem(
               STORAGE_KEY,
-              resizer.getAttribute("aria-valuenow") ?? String(DEFAULT_TOC_WIDTH)
+              resizer.dataset.currentWidth ?? String(DEFAULT_TOC_WIDTH)
             );
           };
 
@@ -91,13 +127,30 @@
           resizer.addEventListener("pointerup", finish);
         });
 
-        resizer.addEventListener("dblclick", () => setWidth(DEFAULT_TOC_WIDTH));
+        resizer.addEventListener("dblclick", () => {
+          setCollapsed(layout.dataset.tocCollapsed !== "true");
+        });
 
         resizer.addEventListener("keydown", event => {
-          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+          if (
+            event.key !== "ArrowLeft" &&
+            event.key !== "ArrowRight" &&
+            event.key !== "Enter" &&
+            event.key !== " "
+          )
+            return;
           event.preventDefault();
-          const current = Number(resizer.getAttribute("aria-valuenow"));
+          if (event.key === "Enter" || event.key === " ") {
+            setCollapsed(layout.dataset.tocCollapsed !== "true");
+            return;
+          }
+          setCollapsed(false);
+          const current = Number(resizer.dataset.currentWidth);
           setWidth(current + (event.key === "ArrowRight" ? 10 : -10));
+        });
+
+        collapseButton?.addEventListener("click", () => {
+          setCollapsed(layout.dataset.tocCollapsed !== "true");
         });
       });
   }

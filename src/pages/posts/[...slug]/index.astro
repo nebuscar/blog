@@ -201,7 +201,20 @@ const commentPath = `${getLegacyPostUrl(
     </div>
 
     <aside class="post-toc-sidebar" aria-label="文章目录">
-      <ArticleToc {headings} />
+      <div class="post-toc-sidebar-controls">
+        <button
+          type="button"
+          data-post-toc-collapse
+          aria-label="折叠目录栏"
+          aria-expanded="true"
+          title="折叠目录栏"
+        >
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="post-toc-sidebar-content">
+        <ArticleToc {headings} />
+      </div>
     </aside>
 
     <PostSidebarResizer />
@@ -256,6 +269,7 @@ const commentPath = `${getLegacyPostUrl(
   .post-detail-layout {
     --post-toc-width: 280px;
     --post-graph-width: 18rem;
+    --post-content-max: 54rem;
 
     display: grid;
     width: 100%;
@@ -281,16 +295,29 @@ const commentPath = `${getLegacyPostUrl(
   @media (min-width: 1280px) {
     .post-detail-layout {
       grid-template-columns:
-        var(--post-toc-width) 0.5rem minmax(0, 54rem) 0.5rem
+        var(--post-toc-width) 0.5rem minmax(0, var(--post-content-max)) 0.5rem
         var(--post-graph-width);
       column-gap: 1rem;
       width: calc(100% - 6rem);
-      max-width: calc(var(--post-toc-width) + var(--post-graph-width) + 62rem);
+      max-width: calc(
+        var(--post-toc-width) + var(--post-graph-width) +
+          var(--post-content-max) + 5rem
+      );
       padding-inline: 0;
+    }
+
+    .post-detail-layout[data-toc-collapsed="true"] {
+      --post-toc-width: 3.25rem;
+      --post-content-max: 62rem;
     }
 
     .post-detail-layout[data-graph-collapsed="true"] {
       --post-graph-width: 3.25rem;
+      --post-content-max: 60rem;
+    }
+
+    .post-detail-layout[data-toc-collapsed="true"][data-graph-collapsed="true"] {
+      --post-content-max: 72rem;
     }
 
     .post-toc-sidebar {
@@ -306,11 +333,17 @@ const commentPath = `${getLegacyPostUrl(
     .post-reading-column {
       grid-column: 3;
       grid-row: 1;
+      max-width: var(--post-content-max);
+    }
+
+    .post-reading-column .app-prose {
+      max-width: 100%;
     }
 
     .post-after-content {
       grid-column: 3;
       grid-row: 2;
+      max-width: var(--post-content-max);
     }
 
     .post-graph-sidebar {
@@ -325,6 +358,7 @@ const commentPath = `${getLegacyPostUrl(
       scrollbar-width: thin;
     }
 
+    .post-toc-sidebar-controls,
     .post-graph-sidebar-controls {
       position: sticky;
       top: 0;
@@ -339,6 +373,11 @@ const commentPath = `${getLegacyPostUrl(
       );
     }
 
+    .post-toc-sidebar-controls {
+      justify-content: flex-start;
+    }
+
+    .post-toc-sidebar-controls button,
     .post-graph-sidebar-controls button {
       display: grid;
       width: 2rem;
@@ -350,18 +389,39 @@ const commentPath = `${getLegacyPostUrl(
       background: var(--background);
     }
 
+    .post-toc-sidebar-controls button:hover,
+    .post-toc-sidebar-controls button:focus-visible,
     .post-graph-sidebar-controls button:hover,
     .post-graph-sidebar-controls button:focus-visible {
       color: var(--accent);
       border-color: var(--accent);
     }
 
+    .post-toc-sidebar-controls span,
     .post-graph-sidebar-controls span {
       width: 0.65rem;
       height: 0.65rem;
       border-top: 2px solid currentColor;
       border-right: 2px solid currentColor;
       transform: rotate(45deg);
+    }
+
+    .post-toc-sidebar-controls span {
+      transform: rotate(-135deg);
+    }
+
+    .post-detail-layout[data-toc-collapsed="true"] .post-toc-sidebar-controls {
+      justify-content: center;
+    }
+
+    .post-detail-layout[data-toc-collapsed="true"]
+      .post-toc-sidebar-controls
+      span {
+      transform: rotate(45deg);
+    }
+
+    .post-detail-layout[data-toc-collapsed="true"] .post-toc-sidebar-content {
+      display: none;
     }
 
     .post-detail-layout[data-graph-collapsed="true"]
