@@ -2,7 +2,7 @@
 title: "ATG5-Bulk RNAseq与scRNA-seq Methods描述写作参考"
 description: "RNA-seq and Single-cell Methods Writing References"
 pubDatetime: 2026-06-22T15:01:00.000Z
-modDatetime: 2026-06-22T23:40:30+08:00
+modDatetime: 2026-06-23T00:32:29+08:00
 slug: 20260622-2301-zgrvy
 legacySlug: "新笔记/atg5-bulkrnaseq与scrna-seqmethods描述写作参考"
 tags: []
@@ -10,7 +10,7 @@ tags: []
 ## 1 转录组 RNA-seq
 
 ### 1.1 DESeq2 Differential Expression Analysis
-![500x155](ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_c7af50c8-08f8-4ce6-b5cb-64bdf0cfe837.png)
+![ATG5 Bulk RNAseq与scRNA seq Methods描述写作参考 2026 06 22 c7af50c8 08f8 4ce6 b5cb 64bdf0cfe837](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/23/ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_c7af50c8-08f8-4ce6-b5cb-64bdf0cfe837.png)
 English example:
 ```
 Differential expression analysis of RNA-seq data was performed using the DESeq2 R package. Raw read count matrices were used as input, and DESeq2 was applied to identify genes differentially expressed between experimental groups. P values were adjusted for multiple testing using the Benjamini-Hochberg method. Genes with adjusted p values below the preset threshold and fold changes exceeding the cutoff were considered differentially expressed. Pairwise comparisons were conducted according to the experimental design, including AD versus control, intervention versus control, and intervention versus AD groups.
@@ -25,7 +25,7 @@ References:
 3. Baker et al., 2026. Bulk RNA-seq; Methods describes featureCounts input to DESeq2, FDR correction, and log2FC threshold. [https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/)
 
 ### 1.2 Functional analysis of DEGs
-![500x67](ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_7c3ce50a-fd19-4f6d-81d4-226ab103fb2b.png)
+![ATG5 Bulk RNAseq与scRNA seq Methods描述写作参考 2026 06 22 7c3ce50a fd19 4f6d 81d4 226ab103fb2b](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/23/ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_7c3ce50a-fd19-4f6d-81d4-226ab103fb2b.png)
 #### 1.2.1 GO Enrichment Analysis
 English example:
 ```
@@ -55,7 +55,7 @@ References:
 3. Siregar et al., 2026. Methods 2.5 describes GO/KEGG/GSEA integrative pathway enrichment analysis. [https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/](https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/)
 
 ### 1.3 Gene Set Enrichment Analysis
-![500x99](ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_3e52a31e-76a7-4b41-a88a-9d4320c1034b.png)
+![ATG5 Bulk RNAseq与scRNA seq Methods描述写作参考 2026 06 22 3e52a31e 76a7 4b41 a88a 9d4320c1034b](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/23/ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_3e52a31e-76a7-4b41-a88a-9d4320c1034b.png)
 English example:
 ```
 To avoid information loss caused by arbitrary DEG cutoffs, Gene Set Enrichment Analysis was performed using a ranked list of all genes. Genes were ranked according to differential expression statistics, log2 fold change, or other ranking metrics, and were tested against predefined gene sets from KEGG, GO, or MSigDB. Enrichment results were evaluated using normalized enrichment score and FDR q value to determine the direction and significance of pathway-level changes between groups.
