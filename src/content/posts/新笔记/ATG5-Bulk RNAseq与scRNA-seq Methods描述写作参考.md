@@ -2,7 +2,7 @@
 title: "ATG5-Bulk RNAseq与scRNA-seq Methods描述写作参考"
 description: "RNA-seq and Single-cell Methods Writing References"
 pubDatetime: 2026-06-22T15:01:00.000Z
-modDatetime: 2026-06-23T00:43:19+08:00
+modDatetime: 2026-06-23T00:48:21+08:00
 slug: 20260622-2301-zgrvy
 legacySlug: "新笔记/atg5-bulkrnaseq与scrna-seqmethods描述写作参考"
 tags: []
@@ -20,9 +20,9 @@ Differential expression analysis of RNA-seq data was performed using the DESeq2 
 RNA-seq 数据的差异表达分析采用 DESeq2 R 包进行。将原始 read count 矩阵作为输入，利用 DESeq2 对不同实验组之间的基因表达差异进行统计检验，并采用 Benjamini-Hochberg 方法进行多重检验校正。校正后 p 值低于预设阈值且 fold change 达到筛选标准的基因被定义为差异表达基因。根据研究设计，对 AD 组与对照组、干预组与对照组以及干预组与 AD 组进行两两比较。
 ```
 References:
-1. Wang et al., 2025. AD astrocyte RNA-seq; Methods 2.2 describes DESeq2 v1.36.0, fold-change cutoff, and Benjamini-Hochberg adjusted p value. [https://pmc.ncbi.nlm.nih.gov/articles/PMC12639471/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12639471/)
-2. Karthivashan et al., 2026. 5xFAD AD model; Methods 2.6 describes mRNA RNA-seq and DESeq2-based analysis. [https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/](https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/)
-3. Baker et al., 2026. Bulk RNA-seq; Methods describes featureCounts input to DESeq2, FDR correction, and log2FC threshold. [https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/)
+1. Wang et al., 2025. AD astrocyte RNA-seq; Methods 2.2 describes DESeq2 v1.36.0, fold-change cutoff, and Benjamini-Hochberg adjusted p value. [PMC12639471](https://pmc.ncbi.nlm.nih.gov/articles/PMC12639471/)
+2. Karthivashan et al., 2026. 5xFAD AD model; Methods 2.6 describes mRNA RNA-seq and DESeq2-based analysis. [PMC13240024](https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/)
+3. Baker et al., 2026. Bulk RNA-seq; Methods describes featureCounts input to DESeq2, FDR correction, and log2FC threshold. [PMC12931797](https://pmc.ncbi.nlm.nih.gov/articles/PMC12931797/)
 
 ### 1.2 Functional analysis of DEGs
 ![ATG5 Bulk RNAseq与scRNA seq Methods描述写作参考 2026 06 22 7c3ce50a fd19 4f6d 81d4 226ab103fb2b](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/23/ATG5-Bulk-RNAseq与scRNA-seq-Methods描述写作参考_2026-06-22_7c3ce50a-fd19-4f6d-81d4-226ab103fb2b.png)
@@ -122,7 +122,7 @@ Based on cell-type annotation, the number and proportion of cells in each subpop
 根据细胞注释结果，统计每个样本或实验组中各细胞亚群的细胞数量和比例。使用堆叠柱状图或分组柱状图展示不同实验组之间细胞组成的差异。对于特定目标亚群，可进一步比较其在疾病组和对照组或基因修饰组之间的比例变化，以评估疾病状态下细胞群体扩增或减少。
 ```
 References:
-1. Ayata et al., 2025. Extended Data Fig. 12 uses bar graphs to show percentage changes in microglial subpopulations. [PMC12675299)
+1. Ayata et al., 2025. Extended Data Fig. 12 uses bar graphs to show percentage changes in microglial subpopulations. [PMC12675299](https://pmc.ncbi.nlm.nih.gov/articles/PMC12675299/)
 2. Coburn et al., 2025. Methods 2.11 describes differential proportion analysis. [PMC12635866](https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/)
 3. Nagata et al., 2024. Figure 3/Results compare microglial cluster frequencies. [PMC11628182](https://pmc.ncbi.nlm.nih.gov/articles/PMC11628182/)
 
@@ -136,7 +136,7 @@ GO biological process enrichment analysis was performed using differentially exp
 针对特定细胞类型或细胞亚群内的组间差异表达基因进行 GO biological process 富集分析，以解析疾病状态下细胞功能改变。差异表达基因可来源于单细胞亚群比较或 pseudobulk 分析。显著上调或下调的基因与背景基因集进行比较，FDR 小于 0.05 的 GO 条目被认为显著富集，并可进一步以富集网络或气泡图进行可视化。
 ```
 References:
-1. Coburn et al., 2025. Methods 2.13 describes Gene ontology network and transcription factor analysis. [PMC12635866)
+1. Coburn et al., 2025. Methods 2.13 describes Gene ontology network and transcription factor analysis. [PMC12635866](https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/)
 2. Nagata et al., 2024. AD model snRNA-seq paper using differential genes for GO enrichment analysis. [PMC11628182](https://pmc.ncbi.nlm.nih.gov/articles/PMC11628182/)
 3. Ayata et al., 2025. Uses enrichment/GSEA analyses to interpret microglial functional gene programs. [PMC12675299](https://pmc.ncbi.nlm.nih.gov/articles/PMC12675299/)
 
