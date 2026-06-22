@@ -1,3 +1,17 @@
+/**
+ * @typedef {object} GraphSettings
+ * @property {number} labelOpacity
+ * @property {number} nodeSize
+ * @property {number} linkWidth
+ * @property {number} centerForce
+ * @property {number} repelForce
+ * @property {number} linkForce
+ * @property {boolean} showOrphans
+ * @property {string[]} selectedTags
+ * @property {boolean} animation
+ */
+
+/** @type {Readonly<GraphSettings>} */
 export const DEFAULT_GRAPH_SETTINGS = Object.freeze({
   labelOpacity: 0,
   nodeSize: 1,
@@ -17,6 +31,11 @@ const clamp = (value, min, max, fallback) => {
     : fallback;
 };
 
+/**
+ * @param {Partial<GraphSettings>} settings
+ * @param {Iterable<string>} [availableTags]
+ * @returns {GraphSettings}
+ */
 export function normalizeGraphSettings(settings = {}, availableTags) {
   const validTags = availableTags ? new Set(availableTags) : null;
 
@@ -73,6 +92,10 @@ export function normalizeGraphSettings(settings = {}, availableTags) {
   };
 }
 
+/**
+ * @param {{ id: string; title: string; tags: string[]; degree: number }[]} nodes
+ * @param {{ query?: string; selectedTags?: string[]; showOrphans?: boolean }} [filters]
+ */
 export function filterGraphNodes(
   nodes,
   { query = "", selectedTags = [], showOrphans = true } = {}
