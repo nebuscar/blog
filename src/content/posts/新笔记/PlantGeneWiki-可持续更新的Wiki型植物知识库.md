@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260612-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T05:14:41+08:00
+modDatetime: 2026-06-24T05:21:26+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags: []
@@ -71,6 +71,75 @@ PlantGeneWiki 需要具备自动或半自动更新能力，能够定期发现新
 ### 3.7 支撑大语言模型可靠推理
 PlantGeneWiki 的最终目标不是单纯存储知识，而是为植物知识智能体提供可靠外部知识基础。系统需要向大语言模型提供可控的检索结果、结构化关系、证据片段和来源引用，使模型在生成回答时能够基于明确证据进行解释、比较和推理。因此，系统评价不应只看数据规模，还应关注智能体回答的准确性、证据完整性、可解释性、更新及时性和人工复核成本。
 ## 4 知识对象模型[^1]
+
+**例子：基因对象**
+```yaml
+type: Gene
+id: BnaA01G0000100ZS
+species: Brassica napus
+aliases:
+  - BnaA01G0000100
+  - possible historical IDs
+description: putative transcription factor
+annotations:
+  - GO:xxxxxxx
+  - KEGG:xxxx
+orthologs:
+  - ATxGxxxxx
+traits:
+  - flowering time
+  - seed oil content
+literature:
+  - PMID:xxxxxxx
+evidence:
+  - source: paper
+    claim: this gene is associated with flowering time
+    evidence_type: GWAS candidate gene
+    confidence: medium
+```
+这不是最终数据库格式，只是说明“一个对象应该包含哪些知识”。
+
+---
+
+**例子：性状对象**
+```
+type: Trait
+id: seed_oil_content
+name: Seed oil content
+related_species:
+  - Brassica napus
+  - Arabidopsis thaliana
+related_genes:
+  - BnaA01Gxxxxx
+  - ATxGxxxxx
+related_qtls:
+  - qOC-A01-1
+related_literature:
+  - PMID:xxxxxxx
+evidence_types:
+  - QTL
+  - GWAS
+  - expression
+  - functional validation
+```
+性状页面就不只是解释“含油量是什么”，还要列出相关基因、QTL/GWAS、文献证据和跨物种关系。
+
+---
+**知识对象之间的关系**
+PlantGeneWiki 的重点不是单个对象，而是对象网络：
+```
+Species --has_gene--> Gene
+Gene --belongs_to--> Orthogroup
+Gene --ortholog_of--> Gene
+Gene --associated_with--> Trait
+Gene --participates_in--> Pathway
+Literature --mentions--> Gene
+Literature --supports--> Claim
+Dataset --provides_evidence_for--> Gene/Trait
+Cultivar --has_trait--> Trait
+Topic --summarizes--> Literature
+```
+
 ## 5 知识来源
 
 ## 6 知识组织方式
