@@ -9,6 +9,7 @@ import remarkCollapse from "remark-collapse";
 import rehypeCallouts from "rehype-callouts";
 import rehypeKatex from "rehype-katex";
 import rehypeAutoFigure from "./src/utils/rehypeAutoFigure.mjs";
+import remarkResolvePostLinks from "./src/utils/remarkResolvePostLinks.mjs";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -50,6 +51,7 @@ export default defineConfig({
     processor: unified({
       remarkPlugins: [
         remarkMath,
+        remarkResolvePostLinks,
         remarkToc,
         [remarkCollapse, { test: "Table of contents" }],
       ],
