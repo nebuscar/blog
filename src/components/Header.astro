@@ -230,6 +230,7 @@ const isActive = (path: string) => {
     let lastScrollY = window.scrollY;
     let pointerOverHeader = false;
     let headerHasFocus = false;
+    let manuallyHidden = false;
 
     const openLabel = menuBtn.dataset.labelOpen ?? "Open menu";
     const closeLabel = menuBtn.dataset.labelClose ?? "Close menu";
@@ -253,15 +254,22 @@ const isActive = (path: string) => {
     };
 
     const showHeader = () => {
+      manuallyHidden = false;
       header.classList.remove("is-hidden");
       document.documentElement.classList.remove("site-header-hidden");
+      document.documentElement.classList.remove("site-header-manually-hidden");
       setToggleState(true);
     };
 
-    const hideHeader = () => {
+    const hideHeader = (manual = false) => {
+      manuallyHidden = manual;
       clearHideTimer();
       header.classList.add("is-hidden");
       document.documentElement.classList.add("site-header-hidden");
+      document.documentElement.classList.toggle(
+        "site-header-manually-hidden",
+        manual
+      );
       setToggleState(false);
     };
 
@@ -271,11 +279,12 @@ const isActive = (path: string) => {
 
       headerWindow.__headerAutoHideTimer = window.setTimeout(() => {
         if (pointerOverHeader || headerHasFocus || menuIsOpen()) return;
-        hideHeader();
+        hideHeader(false);
       }, 3000);
     };
 
     const revealAndSchedule = () => {
+      if (manuallyHidden) return;
       showHeader();
       scheduleHide();
     };
@@ -301,9 +310,10 @@ const isActive = (path: string) => {
       "click",
       () => {
         if (header.classList.contains("is-hidden")) {
-          revealAndSchedule();
+          showHeader();
+          scheduleHide();
         } else {
-          hideHeader();
+          hideHeader(true);
         }
       },
       { signal }
@@ -312,6 +322,7 @@ const isActive = (path: string) => {
     header.addEventListener(
       "pointerenter",
       () => {
+        if (manuallyHidden) return;
         pointerOverHeader = true;
         clearHideTimer();
         showHeader();
@@ -331,6 +342,7 @@ const isActive = (path: string) => {
     header.addEventListener(
       "focusin",
       () => {
+        if (manuallyHidden) return;
         headerHasFocus = true;
         clearHideTimer();
         showHeader();
