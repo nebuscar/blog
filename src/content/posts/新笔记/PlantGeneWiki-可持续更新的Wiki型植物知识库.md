@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260612-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T05:06:09+08:00
+modDatetime: 2026-06-24T05:14:41+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags: []
@@ -74,5 +74,8 @@ PlantGeneWiki 的最终目标不是单纯存储知识，而是为植物知识智
 ## 5 知识来源
 
 ## 6 知识组织方式
+
+
+---
 
 [^1]: 知识对象模型：就是回答PlantGeneWiki 里有哪些类型的“东西”需要被当作独立知识单元管理？这些东西之间有什么关系？
