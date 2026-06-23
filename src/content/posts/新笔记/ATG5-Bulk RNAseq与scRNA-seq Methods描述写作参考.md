@@ -2,7 +2,7 @@
 title: "ATG5-Bulk RNAseq与scRNA-seq Methods描述写作参考"
 description: "RNA-seq and Single-cell Methods Writing References"
 pubDatetime: 2026-06-22T15:01:00.000Z
-modDatetime: 2026-06-23T09:41:17+08:00
+modDatetime: 2026-06-23T09:41:26+08:00
 slug: 20260622-2301-zgrvy
 legacySlug: "新笔记/atg5-bulkrnaseq与scrna-seqmethods描述写作参考"
 tags: []
@@ -12,6 +12,7 @@ tags: []
 文章跳转：[Analysis of the potential regulatory mechanism of PIEZO1 in Alzheimer’s disease based on RNA sequencing - ScienceDirect](https://www.sciencedirect.com/science/article/pii/S2667242125001812?via%3Dihub)
 #### 1.1.1 DESeq2 Differential Expression Analysis
 跳转： [DESeq2 Differential Expression Analysis](https://www.sciencedirect.com/science/article/pii/S2667242125001812?via%3Dihub#sec0010:~:text=2.2.-,Differential%20expression%20analysis,-Differential%20expression%20analysis)
+
 <font color="#ffc000">Differential expression analysis of RNA-seq data</font> was performed using <font color="#4f81bd">the DESeg2 R package (v1.36.0)</font>. Genes with absolute fold change (IFC= > 1.8) and Benjamini-Hochberg adjusted p-value (padj) <0.01 were regarded asdifferentially expressed genes.
 Three pairwise comparisons were conducted:
 1. B vs. A: AD group (astrocyte + tau PFF) vs. control group (astrocyte)
@@ -23,6 +24,7 @@ References:
 
 #### 1.1.2 Functional analysis of DEGs
 跳转：[Functional analysis of DEGs](https://www.sciencedirect.com/science/article/pii/S2667242125001812?via%3Dihub#sec0010:~:text=Functional%20annotation%20of%20DEGs)
+
 To explore the functions of DEGs across different groups, <font color="#ffc000">Gene Ontology (GO)</font> and <font color="#ffc000">Kyoto Encyclopedia of Genes and Genomes (KEGG) pathway analyses</font> were performed using <font color="#4f81bd">the ClusterProfiler package version 4.4.4</font>. An adjusted p-value (padj) < 0.05 was considered statistically significant.
 
 ### 1.2 Source[^2]
