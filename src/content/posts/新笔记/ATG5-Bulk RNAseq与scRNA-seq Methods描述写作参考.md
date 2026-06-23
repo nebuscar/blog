@@ -2,7 +2,7 @@
 title: "ATG5-Bulk RNAseq与scRNA-seq Methods描述写作参考"
 description: "RNA-seq and Single-cell Methods Writing References"
 pubDatetime: 2026-06-22T15:01:00.000Z
-modDatetime: 2026-06-23T09:39:26+08:00
+modDatetime: 2026-06-23T09:40:44+08:00
 slug: 20260622-2301-zgrvy
 legacySlug: "新笔记/atg5-bulkrnaseq与scrna-seqmethods描述写作参考"
 tags: []
@@ -34,10 +34,10 @@ To explore the functions of DEGs across different groups, <font color="#ffc000">
 
 ### 1.4 Source [^4]
 
-### 1.5 Source[^6]
+### 1.5 Source[^5]
 
 ## 2 单细胞 scRNA-seq / snRNA-seq
-### 2.1 *Source： [^7]*
+### 2.1 *Source： [^6]*
 文章跳转：[MARCO+ macrophages drive immunosuppressive remodeling and metastasis in chemotherapy-associated steatohepatitis - Journal of Hepatology](https://www.journal-of-hepatology.eu/article/S0168-8278\(25\)02624-8/abstract)
 
 DOI: [10.1016/j.jhep.2025.11.008](https://doi.org/10.1016/j.jhep.2025.11.008)
@@ -47,7 +47,7 @@ DOI: [10.1016/j.jhep.2025.11.008](https://doi.org/10.1016/j.jhep.2025.11.008)
 <font color="#ffc000">Count matrices</font> were qualified and analyzed using Seurat, a R package (version 5.10). <font color="#ffc000">Low quality cells</font> were defined as those with less than 500 detected genes or over 6000 genes ormore than 20% mitochondrial UMI counts, were excluded. All samples were normalized by LogNormalize method, and scaled to achieve a mean of zero and a standard derivation of one.The top 2000 variable features were chosen for principal component analysis (PCA). <font color="#4f81bd">Anchor-based CCA integration</font> was utilized to remove batch effect and integrate multiple samples. The top 30 principals were used to construct a shared neighborhood graph and clusters with a givenset of resolution presented in the following sections. The reduction was achieved by usinguniform manifold approximation and projection (UMAP).
 #### 2.1.3 Cell Type Annotation
 In Figure 1C, the major clusters were achieved by performing <font color="#ffc000">the first-round clustering</font> with aresolution of 0.1. <font color="#ffc000">The second-round clustering</font> on myeloid with a resolution of 0.8, T cell witha resolution of 0.7, and NKs with a resolution of 0.4. Differential expressed genes were identified by FindAllMarkers function with thresholds on log-scale fold change of >0.25 and *p* value of <0.05 (Wilcoxon rank-sum test, and the p values have been corrected by falsediscovery rate (FDR)).
-### 2.2 *Source： [^8]*
+### 2.2 *Source： [^7]*
 文章跳转：[Human microglia differentially respond to β‐amyloid, tau, and combined Alzheimer's disease pathologies in vivo - Coburn - 2025 - Alzheimer's & Dementia - Wiley Online Library](https://alz-journals.onlinelibrary.wiley.com/doi/10.1002/alz.70930)
 #### 2.2.1 Single-Cell Sequencing via 10x Genomics
 跳转：[Single-Cell Sequencing](https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/#alz70930-sec-0070:~:text=Single%E2%80%90cell%20sequencing%20via%2010%C3%97%20Genomics)
@@ -57,7 +57,7 @@ In Figure 1C, the major clusters were achieved by performing <font color="#ffc00
 跳转：[Single-Cell Data Processing](https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/#alz70930-sec-0070:~:text=scRNA%E2%80%90seq%20data%20visualization%20and%20differential%20gene%20analysis)
 
 <font color="#ffc000">UMI count tables</font> were read into Seurat (version 3) for preprocessing and clustering analysis. <font color="#ffc000">Initial quality control(QC)</font> was performed by log - normalizing and scaling (default settings) each dataset followed by <font color="#4f81bd">principal componentanalysis (PCA)</font> performed using all genes in the dataset. <font color="#4f81bd">Seurat's "ElbowPlot" function</font> was used to select principal components (PCs) to be used for clustering along with a resolution parameter of 0.5 and clusters identified as beingdoublets, gene - poor, or dividing are removed from the dataset prior to downstream analysis. <font color="#ffc000">Secondary QC cutoffs</font> were then applied to retain only cells with < 20%-25% ribosomal genes, 12.5% mitochondrial genes,> 500 genes but less than double the median gene count, and 500 UMI but less than double the median UM count. At this point one hPS19 and one hPS - 5X sample were discarded due to abnormal 10x cell capture and transcript amplification. Thefinal samples that yielded clean and high viability isolates and passed QC are as follows: four hWT mice (pooled twoper 10x run into two 10x runs); three h5xFAD mice (two pooled into one 10x run, one in a 10x run independently;two hPS19 mice pooled into one 10x run; one hPS - 5X mouse in one 10x run. Cells passing QC for each sample were then merged using <font color="#4f81bd">Seurat's "merge" function</font> and datasets were processed using Seurat's integrated analysisworkflow. Briefly, <font color="#ffc000">samples from individual mice</font> were integrated using the "<font color="#4f81bd">FindntegationAnchors</font>" and"<font color="#4f81bd">IntegrateData</font>" commands using dimensions 1:25. Datasets were then scaled, and sources of technical variation areregressed out (number of genes, percent ribosomal genes, and percent mitochondrial genes) and PCA wasperformed using <font color="#4f81bd">Seurat's "RunPCA" command.</font> <font color="#ffc000">A shared nearest neighbor (SNN) plot</font> was generated using <font color="#4f81bd">Seurat's"FindNeighbors" function</font> using PCs 1:40 as input, clustering was performed using the <font color="#4f81bd">"FindClusters" function</font> and a resolution parameter of 0.3, and dimension reduction was performed using the <font color="#4f81bd">"RunuMAP" function</font> with the same PCs used for generating the SNN plot. <font color="#ffc000">Differentially expressed genes (DEGs)</font> were determined between clusters usingthe <font color="#4f81bd">"FindAllMarkers" function</font>, which employs a Wilcoxon rank sum test with and FDR cutoff of 0.01, an LFC cutoff of 0.25, and the requirement that the gene be expressed in at least 10% of the cluster and clusters are labeledaccording to manual curation of the differential gene lists.
-### 2.3 Source：[^9]
+### 2.3 Source：[^8]
 文章跳转：[Single-cell transcriptomic analysis of Alzheimer’s disease | Nature](https://www.nature.com/articles/s41586-019-1195-2)
 #### 2.3.1 Quality control for cell inclusion
 跳转：[Quality control for cell inclusion](https://pmc.ncbi.nlm.nih.gov/articles/PMC6865822/#S8:~:text=al.25.-,Quality%20control%20for%20cell%20inclusion,-.)
@@ -85,7 +85,7 @@ For sub-clusters a set of markers (specifically overexpressed) genes was defined
 <font color="#4f81bd">Bulk RNA-seq differential analyses</font> was performed by fitting a linear model using <font color="#4f81bd">the Rpackage limma</font>, while accounting for the covariates age, RNA integrity number, post-mortem interval, and plate batches. The pathological definition of AD groups as provided by ROSMAP was used. This classification defines AD or Non-AD groups based exclusively on theoverall pathological burden, without considering clinical diagnosis. We used the labels low-AD-pathology groups for consistency.
 
 Consistency of gene expression perturbations in the different cell-types observed in snRNAdata with those detected in tissue-level bulk was assessed using a resampling approach. To test whether the genes identified as DEGs in single-cell data are also detected as high-ranking in the differential analysis in bulk, a z-score statistic was computed to quantify thedeviation of the observed differential (p-value) rank scores obtained in the bulk analysis forthe genes detected as DEGs in single-cells, relative to those observed in 1000 randomlychosen gene sets (Extended Data Table S2). This analysis was performed for each cell-typeindependently.
-### 2.4 Source：[^10]
+### 2.4 Source：[^9]
 文章跳转：[Tau Accumulation Induces Microglial State Alterations in Alzheimer's Disease Model Mice | eNeuro](https://www.eneuro.org/content/11/12/ENEURO.0260-24.2024)
 #### 2.4.1 Single-nucleus RNA-seq sequence data analysis
 跳转：[Single-nucleus RNA-seq sequence data analysis](https://pmc.ncbi.nlm.nih.gov/articles/PMC11628182/#s2:~:text=Single%2Dnucleus%20RNA%2Dseq%20sequence%20data%20analysis)
@@ -102,11 +102,10 @@ References:
 
 [^1]: [PMC12639471](https://pmc.ncbi.nlm.nih.gov/articles/PMC12639471/)
 [^2]: [PMC13240024](https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/)
-[^4]: [PMC13116960](https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/)
 [^3]: [PMC13116960](https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/)
-[^5]: [PMC13240024](https://pmc.ncbi.nlm.nih.gov/articles/PMC13240024/)
-[^6]: [PMC12639471](https://pmc.ncbi.nlm.nih.gov/articles/PMC12639471/)
-[^7]: [MARCO+ macrophages drive immunosuppressive remodeling and metastasis in chemotherapy-associated steatohepatitis - Journal of Hepatology](https://www.journal-of-hepatology.eu/article/S0168-8278\(25\)02624-8/abstract)
-[^8]: [PMC12635866](https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/)
-[^9]: [PMC6865822](https://pmc.ncbi.nlm.nih.gov/articles/PMC6865822/)
-[^10]: [PMC11628182](https://pmc.ncbi.nlm.nih.gov/articles/PMC11628182/)
+[^4]: [PMC13116960](https://pmc.ncbi.nlm.nih.gov/articles/PMC13116960/)
+[^5]: [PMC12639471](https://pmc.ncbi.nlm.nih.gov/articles/PMC12639471/)
+[^6]: [MARCO+ macrophages drive immunosuppressive remodeling and metastasis in chemotherapy-associated steatohepatitis - Journal of Hepatology](https://www.journal-of-hepatology.eu/article/S0168-8278\(25\)02624-8/abstract)
+[^7]: [PMC12635866](https://pmc.ncbi.nlm.nih.gov/articles/PMC12635866/)
+[^8]: [PMC6865822](https://pmc.ncbi.nlm.nih.gov/articles/PMC6865822/)
+[^9]: [PMC11628182](https://pmc.ncbi.nlm.nih.gov/articles/PMC11628182/)
