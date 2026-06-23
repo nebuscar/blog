@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildKnowledgeGraph,
+  extractMarkdownPostLinks,
   extractWikiLinks,
   getLocalKnowledgeGraph,
 } from "../src/utils/knowledgeGraph.mjs";
@@ -46,6 +47,65 @@ test("extracts Obsidian wikilinks without headings or aliases", () => {
       "文本 [[SMR]]、[[连锁不平衡【LD】#基本概念|LD]]、![[附件.png]]"
     ),
     ["SMR", "连锁不平衡【LD】"]
+  );
+});
+
+test("extracts markdown links that point to local posts", () => {
+  assert.deepEqual(
+    extractMarkdownPostLinks(
+      "链接 [项目规范](项目目录结构标准化规范手册.md) 和 [带锚点](子目录/产品型项目管理规范手册.md#section)，忽略 [外链](https://example.com/a.md) 与 ![图片](image.md)。"
+    ),
+    ["项目目录结构标准化规范手册.md", "子目录/产品型项目管理规范手册.md"]
+  );
+});
+
+test("builds graph links from markdown post links", () => {
+  const graph = buildKnowledgeGraph([
+    {
+      id: "新笔记/项目目录结构标准化规范手册",
+      filePath: "src/content/posts/新笔记/项目目录结构标准化规范手册.md",
+      body: "[探索型生信分析项目管理规范](探索型生信分析项目管理规范.md) 和 [产品型项目管理规范手册](产品型项目管理规范手册.md)",
+      data: {
+        title: "项目目录结构标准化规范手册",
+        slug: "20260624-0157-15aa9",
+        legacySlug: "新笔记/项目目录结构标准化规范手册",
+        tags: [],
+      },
+    },
+    {
+      id: "新笔记/探索型生信分析项目管理规范",
+      filePath: "src/content/posts/新笔记/探索型生信分析项目管理规范.md",
+      body: "",
+      data: {
+        title: "探索型生信分析项目管理规范手册",
+        slug: "20260624-0121-14fva",
+        legacySlug: "新笔记/探索型生信分析项目管理规范",
+        tags: [],
+      },
+    },
+    {
+      id: "新笔记/产品型项目管理规范手册",
+      filePath: "src/content/posts/新笔记/产品型项目管理规范手册.md",
+      body: "",
+      data: {
+        title: "产品型项目管理规范手册",
+        slug: "20260624-0158-1r6l1",
+        legacySlug: "新笔记/产品型项目管理规范手册",
+        tags: [],
+      },
+    },
+  ]);
+
+  assert.equal(graph.links.length, 2);
+  assert.deepEqual(
+    getLocalKnowledgeGraph(graph, "新笔记/项目目录结构标准化规范手册")
+      .nodes.map(node => node.id)
+      .sort(),
+    [
+      "新笔记/产品型项目管理规范手册",
+      "新笔记/探索型生信分析项目管理规范",
+      "新笔记/项目目录结构标准化规范手册",
+    ]
   );
 });
 

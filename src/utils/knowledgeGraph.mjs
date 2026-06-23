@@ -1,6 +1,7 @@
 import path from "node:path";
 
 const WIKILINK_PATTERN = /(?<!!)\[\[([^\]\n]+)\]\]/g;
+const MARKDOWN_LINK_PATTERN = /(?<!!)\[[^\]\n]+\]\(([^)\s]+(?:\s+"[^"]*")?)\)/g;
 const INVISIBLE_CHARACTERS = /[\u200B-\u200D\u2060\uFEFF]/g;
 
 function normalizeLookupKey(value) {
@@ -26,6 +27,18 @@ function getWikiLinkTarget(rawLink) {
   return rawLink.split("|", 1)[0].split("#", 1)[0].trim();
 }
 
+function getMarkdownLinkTarget(rawLink) {
+  const target = String(rawLink).trim().split(/\s+/, 1)[0].split("#", 1)[0];
+  if (!target || !target.toLowerCase().endsWith(".md")) return "";
+  if (target.startsWith("/") || /^[a-z][a-z\d+.-]*:/i.test(target)) return "";
+
+  try {
+    return decodeURI(target);
+  } catch {
+    return target;
+  }
+}
+
 export function extractWikiLinks(markdown) {
   const links = [];
 
@@ -35,6 +48,26 @@ export function extractWikiLinks(markdown) {
   }
 
   return [...new Set(links)];
+}
+
+export function extractMarkdownPostLinks(markdown) {
+  const links = [];
+
+  for (const match of String(markdown).matchAll(MARKDOWN_LINK_PATTERN)) {
+    const target = getMarkdownLinkTarget(match[1]);
+    if (target) links.push(target);
+  }
+
+  return [...new Set(links)];
+}
+
+function extractPostLinks(markdown) {
+  return [
+    ...new Set([
+      ...extractWikiLinks(markdown),
+      ...extractMarkdownPostLinks(markdown),
+    ]),
+  ];
 }
 
 function getPostAliases(post) {
@@ -93,7 +126,7 @@ export function buildKnowledgeGraph(posts, getUrl = post => post.url ?? "#") {
   const links = [];
 
   for (const post of posts) {
-    for (const target of extractWikiLinks(post.body ?? "")) {
+    for (const target of extractPostLinks(post.body ?? "")) {
       const targetId = resolveTarget(target, aliasIndex);
       if (!targetId || !nodeIds.has(targetId) || targetId === post.id) continue;
 
