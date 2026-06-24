@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T14:58:55+08:00
+modDatetime: 2026-06-24T15:04:52+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -12,8 +12,8 @@ tags:
 
 <u>*定义 PlantGeneWiki 的系统身份和边界。*</u>
 
-这不是一个传统意义上的植物基因组数据库
-****
+这不是一个传统意义上的植物基因组数据库。
+
 **PlantGeneWiki**是一个面向植物基因组学智能体的 Wiki 型知识库基础设施。它不是传统字段数据库，也不是单纯文献检索系统，而是以物种、基因、性状、文献、通路、品种、数据集和同源组等知识对象为页面单元，组织可读、可检索、可追溯、可推理的多源知识网络。
 
 ---
@@ -397,17 +397,17 @@ Relations + EvidenceClaims
 Wiki Pages / Knowledge Graph / Vector Index
 ```
 
-| 原始数据类型 | Dataset 类型 | 转化结果 |
-|---|---|---|
-| 基因组 FASTA | `genome_sequence` | 更新 `Species` 的基因组版本信息，作为序列来源保存 |
-| GFF/GTF 注释文件 | `genome_annotation` | 生成 `Gene` 对象，提取坐标、转录本、基因结构 |
-| 蛋白/CDS 序列 | `sequence_set` | 补充 `Gene` 的蛋白 ID、序列长度和功能分析输入 |
-| GO/KEGG/InterPro 注释表 | `functional_annotation` | 更新 `Gene` 注释，生成 `Gene-Pathway` / `Gene-Function` 关系 |
-| 同源分析结果 | `orthology_result` | 生成 `Orthogroup` 对象，建立 `Gene-Orthogroup` 关系 |
-| 表达矩阵 | `expression_profile` | 生成表达证据，建立 `Gene-condition/tissue` 关系 |
-| QTL/GWAS 表 | `trait_association` | 生成 `Trait`、`locus`、`Gene-Trait EvidenceClaim` |
-| PGCP JSON | `external_database_record` | 补充 `Gene`、`Orthogroup`、同源关系和外部证据 |
-| 文献 PDF/摘要 | `literature_text` | 生成 `Literature` 对象和 `EvidenceClaim` |
+| 原始数据类型               | Dataset 类型                 | 转化结果                                                |
+| -------------------- | -------------------------- | --------------------------------------------------- |
+| 基因组 FASTA            | `genome_sequence`          | 更新 `Species` 的基因组版本信息，作为序列来源保存                      |
+| GFF/GTF 注释文件         | `genome_annotation`        | 生成 `Gene` 对象，提取坐标、转录本、基因结构                          |
+| 蛋白/CDS 序列            | `sequence_set`             | 补充 `Gene` 的蛋白 ID、序列长度和功能分析输入                        |
+| GO/KEGG/InterPro 注释表 | `functional_annotation`    | 更新 `Gene` 注释，生成 `Gene-Pathway` / `Gene-Function` 关系 |
+| 同源分析结果               | `orthology_result`         | 生成 `Orthogroup` 对象，建立 `Gene-Orthogroup` 关系          |
+| 表达矩阵                 | `expression_profile`       | 生成表达证据，建立 `Gene-condition/tissue` 关系                |
+| QTL/GWAS 表           | `trait_association`        | 生成 `Trait`、`locus`、`Gene-Trait EvidenceClaim`       |
+| PGCP JSON            | `external_database_record` | 补充 `Gene`、`Orthogroup`、同源关系和外部证据                    |
+| 文献 PDF/摘要            | `literature_text`          | 生成 `Literature` 对象和 `EvidenceClaim`                 |
 
 ## 7 自动更新机制
 
