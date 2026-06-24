@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T14:21:22+08:00
+modDatetime: 2026-06-24T14:42:08+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -71,7 +71,7 @@ PlantGeneWiki 需要支持多物种知识组织，而不是局限于单一作物
 ### 3.7 支撑大语言模型可靠推理
 PlantGeneWiki 的最终目标不是单纯存储知识，而是为植物知识智能体提供可靠外部知识基础。系统需要向大语言模型提供可控的检索结果、结构化关系、证据片段和来源引用，使模型在生成回答时能够基于明确证据进行解释、比较和推理。因此，系统评价不应只看数据规模，还应关注智能体回答的准确性、证据完整性、可解释性、更新及时性和人工复核成本。
 ## 4 知识对象模型[^1]
-
+知识对象模型用于定义系统中哪些实体需要被作为独立知识单元管理。每个知识对象既是一个可阅读的 Wiki 页面，也是知识图谱中的结构化节点，同时还是语义检索、证据挂载和智能体推理的入口。系统中的文献、数据库记录、组学数据和人工整理内容，最终都应被映射到这些知识对象及其关系上。
 ### 4.1 核心知识对象类型
 ```text
 Species：物种
@@ -126,9 +126,11 @@ Dataset --provides_evidence_for--> Gene / Trait / Pathway
 Cultivar --has_trait--> Trait
 Topic --summarizes--> Literature
 ```
-### 4.4 示例
+*其中，`EvidenceClaim` 可以理解为“证据声明”，用于表达某条证据支持的具体知识结论，例如“某基因与某性状相关”“某基因参与某通路”“某文献报道某表达模式”等。它不一定需要作为独立 Wiki 页面，但应作为证据链中的结构化记录保存。*
+### 4.4 知识对象示例
 
-### 4.5 物种对象
+#### 4.4.1 物种对象：Species
+物种对象用于组织一个物种相关的基因组资源、注释版本、基因集合、性状知识、文献证据和比较物种关系，是多物种知识整合和跨物种推理的基础节点。
 ```yaml
 type: Species
 id: species:brassica_napus
@@ -170,55 +172,115 @@ related_datasets:
   - Bn_literature_collection
 updated_at: 2026-06-24
 ```
-
-#### 4.5.1 基因对象
+#### 4.4.2 基因对象：Gene
+基因对象用于整合某个基因的基础注释、同源关系、功能信息、表达证据、性状关联、通路关系和文献证据。它是植物基因组学知识库中最重要的对象类型之一。
 ```yaml
 type: Gene
-id: BnaA01G0000100ZS
-species: Brassica napus
+id: gene:bna:BnaA01G0000100ZS
+name: BnaA01G0000100ZS
+species: species:brassica_napus
 aliases:
   - BnaA01G0000100
-  - possible historical IDs
 description: putative transcription factor
 annotations:
-  - GO:xxxxxxx
-  - KEGG:xxxx
+  go:
+    - GO:xxxxxxx
+  kegg:
+    - KEGG:xxxx
+orthogroups:
+  - orthogroup:OG0017389
 orthologs:
-  - ATxGxxxxx
-traits:
-  - flowering time
-  - seed oil content
-literature:
-  - PMID:xxxxxxx
+  - gene:atha:ATxGxxxxx
+related_traits:
+  - trait:flowering_time
+  - trait:seed_oil_content
+related_pathways:
+  - pathway:hormone_signaling
+related_literature:
+  - literature:PMID_xxxxxxx
 evidence:
-  - source: paper
+  - source: literature:PMID_xxxxxxx
     claim: this gene is associated with flowering time
     evidence_type: GWAS candidate gene
     confidence: medium
+updated_at: 2026-06-24
 ```
-*这不是最终数据库格式，只是说明“一个对象应该包含哪些知识”。*
-#### 4.5.2 性状对象
+#### 4.4.3 性状对象：Trait
+性状对象用于组织与某个农艺性状、发育性状或抗逆性状相关的基因、QTL/GWAS 位点、通路、品种、物种和文献证据。性状页面不只是解释“某个性状是什么”，还需要汇总与该性状相关的多源证据。
 ```yaml
 type: Trait
-id: seed_oil_content
+id: trait:seed_oil_content
 name: Seed oil content
+aliases:
+  - oil content
+  - seed oil accumulation
 related_species:
-  - Brassica napus
-  - Arabidopsis thaliana
+  - species:brassica_napus
+  - species:arabidopsis_thaliana
 related_genes:
-  - BnaA01Gxxxxx
-  - ATxGxxxxx
+  - gene:bna:BnaA01Gxxxxx
+  - gene:atha:ATxGxxxxx
 related_qtls:
-  - qOC-A01-1
+  - qtl:qOC-A01-1
+related_gwas_loci:
+  - gwas_locus:chrA01_xxxxx_yyyyy
+related_pathways:
+  - pathway:fatty_acid_biosynthesis
 related_literature:
-  - PMID:xxxxxxx
+  - literature:PMID_xxxxxxx
 evidence_types:
   - QTL
   - GWAS
   - expression
   - functional validation
+updated_at: 2026-06-24
 ```
-性状页面就不只是解释“含油量是什么”，还要列出相关基因、QTL/GWAS、文献证据和跨物种关系。
+
+#### 4.4.4 文献对象：Literature
+文献对象用于组织 PlantGeneWiki 中的论文、综述、预印本和其他学术文本来源。它是知识库中最重要的证据来源之一，也是自动更新机制的主要入口。
+
+在 PlantGeneWiki 中，文献对象不只是记录标题、作者和 DOI，而是需要进一步记录文献涉及的物种、基因、性状、通路、数据集、研究主题，以及从文献中抽取出的证据声明。文献对象同时服务于三类任务：文献检索、知识抽取和证据追溯。
+```yaml
+type: Literature
+id: literature:PMID_xxxxxxx
+title: Genome-wide association study of seed oil content in Brassica napus
+authors:
+  - Zhang X
+  - Li Y
+year: 2024
+source_type: journal_article
+identifiers:
+  pmid: PMID_xxxxxxx
+  doi: 10.xxxx/xxxxx
+journal: Example Journal
+abstract: This study identifies candidate loci associated with seed oil content in Brassica napus.
+related_species:
+  - species:brassica_napus
+related_genes:
+  - gene:bna:BnaA01Gxxxxx
+  - gene:bna:BnaC03Gxxxxx
+related_traits:
+  - trait:seed_oil_content
+related_datasets:
+  - dataset:GWAS_seed_oil_content_2024
+related_topics:
+  - topic:gwas
+  - topic:seed_oil_content
+evidence_claims:
+  - id: claim:PMID_xxxxxxx_001
+    claim_type: gene_trait_association
+    subject: gene:bna:BnaA01Gxxxxx
+    predicate: associated_with
+    object: trait:seed_oil_content
+    evidence_type: GWAS
+    evidence_text: Candidate genes near significant loci were associated with seed oil content.
+    evidence_location: abstract
+    confidence: medium
+screening_status: included
+curation_status: machine_extracted_pending_review
+updated_at: 2026-06-24
+```
+*文献对象的核心不只是文献元数据，而是它能产生哪些可追溯的知识证据。例如，一篇 GWAS 文献可能同时支持多个基因-性状关系、多个 QTL/GWAS 位点、多个候选基因解释和一个研究主题变化判断。*
 ## 5 知识来源
 
 ## 6 知识组织方式[^2]
