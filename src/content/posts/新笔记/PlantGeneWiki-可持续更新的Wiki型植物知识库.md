@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T14:13:30+08:00
+modDatetime: 2026-06-24T14:21:22+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -128,7 +128,50 @@ Topic --summarizes--> Literature
 ```
 ### 4.4 示例
 
-#### 4.4.1 基因对象
+### 4.5 物种对象
+```yaml
+type: Species
+id: species:brassica_napus
+scientific_name: Brassica napus
+common_name: 甘蓝型油菜
+aliases:
+  - rapeseed
+  - oilseed rape
+taxonomy:
+  family: Brassicaceae
+  genus: Brassica
+  species: Brassica napus
+genome_type: allotetraploid
+subgenomes:
+  - A
+  - C
+related_species:
+  - species:brassica_rapa
+  - species:brassica_oleracea
+  - species:arabidopsis_thaliana
+genome_versions:
+  - name: ZS11
+    source: BRAD
+    status: active
+  - name: Darmor-bzh
+    source: NCBI
+    status: historical_or_comparative
+data_sources:
+  - BRAD
+  - NCBI
+  - Ensembl Plants
+  - literature
+related_traits:
+  - seed_oil_content
+  - flowering_time
+  - sclerotinia_resistance
+related_datasets:
+  - Bn_genome_annotation_ZS11
+  - Bn_literature_collection
+updated_at: 2026-06-24
+```
+
+#### 4.5.1 基因对象
 ```yaml
 type: Gene
 id: BnaA01G0000100ZS
@@ -154,7 +197,7 @@ evidence:
     confidence: medium
 ```
 *这不是最终数据库格式，只是说明“一个对象应该包含哪些知识”。*
-#### 4.4.2 性状对象
+#### 4.5.2 性状对象
 ```yaml
 type: Trait
 id: seed_oil_content
