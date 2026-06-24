@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T15:04:52+08:00
+modDatetime: 2026-06-24T16:35:08+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -381,20 +381,26 @@ PlantGeneWiki 不直接把原始基因组序列、注释文件、表达矩阵或
 
 原始数据层负责保存数据文件和来源信息；Dataset 层负责记录数据类型、版本、字段含义和处理状态；知识对象层负责承载可阅读、可查询和可推理的实体知识；证据层负责记录每条知识来自哪个数据集、哪个字段或哪个分析步骤。
 
-```text
-Raw Data
-  ↓
-Dataset Registry
-  ↓
-Parser / Normalizer
-  ↓
-Entity Resolution
-  ↓
-Knowledge Objects
-  ↓
-Relations + EvidenceClaims
-  ↓
-Wiki Pages / Knowledge Graph / Vector Index
+```mermaid
+flowchart TD
+    A["Raw Data<br/>原始数据"]
+    B["Dataset Registry<br/>数据集登记"]
+    C["Parser / Normalizer<br/>解析与标准化"]
+    D["Entity Resolution<br/>实体对齐"]
+    E["Knowledge Objects<br/>知识对象"]
+    F["Relations + EvidenceClaims<br/>关系与证据声明"]
+    G["Wiki Pages<br/>Wiki 页面"]
+    H["Knowledge Graph<br/>知识图谱"]
+    I["Vector Index<br/>向量索引"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    F --> H
+    F --> I
 ```
 
 | 原始数据类型               | Dataset 类型                 | 转化结果                                                |
