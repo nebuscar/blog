@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T16:35:08+08:00
+modDatetime: 2026-06-24T20:42:49+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -128,13 +128,67 @@ Topic --summarizes--> Literature
 ```
 *其中，`EvidenceClaim` 可以理解为“证据声明”，用于表达某条证据支持的具体知识结论，例如“某基因与某性状相关”“某基因参与某通路”“某文献报道某表达模式”等。它不一定需要作为独立 Wiki 页面，但应作为证据链中的结构化记录保存。*
 ### 4.4 知识对象示例
+本节通过典型对象示例说明 PlantGeneWiki 如何将原始数据、结构化注释、同源关系、性状知识和文献证据组织为可管理的知识对象。需要强调的是，这些 YAML 示例不是最终数据库表结构，而是用于说明“系统如何理解一个知识对象”。
+#### 4.4.1 数据集对象：Dataset
+`Dataset` 用于表示进入 PlantGeneWiki 的一个数据来源或数据文件。原始 FASTA、GFF/GTF、JSON、表达矩阵、GWAS 表和文献 PDF 都不直接作为知识页面管理，而是首先登记为 Dataset。
 
-#### 4.4.1 物种对象：Species
+```yaml
+object_type: Dataset
+object_id: dataset:pgcp:abies_alba:v1:cds
+name: Abies alba PGCP v1 CDS sequences
+dataset_type: sequence_set
+species: species:abies_alba
+source:
+  name: PGCP
+version: v1
+sequence_type: CDS
+storage:
+  type: internal_raw_storage
+  path_policy: hidden_in_public_release
+file:
+  format: fasta.gz
+  original_filename: abies_alba.cds.fa.gz
+stats:
+  sequence_count: null
+  total_length: null
+  min_length: null
+  max_length: null
+  mean_length: null
+updated_at: 2026-06-24
+```
+*Dataset 对象的作用不是展示原始文件内容，而是记录数据来源、版本、文件类型、统计摘要和后续解析结果。大型原始数据仍保存在服务器或对象存储中，公开 Wiki 页面只展示其元数据和可追溯信息。*
+
+#### 4.4.2 序列记录对象：SequenceRecord
+`SequenceRecord` 表示某个序列数据集中的一条序列记录，例如 FASTA 文件中的一个 header 及其对应序列。SequenceRecord 不是 Gene 本身，而是 Gene、Transcript 或 Protein 的数据证据之一。
+
+```yaml
+object_type: SequenceRecord
+object_id: seq:pgcp:abies_alba:v1:cds:Aalbaalba5_s000000100000010.1.v1.0
+sequence_id: Aalbaalba5_s000000100000010.1.v1.0
+species: species:abies_alba
+dataset: dataset:pgcp:abies_alba:v1:cds
+sequence_type: CDS
+length: null
+checksum:
+  md5: null
+inferred_gene_id: Aalbaalba5_s000000100000010
+inference_method: header_parse
+confidence: medium
+related_objects:
+  - predicate: contained_in_dataset
+    target: dataset:pgcp:abies_alba:v1:cds
+  - predicate: possible_sequence_of
+    target: gene:abies_alba:Aalbaalba5_s000000100000010
+    confidence: medium
+```
+*对于 CDS FASTA 或蛋白 FASTA，如果缺少 GFF/GTF 支持，系统只能从 header 中推断可能的 gene_id。该推断关系应标记置信度，不能直接等同于经过注释确认的 Gene-Transcript 关系。*
+
+#### 4.4.3 物种对象：Species
 物种对象用于组织一个物种相关的基因组资源、注释版本、基因集合、性状知识、文献证据和比较物种关系，是多物种知识整合和跨物种推理的基础节点。
 ```yaml
-type: Species
-id: species:brassica_napus
-scientific_name: Brassica napus
+object_type: Species
+object_id: species:brassica_napus
+name: Brassica napus
 common_name: 甘蓝型油菜
 aliases:
   - rapeseed
@@ -172,11 +226,11 @@ related_datasets:
   - Bn_literature_collection
 updated_at: 2026-06-24
 ```
-#### 4.4.2 基因对象：Gene
+#### 4.4.4 基因对象：Gene
 基因对象用于整合某个基因的基础注释、同源关系、功能信息、表达证据、性状关联、通路关系和文献证据。它是植物基因组学知识库中最重要的对象类型之一。
 ```yaml
-type: Gene
-id: gene:bna:BnaA01G0000100ZS
+object_type: Gene
+object_id: gene:bna:BnaA01G0000100ZS
 name: BnaA01G0000100ZS
 species: species:brassica_napus
 aliases:
@@ -187,47 +241,55 @@ annotations:
     - GO:xxxxxxx
   kegg:
     - KEGG:xxxx
-orthogroups:
-  - orthogroup:OG0017389
-orthologs:
-  - gene:atha:ATxGxxxxx
-related_traits:
-  - trait:flowering_time
-  - trait:seed_oil_content
-related_pathways:
-  - pathway:hormone_signaling
-related_literature:
-  - literature:PMID_xxxxxxx
-evidence:
-  - source: literature:PMID_xxxxxxx
+related_objects:
+  - predicate: belongs_to_species
+    target: species:brassica_napus
+  - predicate: belongs_to_orthogroup
+    target: orthogroup:OG0017389
+  - predicate: ortholog_of
+    target: gene:atha:ATxGxxxxx
+  - predicate: associated_with
+    target: trait:flowering_time
+  - predicate: associated_with
+    target: trait:seed_oil_content
+  - predicate: participates_in
+    target: pathway:hormone_signaling
+  - predicate: mentioned_in
+    target: literature:PMID_xxxxxxx
+evidence_records:
+  - evidence_id: evidence:PMID_xxxxxxx:BnaA01G0000100ZS:flowering_time
+    source: literature:PMID_xxxxxxx
     claim: this gene is associated with flowering time
     evidence_type: GWAS candidate gene
     confidence: medium
 updated_at: 2026-06-24
 ```
-#### 4.4.3 性状对象：Trait
+#### 4.4.5 性状对象：Trait
 性状对象用于组织与某个农艺性状、发育性状或抗逆性状相关的基因、QTL/GWAS 位点、通路、品种、物种和文献证据。性状页面不只是解释“某个性状是什么”，还需要汇总与该性状相关的多源证据。
 ```yaml
-type: Trait
-id: trait:seed_oil_content
+object_type: Trait
+object_id: trait:seed_oil_content
 name: Seed oil content
 aliases:
   - oil content
   - seed oil accumulation
-related_species:
-  - species:brassica_napus
-  - species:arabidopsis_thaliana
-related_genes:
-  - gene:bna:BnaA01Gxxxxx
-  - gene:atha:ATxGxxxxx
-related_qtls:
-  - qtl:qOC-A01-1
-related_gwas_loci:
-  - gwas_locus:chrA01_xxxxx_yyyyy
-related_pathways:
-  - pathway:fatty_acid_biosynthesis
-related_literature:
-  - literature:PMID_xxxxxxx
+related_objects:
+  - predicate: observed_in_species
+    target: species:brassica_napus
+  - predicate: observed_in_species
+    target: species:arabidopsis_thaliana
+  - predicate: associated_with_gene
+    target: gene:bna:BnaA01Gxxxxx
+  - predicate: associated_with_gene
+    target: gene:atha:ATxGxxxxx
+  - predicate: associated_with_qtl
+    target: qtl:qOC-A01-1
+  - predicate: associated_with_gwas_locus
+    target: gwas_locus:chrA01_xxxxx_yyyyy
+  - predicate: related_to_pathway
+    target: pathway:fatty_acid_biosynthesis
+  - predicate: mentioned_in
+    target: literature:PMID_xxxxxxx
 evidence_types:
   - QTL
   - GWAS
@@ -236,13 +298,14 @@ evidence_types:
 updated_at: 2026-06-24
 ```
 
-#### 4.4.4 文献对象：Literature
+#### 4.4.6 文献对象：Literature
 文献对象用于组织 PlantGeneWiki 中的论文、综述、预印本和其他学术文本来源。它是知识库中最重要的证据来源之一，也是自动更新机制的主要入口。
 
 在 PlantGeneWiki 中，文献对象不只是记录标题、作者和 DOI，而是需要进一步记录文献涉及的物种、基因、性状、通路、数据集、研究主题，以及从文献中抽取出的证据声明。文献对象同时服务于三类任务：文献检索、知识抽取和证据追溯。
 ```yaml
-type: Literature
-id: literature:PMID_xxxxxxx
+object_type: Literature
+object_id: literature:PMID_xxxxxxx
+name: Genome-wide association study of seed oil content in Brassica napus
 title: Genome-wide association study of seed oil content in Brassica napus
 authors:
   - Zhang X
@@ -254,20 +317,23 @@ identifiers:
   doi: 10.xxxx/xxxxx
 journal: Example Journal
 abstract: This study identifies candidate loci associated with seed oil content in Brassica napus.
-related_species:
-  - species:brassica_napus
-related_genes:
-  - gene:bna:BnaA01Gxxxxx
-  - gene:bna:BnaC03Gxxxxx
-related_traits:
-  - trait:seed_oil_content
-related_datasets:
-  - dataset:GWAS_seed_oil_content_2024
-related_topics:
-  - topic:gwas
-  - topic:seed_oil_content
-evidence_claims:
-  - id: claim:PMID_xxxxxxx_001
+related_objects:
+  - predicate: studies_species
+    target: species:brassica_napus
+  - predicate: mentions_gene
+    target: gene:bna:BnaA01Gxxxxx
+  - predicate: mentions_gene
+    target: gene:bna:BnaC03Gxxxxx
+  - predicate: studies_trait
+    target: trait:seed_oil_content
+  - predicate: uses_dataset
+    target: dataset:GWAS_seed_oil_content_2024
+  - predicate: belongs_to_topic
+    target: topic:gwas
+  - predicate: belongs_to_topic
+    target: topic:seed_oil_content
+evidence_records:
+  - evidence_id: evidence:PMID_xxxxxxx:001
     claim_type: gene_trait_association
     subject: gene:bna:BnaA01Gxxxxx
     predicate: associated_with
@@ -282,13 +348,13 @@ updated_at: 2026-06-24
 ```
 *文献对象的核心不只是文献元数据，而是它能产生哪些可追溯的知识证据。例如，一篇 GWAS 文献可能同时支持多个基因-性状关系、多个 QTL/GWAS 位点、多个候选基因解释和一个研究主题变化判断。*
 
-#### 4.4.5 同源组对象：Orthogroup
+#### 4.4.7 同源组对象：Orthogroup
 同源组对象用于组织不同物种中具有共同进化来源的一组基因，是 PlantGeneWiki 支持跨物种比较、功能迁移和保守性分析的关键对象。对于植物基因组学问题，很多基因功能并不能只依赖单一物种证据判断，而需要结合拟南芥、油菜、白菜、甘蓝及其他物种中的同源基因关系进行推理。
 
 在 PlantGeneWiki 中，同源组对象不只是保存一组同源基因 ID，而是需要记录该同源组包含哪些物种、哪些基因、同源关系类型、功能注释一致性、物种特异性扩张情况，以及相关文献和数据库证据。它是连接多物种基因对象的核心桥梁。
 ```yaml
-type: Orthogroup
-id: orthogroup:OG0017389
+object_type: Orthogroup
+object_id: orthogroup:OG0017389
 name: OG0017389
 members:
   - gene:bna:BnaA01G0000100ZS
@@ -314,64 +380,31 @@ conserved_functions:
 species_specific_expansion:
   status: possible
   notes: Brassica napus contains multiple retained homologs from A and C subgenomes.
-related_traits:
-  - trait:flowering_time
-related_pathways:
-  - pathway:hormone_signaling
+related_objects:
+  - predicate: has_member
+    target: gene:bna:BnaA01G0000100ZS
+  - predicate: has_member
+    target: gene:bra:BraA01Gxxxxx
+  - predicate: has_member
+    target: gene:bol:BolC01Gxxxxx
+  - predicate: has_member
+    target: gene:atha:ATxGxxxxx
+  - predicate: associated_with_trait
+    target: trait:flowering_time
+  - predicate: related_to_pathway
+    target: pathway:hormone_signaling
 data_sources:
   - PGCP
   - OrthoFinder
   - literature
-evidence:
-  - source: PGCP
+evidence_records:
+  - evidence_id: evidence:PGCP:OG0017389
+    source: PGCP
     evidence_type: orthology_inference
     confidence: medium
 updated_at: 2026-06-24
 ```
 
-#### 4.4.6 数据集对象：Dataset
-
-数据集对象用于管理 PlantGeneWiki 中的结构化数据来源和分析结果，包括基因组注释、表达谱、QTL、GWAS、重测序、同源关系、功能注释、品种登记和人工整理表格等。它是知识库中除文献之外的另一类重要证据来源。
-
-在 PlantGeneWiki 中，数据集对象不只是文件记录，而是需要说明数据集的来源、版本、覆盖物种、数据类型、字段含义、处理流程、质量控制状态，以及它支持了哪些知识对象和证据声明。数据集对象对于保证知识库可追溯、可更新和可复现非常关键。
-```yaml
-type: Dataset
-id: dataset:Bn_GWAS_seed_oil_content_2024
-name: Brassica napus GWAS dataset for seed oil content
-dataset_type: GWAS
-description: GWAS dataset used to identify loci associated with seed oil content in Brassica napus.
-related_species:
-  - species:brassica_napus
-related_traits:
-  - trait:seed_oil_content
-related_genes:
-  - gene:bna:BnaA01Gxxxxx
-  - gene:bna:BnaC03Gxxxxx
-source:
-  source_type: literature
-  literature_id: literature:PMID_xxxxxxx
-  doi: 10.xxxx/xxxxx
-version: original_publication
-data_format:
-  - table
-  - supplementary_file
-fields:
-  - marker_id
-  - chromosome
-  - position
-  - p_value
-  - candidate_gene
-processing_status: parsed
-curation_status: machine_extracted_pending_review
-quality_control:
-  status: partial
-  notes: Candidate genes require manual verification against genome annotation version.
-evidence_claims:
-  - claim:PMID_xxxxxxx_001
-supports_relations:
-  - gene:bna:BnaA01Gxxxxx --associated_with--> trait:seed_oil_content
-updated_at: 2026-06-24
-```
 ## 5 知识来源
 
 ## 6 知识组织方式[^2]
