@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKG讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-25T00:31:12+08:00
+modDatetime: 2026-06-25T00:35:51+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -489,7 +489,7 @@ flowchart TD
 
 ### 10.1 知识覆盖度
 *回答的是：这个对象目前知道了多少？*
-![PlantGeneWiki 可持续更新的Wiki型植物知识库 2026 06 24 851c90bb 5caf 48e1 ba7a e8c4ac629b20](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/24/PlantGeneWiki-可持续更新的Wiki型植物知识库_2026-06-24_851c90bb-5caf-48e1-ba7a-e8c4ac629b20.png)
+![PlantGeneWiki 可持续更新的Wiki型植物知识库 2026 06 24 851c90bb 5caf 48e1 ba7a e8c4ac629b20](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/25/PlantGeneWiki-可持续更新的Wiki型植物知识库_2026-06-24_851c90bb-5caf-48e1-ba7a-e8c4ac629b20.png)
 
 ### 10.2 证据可靠性
 *回答的是：这些知识有多可信？*
