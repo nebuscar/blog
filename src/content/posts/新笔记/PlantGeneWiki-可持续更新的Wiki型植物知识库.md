@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T20:42:49+08:00
+modDatetime: 2026-06-25T00:22:04+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -408,6 +408,7 @@ updated_at: 2026-06-24
 ## 5 知识来源
 
 ## 6 知识组织方式[^2]
+*识组织方式回答：知识怎么整理？  知识在进入系统前后如何被标准化、拆分、关联、追踪*
 
 ### 6.1 原始数据到知识对象的转化
 PlantGeneWiki 不直接把原始基因组序列、注释文件、表达矩阵或数据库 JSON 作为 Wiki 页面展示，而是先将其登记为 Dataset 对象，再通过解析、标准化、实体对齐和证据抽取流程，转化为 Gene、Species、Orthogroup、Trait、Pathway 等知识对象及其关系。
@@ -447,15 +448,51 @@ flowchart TD
 | QTL/GWAS 表           | `trait_association`        | 生成 `Trait`、`locus`、`Gene-Trait EvidenceClaim`       |
 | PGCP JSON            | `external_database_record` | 补充 `Gene`、`Orthogroup`、同源关系和外部证据                    |
 | 文献 PDF/摘要            | `literature_text`          | 生成 `Literature` 对象和 `EvidenceClaim`                 |
+## 7 知识组件
+*知识组件回答：整理好的知识怎么被系统使用？*
+```mermaid
+flowchart TD
+    A["Knowledge Objects / Wiki Pages"]
 
-## 7 自动更新机制
+    A --> B["Vector Knowledge Base"]
+    A --> C["Structured Knowledge Graph"]
 
-## 8 评价指标
+    B --> D["Search / Reasoning / Agent"]
+    C --> D
+```
 
-## 9 阶段性建设路线
+```mermaid
+flowchart TD
+    A["Knowledge Objects / Wiki Pages"]
+
+    B["Vector Knowledge Base"]
+    C["Structured Knowledge Graph"]
+
+    D["Search / Reasoning / Agent"]
+
+    A --> B
+    A --> C
+    B --> D
+    C --> D
+
+    B -. "Dual Knowledge Components" .- C
+```
+### 7.1 向量化知识库
+### 7.2 结构化知识图谱
+## 8 自动更新机制
+
+## 9 评价指标
+
+### 9.1 知识覆盖度
+*回答的是：这个对象目前知道了多少？*
+![PlantGeneWiki 可持续更新的Wiki型植物知识库 2026 06 24 851c90bb 5caf 48e1 ba7a e8c4ac629b20](https://pub-b6575bc5365d47eea85c3b697ba6ad51.r2.dev/2026/06/24/PlantGeneWiki-可持续更新的Wiki型植物知识库_2026-06-24_851c90bb-5caf-48e1-ba7a-e8c4ac629b20.png)
+
+### 9.2 证据可靠性
+*回答的是：这些知识有多可信？*
+## 10 阶段性建设路线
 
 ---
-## 10 名词解释
+## 11 名词解释
 
 [^1]: <font color="#ffc000">知识对象模型</font>：就是回答PlantGeneWiki 里有哪些类型的“东西”需要被当作独立知识单元管理？这些东西之间有什么关系？
 [^2]: <font color="#ffc000">知识组织方式</font>：就是回答 PlantGeneWiki 不是把数据堆在一起，而是用什么结构把知识对象、文本、证据、关系和索引组织起来。它关注的不是“有哪些对象”，而是“这些对象怎么被组织成一个可用的 KB”。
