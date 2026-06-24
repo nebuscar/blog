@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T13:46:23+08:00
+modDatetime: 2026-06-24T14:13:30+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -13,8 +13,8 @@ tags:
 <u>*定义 PlantGeneWiki 的系统身份和边界。*</u>
 
 这不是一个传统意义上的植物基因组数据库
-
-<font color="#ffc000">PlantGeneWiki </font>是一个面向植物基因组学智能体的 Wiki 型知识库基础设施。它不是传统字段数据库，也不是单纯文献检索系统，而是以物种、基因、性状、文献、通路、品种、数据集和同源组等知识对象为页面单元，组织可读、可检索、可追溯、可推理的多源知识网络。
+****
+**PlantGeneWiki**是一个面向植物基因组学智能体的 Wiki 型知识库基础设施。它不是传统字段数据库，也不是单纯文献检索系统，而是以物种、基因、性状、文献、通路、品种、数据集和同源组等知识对象为页面单元，组织可读、可检索、可追溯、可推理的多源知识网络。
 
 ---
 <font color="#ffc000">科学问题：</font>将大语言模型的可靠推理边界推展至一个现有系统服务不足的复杂作物基因组学领域
@@ -31,7 +31,7 @@ tags:
 ## 2 科学问题
 <u>*解释研究动机和学术价值。*</u>
 
-> <font color="#ffc000">如何将大语言模型的可靠推理边界拓展到现有数据库和通用模型服务不足的复杂作物基因组学领域？</font>
+> 如何将大语言模型的可靠推理边界拓展到现有数据库和通用模型服务不足的复杂作物基因组学领域？
 
 在植物基因组学，尤其是油菜等复杂作物研究中，研究问题往往不是单一事实查询，而是跨文献、跨数据库、跨物种、跨证据类型的综合推理。例如：
 - 某个基因是否真正参与某个农艺性状的调控？
@@ -72,7 +72,63 @@ PlantGeneWiki 需要支持多物种知识组织，而不是局限于单一作物
 PlantGeneWiki 的最终目标不是单纯存储知识，而是为植物知识智能体提供可靠外部知识基础。系统需要向大语言模型提供可控的检索结果、结构化关系、证据片段和来源引用，使模型在生成回答时能够基于明确证据进行解释、比较和推理。因此，系统评价不应只看数据规模，还应关注智能体回答的准确性、证据完整性、可解释性、更新及时性和人工复核成本。
 ## 4 知识对象模型[^1]
 
-**例子：基因对象**
+### 4.1 核心知识对象类型
+```text
+Species：物种
+Gene：基因
+Orthogroup：同源组
+Trait：性状
+Literature：文献
+Pathway：通路
+Cultivar：品种/材料
+Dataset：数据集
+Topic：研究主题
+```
+*这些对象不是普通页面分类，而是 PlantGeneWiki 中知识管理的基本单位。一个对象可以同时具有页面内容、结构化元数据、关联关系、证据记录和索引信息。*
+
+### 4.2 知识对象的通用结构
+
+每个知识对象都应至少包含以下通用字段：
+
+| 字段 | 说明 |
+|---|---|
+| `object_id` | 对象唯一标识符 |
+| `object_type` | 对象类型，如 `Gene`、`Trait`、`Literature` |
+| `name` | 标准名称 |
+| `aliases` | 别名、历史名称、数据库交叉编号 |
+| `description` | 简要描述 |
+| `source` | 主要来源 |
+| `version` | 数据或注释版本 |
+| `updated_at` | 最近更新时间 |
+| `related_objects` | 关联对象 |
+| `evidence_records` | 支撑该对象知识的证据记录 |
+| `wiki_page` | 面向人工阅读的页面内容 |
+
+其中，`object_id` 和 `object_type` 是对象管理的基础；`aliases` 用于解决不同数据库和文献中的命名差异；`related_objects` 用于建立知识图谱关系；`evidence_records` 用于追踪每条关键知识的来源和可信度。
+
+---
+### 4.3 知识对象之间的关系
+
+PlantGeneWiki 的重点不是孤立对象，而是对象之间形成的知识网络。
+```text
+Species --has_gene--> Gene
+Gene --belongs_to_species--> Species
+Gene --belongs_to_orthogroup--> Orthogroup
+Gene --ortholog_of--> Gene
+Gene --associated_with--> Trait
+Gene --participates_in--> Pathway
+Gene --mentioned_in--> Literature
+Trait --supported_by--> Literature
+Trait --associated_with_qtl_gwas--> Dataset
+Literature --mentions--> Gene / Trait / Species / Pathway
+Literature --supports--> EvidenceClaim
+Dataset --provides_evidence_for--> Gene / Trait / Pathway
+Cultivar --has_trait--> Trait
+Topic --summarizes--> Literature
+```
+### 4.4 示例
+
+#### 4.4.1 基因对象
 ```yaml
 type: Gene
 id: BnaA01G0000100ZS
@@ -97,11 +153,8 @@ evidence:
     evidence_type: GWAS candidate gene
     confidence: medium
 ```
-这不是最终数据库格式，只是说明“一个对象应该包含哪些知识”。
-
----
-
-**例子：性状对象**
+*这不是最终数据库格式，只是说明“一个对象应该包含哪些知识”。*
+#### 4.4.2 性状对象
 ```yaml
 type: Trait
 id: seed_oil_content
@@ -123,33 +176,18 @@ evidence_types:
   - functional validation
 ```
 性状页面就不只是解释“含油量是什么”，还要列出相关基因、QTL/GWAS、文献证据和跨物种关系。
-
----
-**知识对象之间的关系**
-PlantGeneWiki 的重点不是单个对象，而是对象网络：
-```text
-Species --has_gene--> Gene
-Gene --belongs_to--> Orthogroup
-Gene --ortholog_of--> Gene
-Gene --associated_with--> Trait
-Gene --participates_in--> Pathway
-Literature --mentions--> Gene
-Literature --supports--> Claim
-Dataset --provides_evidence_for--> Gene/Trait
-Cultivar --has_trait--> Trait
-Topic --summarizes--> Literature
-```
-
 ## 5 知识来源
 
 ## 6 知识组织方式[^2]
 
 ## 7 自动更新机制
 
-## 8 阶段性建设路线
+## 8 ping'jia'zhi'b 评价指标
+
+## 9 阶段性建设路线
 
 ---
-## 9 名词解释
+## 10 名词解释
 
 [^1]: <font color="#ffc000">知识对象模型</font>：就是回答PlantGeneWiki 里有哪些类型的“东西”需要被当作独立知识单元管理？这些东西之间有什么关系？
 [^2]: <font color="#ffc000">知识组织方式</font>：就是回答 PlantGeneWiki 不是把数据堆在一起，而是用什么结构把知识对象、文本、证据、关系和索引组织起来。它关注的不是“有哪些对象”，而是“这些对象怎么被组织成一个可用的 KB”。
