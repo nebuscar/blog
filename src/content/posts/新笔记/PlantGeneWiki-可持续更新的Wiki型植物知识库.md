@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKB讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-24T14:42:08+08:00
+modDatetime: 2026-06-24T14:58:55+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -281,13 +281,137 @@ curation_status: machine_extracted_pending_review
 updated_at: 2026-06-24
 ```
 *文献对象的核心不只是文献元数据，而是它能产生哪些可追溯的知识证据。例如，一篇 GWAS 文献可能同时支持多个基因-性状关系、多个 QTL/GWAS 位点、多个候选基因解释和一个研究主题变化判断。*
+
+#### 4.4.5 同源组对象：Orthogroup
+同源组对象用于组织不同物种中具有共同进化来源的一组基因，是 PlantGeneWiki 支持跨物种比较、功能迁移和保守性分析的关键对象。对于植物基因组学问题，很多基因功能并不能只依赖单一物种证据判断，而需要结合拟南芥、油菜、白菜、甘蓝及其他物种中的同源基因关系进行推理。
+
+在 PlantGeneWiki 中，同源组对象不只是保存一组同源基因 ID，而是需要记录该同源组包含哪些物种、哪些基因、同源关系类型、功能注释一致性、物种特异性扩张情况，以及相关文献和数据库证据。它是连接多物种基因对象的核心桥梁。
+```yaml
+type: Orthogroup
+id: orthogroup:OG0017389
+name: OG0017389
+members:
+  - gene:bna:BnaA01G0000100ZS
+  - gene:bra:BraA01Gxxxxx
+  - gene:bol:BolC01Gxxxxx
+  - gene:atha:ATxGxxxxx
+member_species:
+  - species:brassica_napus
+  - species:brassica_rapa
+  - species:brassica_oleracea
+  - species:arabidopsis_thaliana
+orthology_type:
+  - one_to_one
+  - one_to_many
+functional_annotations:
+  go:
+    - GO:xxxxxxx
+  kegg:
+    - KEGG:xxxx
+conserved_functions:
+  - flowering_time_regulation
+  - hormone_signaling
+species_specific_expansion:
+  status: possible
+  notes: Brassica napus contains multiple retained homologs from A and C subgenomes.
+related_traits:
+  - trait:flowering_time
+related_pathways:
+  - pathway:hormone_signaling
+data_sources:
+  - PGCP
+  - OrthoFinder
+  - literature
+evidence:
+  - source: PGCP
+    evidence_type: orthology_inference
+    confidence: medium
+updated_at: 2026-06-24
+```
+
+#### 4.4.6 数据集对象：Dataset
+
+数据集对象用于管理 PlantGeneWiki 中的结构化数据来源和分析结果，包括基因组注释、表达谱、QTL、GWAS、重测序、同源关系、功能注释、品种登记和人工整理表格等。它是知识库中除文献之外的另一类重要证据来源。
+
+在 PlantGeneWiki 中，数据集对象不只是文件记录，而是需要说明数据集的来源、版本、覆盖物种、数据类型、字段含义、处理流程、质量控制状态，以及它支持了哪些知识对象和证据声明。数据集对象对于保证知识库可追溯、可更新和可复现非常关键。
+```yaml
+type: Dataset
+id: dataset:Bn_GWAS_seed_oil_content_2024
+name: Brassica napus GWAS dataset for seed oil content
+dataset_type: GWAS
+description: GWAS dataset used to identify loci associated with seed oil content in Brassica napus.
+related_species:
+  - species:brassica_napus
+related_traits:
+  - trait:seed_oil_content
+related_genes:
+  - gene:bna:BnaA01Gxxxxx
+  - gene:bna:BnaC03Gxxxxx
+source:
+  source_type: literature
+  literature_id: literature:PMID_xxxxxxx
+  doi: 10.xxxx/xxxxx
+version: original_publication
+data_format:
+  - table
+  - supplementary_file
+fields:
+  - marker_id
+  - chromosome
+  - position
+  - p_value
+  - candidate_gene
+processing_status: parsed
+curation_status: machine_extracted_pending_review
+quality_control:
+  status: partial
+  notes: Candidate genes require manual verification against genome annotation version.
+evidence_claims:
+  - claim:PMID_xxxxxxx_001
+supports_relations:
+  - gene:bna:BnaA01Gxxxxx --associated_with--> trait:seed_oil_content
+updated_at: 2026-06-24
+```
 ## 5 知识来源
 
 ## 6 知识组织方式[^2]
 
+### 6.1 原始数据到知识对象的转化
+PlantGeneWiki 不直接把原始基因组序列、注释文件、表达矩阵或数据库 JSON 作为 Wiki 页面展示，而是先将其登记为 Dataset 对象，再通过解析、标准化、实体对齐和证据抽取流程，转化为 Gene、Species、Orthogroup、Trait、Pathway 等知识对象及其关系。
+
+原始数据层负责保存数据文件和来源信息；Dataset 层负责记录数据类型、版本、字段含义和处理状态；知识对象层负责承载可阅读、可查询和可推理的实体知识；证据层负责记录每条知识来自哪个数据集、哪个字段或哪个分析步骤。
+
+```text
+Raw Data
+  ↓
+Dataset Registry
+  ↓
+Parser / Normalizer
+  ↓
+Entity Resolution
+  ↓
+Knowledge Objects
+  ↓
+Relations + EvidenceClaims
+  ↓
+Wiki Pages / Knowledge Graph / Vector Index
+```
+
+| 原始数据类型 | Dataset 类型 | 转化结果 |
+|---|---|---|
+| 基因组 FASTA | `genome_sequence` | 更新 `Species` 的基因组版本信息，作为序列来源保存 |
+| GFF/GTF 注释文件 | `genome_annotation` | 生成 `Gene` 对象，提取坐标、转录本、基因结构 |
+| 蛋白/CDS 序列 | `sequence_set` | 补充 `Gene` 的蛋白 ID、序列长度和功能分析输入 |
+| GO/KEGG/InterPro 注释表 | `functional_annotation` | 更新 `Gene` 注释，生成 `Gene-Pathway` / `Gene-Function` 关系 |
+| 同源分析结果 | `orthology_result` | 生成 `Orthogroup` 对象，建立 `Gene-Orthogroup` 关系 |
+| 表达矩阵 | `expression_profile` | 生成表达证据，建立 `Gene-condition/tissue` 关系 |
+| QTL/GWAS 表 | `trait_association` | 生成 `Trait`、`locus`、`Gene-Trait EvidenceClaim` |
+| PGCP JSON | `external_database_record` | 补充 `Gene`、`Orthogroup`、同源关系和外部证据 |
+| 文献 PDF/摘要 | `literature_text` | 生成 `Literature` 对象和 `EvidenceClaim` |
+
 ## 7 自动更新机制
 
-## 8 ping'jia'zhi'b 评价指标
+## 8 评价指标
 
 ## 9 阶段性建设路线
 
