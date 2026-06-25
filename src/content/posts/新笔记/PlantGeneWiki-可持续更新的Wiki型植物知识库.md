@@ -2,7 +2,7 @@
 title: "PlantGeneWiki-可持续更新的Wiki型植物知识库"
 description: "W26-20260621-【杨庆勇】-BnKG讲座有感"
 pubDatetime: 2026-06-23T20:15:00.000Z
-modDatetime: 2026-06-25T00:35:51+08:00
+modDatetime: 2026-06-25T15:14:09+08:00
 slug: 20260624-0415-16xrj
 legacySlug: "新笔记/plantgenewiki-可持续更新的wiki型植物知识库"
 tags:
@@ -481,6 +481,7 @@ flowchart TD
 
     B -. "Dual Knowledge Components" .- C
 ```
+---
 ### 8.1 向量化知识库
 ### 8.2 结构化知识图谱
 ## 9 自动更新机制
