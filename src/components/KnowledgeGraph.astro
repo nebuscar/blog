@@ -1127,14 +1127,19 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
   }
 
   .knowledge-graph-full-page {
+    display: flex;
     margin-block: 1rem 2rem;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
   }
 
   .knowledge-graph-full-page .knowledge-graph-details {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(34rem, 1fr);
-    min-height: min(78vh, 58rem);
+    min-height: 0;
+    flex: 1;
   }
 
   .knowledge-graph-full-page .knowledge-graph-details > summary,
@@ -1144,8 +1149,8 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
   }
 
   .knowledge-graph-full-page .knowledge-graph-canvas {
-    height: clamp(34rem, 68vh, 58rem);
-    min-height: 34rem;
+    height: auto;
+    min-height: 0;
   }
 
   .knowledge-graph-full-page .knowledge-graph-settings {
@@ -1157,10 +1162,12 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     z-index: 1;
     width: 22rem;
     max-height: none;
+    min-height: 0;
     border-block: 0;
     border-inline-end: 0;
     border-radius: 0;
     box-shadow: none;
+    overflow-y: auto;
   }
 
   .knowledge-graph-full-page[data-settings-open] .knowledge-graph-details {
@@ -1316,8 +1323,8 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     }
 
     .knowledge-graph-full-page .knowledge-graph-canvas {
-      height: 70svh;
-      min-height: 28rem;
+      height: calc(100svh - 11rem);
+      min-height: 0;
     }
 
     .knowledge-graph-full-page .knowledge-graph-settings {
@@ -1327,6 +1334,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       bottom: 1rem;
       width: calc(100% - 1.5rem);
       max-height: none;
+      overflow-y: auto;
       border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
       border-radius: 1rem;
       box-shadow: 0 18px 48px rgb(0 0 0 / 18%);

@@ -14,6 +14,7 @@ type Props = {
   description?: string;
   ogImage?: string;
   canonicalURL?: string;
+  fixedViewport?: boolean;
 };
 
 const { site } = config;
@@ -23,6 +24,7 @@ const {
   description = site.description,
   ogImage = resolveDefaultOgImagePath(config),
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+  fixedViewport = false,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
@@ -41,7 +43,10 @@ const pageTitle = title.replace(` | ${site.title}`, "");
 <html
   dir={site.dir ?? "ltr"}
   lang={Astro.currentLocale ?? site.lang}
-  class="overflow-y-scroll scroll-smooth"
+  class:list={[
+    "scroll-smooth",
+    fixedViewport ? "overflow-hidden" : "overflow-y-scroll",
+  ]}
 >
   <head>
     <meta charset="UTF-8" />
@@ -123,15 +128,20 @@ const pageTitle = title.replace(` | ${site.title}`, "");
   </head>
   <body
     data-page-kind={isHomePage ? "home" : "inner"}
+    data-page-layout={fixedViewport ? "fixed" : "document"}
     class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
   >
     <div id="site-wallpaper" aria-hidden="true"></div>
     <Header />
-    <div id="wallpaper-spacer" aria-hidden="true"></div>
-    <div id="wallpaper-intro">
-      <h1>{isHomePage ? site.title : pageTitle}</h1>
-      {isHomePage && <p>去码头整点薯条~</p>}
-    </div>
+    {!fixedViewport && <div id="wallpaper-spacer" aria-hidden="true" />}
+    {
+      !fixedViewport && (
+        <div id="wallpaper-intro">
+          <h1>{isHomePage ? site.title : pageTitle}</h1>
+          {isHomePage && <p>去码头整点薯条~</p>}
+        </div>
+      )
+    }
     {
       isHomePage && (
         <a

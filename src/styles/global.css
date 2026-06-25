@@ -175,6 +175,23 @@ html.site-header-hidden #header-visibility-toggle span::after {
   flex-direction: column;
 }
 
+body[data-page-layout="fixed"] {
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+body[data-page-layout="fixed"] #site-content {
+  height: 100svh;
+  min-height: 0;
+  flex: none;
+  overflow: hidden;
+}
+
+body[data-page-layout="fixed"] #site-content::before {
+  display: none;
+}
+
 #wallpaper-spacer {
   height: 100svh;
   flex: none;

@@ -1,8 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
-import Breadcrumb from "@/components/Breadcrumb.astro";
-import Footer from "@/components/Footer.astro";
 import KnowledgeGraph from "@/components/KnowledgeGraph.astro";
 import { buildKnowledgeGraph } from "@/utils/knowledgeGraph.mjs";
 import { getPostUrl } from "@/utils/getPostPaths";
@@ -15,8 +13,7 @@ const graph = buildKnowledgeGraph(posts, post =>
 );
 ---
 
-<Layout title={`知识图谱 | ${config.site.title}`}>
-  <Breadcrumb />
+<Layout title={`知识图谱 | ${config.site.title}`} fixedViewport>
   <main id="main-content" class="graph-page">
     <header class="graph-page-header">
       <h1 class="text-accent text-3xl font-bold">知识图谱</h1>
@@ -27,24 +24,35 @@ const graph = buildKnowledgeGraph(posts, post =>
 
     <KnowledgeGraph {graph} title="全站关联文档图谱" fullPage />
   </main>
-  <Footer />
 </Layout>
 
 <style>
   .graph-page {
+    display: flex;
     width: min(100%, 112rem);
+    height: 100svh;
     margin-inline: auto;
+    padding-block: 5.25rem 1rem;
     padding-inline: clamp(1rem, 3vw, 2.5rem);
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .graph-page-header {
-    margin-block: 2rem 1rem;
+    flex: none;
+    margin-block: 0 0.75rem;
   }
 
   @media (min-width: 1024px) {
     .graph-page {
       width: 100%;
       max-width: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .graph-page {
+      padding-block: 4rem 0.75rem;
     }
   }
 </style>
