@@ -133,12 +133,11 @@ export function buildKnowledgeGraph(posts, getUrl = post => post.url ?? "#") {
       const targetId = resolveTarget(target, aliasIndex);
       if (!targetId || !nodeIds.has(targetId) || targetId === post.id) continue;
 
-      const [source, targetIdSorted] = [post.id, targetId].sort();
-      const key = `${source}\u0000${targetIdSorted}`;
+      const key = `${post.id}\u0000${targetId}`;
       if (edgeKeys.has(key)) continue;
 
       edgeKeys.add(key);
-      links.push({ source, target: targetIdSorted });
+      links.push({ source: post.id, target: targetId });
     }
   }
 

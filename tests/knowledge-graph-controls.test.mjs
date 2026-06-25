@@ -47,3 +47,15 @@ test("plays growth animation by node creation time", async () => {
   assert.match(source, /播放生长动画/);
   assert.match(source, /停止动画/);
 });
+
+test("renders directed arrows and zoom-gated labels below nodes", async () => {
+  const source = await readFile(componentUrl, "utf8");
+
+  assert.match(source, /id="knowledge-graph-arrow"/);
+  assert.match(source, /marker-end/);
+  assert.match(source, /const labelZoomThreshold = 1\.35;/);
+  assert.match(source, /scale >= labelZoomThreshold/);
+  assert.match(source, /label\.setAttribute\("text-anchor", "middle"\)/);
+  assert.match(source, /label\.setAttribute\("y", String\(radius \+ 16\)\)/);
+  assert.match(source, /pointer-events:\s*none;/);
+});

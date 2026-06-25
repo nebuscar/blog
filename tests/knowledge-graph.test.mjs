@@ -115,6 +115,7 @@ test("builds links only between published posts and removes duplicates", () => {
   assert.equal(graph.nodes.length, 3);
   assert.deepEqual(graph.links, [
     { source: "新笔记/SMR", target: "新笔记/连锁不平衡【LD】" },
+    { source: "新笔记/连锁不平衡【LD】", target: "新笔记/SMR" },
   ]);
 });
 
@@ -152,6 +153,34 @@ test("adds creation timestamps to graph nodes for timeline playback", () => {
   );
 });
 
+test("keeps reciprocal references as separate directed edges", () => {
+  const graph = buildKnowledgeGraph([
+    {
+      id: "alpha",
+      body: "[Beta](beta.md) [Beta again](beta.md)",
+      filePath: "src/content/posts/alpha.md",
+      data: {
+        title: "Alpha",
+        tags: [],
+      },
+    },
+    {
+      id: "beta",
+      body: "[Alpha](alpha.md)",
+      filePath: "src/content/posts/beta.md",
+      data: {
+        title: "Beta",
+        tags: [],
+      },
+    },
+  ]);
+
+  assert.deepEqual(graph.links, [
+    { source: "alpha", target: "beta" },
+    { source: "beta", target: "alpha" },
+  ]);
+});
+
 test("creates a one-hop local graph including backlinks", () => {
   const graph = buildKnowledgeGraph(posts);
   const local = getLocalKnowledgeGraph(graph, "新笔记/SMR");
@@ -160,7 +189,7 @@ test("creates a one-hop local graph including backlinks", () => {
     local.nodes.map(node => node.id),
     ["新笔记/SMR", "新笔记/连锁不平衡【LD】"]
   );
-  assert.equal(local.links.length, 1);
+  assert.equal(local.links.length, 2);
 });
 
 test("shows the current node for an isolated post", () => {

@@ -150,7 +150,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
                     min="0"
                     max="1"
                     step="0.05"
-                    value="0"
+                    value="1"
                     data-graph-label-opacity
                   />
                 </label>
@@ -227,6 +227,19 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
             aria-label={`${title}，可拖动节点、滚轮缩放，点击节点打开文章`}
           >
             <svg aria-hidden="true">
+              <defs>
+                <marker
+                  id="knowledge-graph-arrow"
+                  markerWidth="8"
+                  markerHeight="8"
+                  refX="7"
+                  refY="4"
+                  orient="auto"
+                  markerUnits="strokeWidth"
+                >
+                  <path d="M 0 0 L 8 4 L 0 8 z" fill="context-stroke" />
+                </marker>
+              </defs>
               <g data-graph-viewport>
                 <g data-graph-links />
                 <g data-graph-nodes />
@@ -436,6 +449,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       line.classList.add("knowledge-graph-link");
       line.dataset.source = link.source;
       line.dataset.target = link.target;
+      line.setAttribute("marker-end", "url(#knowledge-graph-arrow)");
       linksLayer.append(line);
       return { link, line };
     });
@@ -455,8 +469,9 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       if (node.id === payload.currentId) group.dataset.current = "true";
 
       circle.setAttribute("r", String(radius));
-      label.setAttribute("x", String(radius + 5));
-      label.setAttribute("y", "4");
+      label.setAttribute("x", "0");
+      label.setAttribute("y", String(radius + 16));
+      label.setAttribute("text-anchor", "middle");
       label.textContent = node.title;
       if (
         root.classList.contains("knowledge-graph-sidebar") &&
@@ -486,7 +501,9 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     let panStartY = 0;
     let panOriginX = 0;
     let panOriginY = 0;
+    const labelZoomThreshold = 1.35;
     const settingsStorageKey = "knowledge-graph-settings";
+    const settingsStorageVersion = 2;
     let settings: GraphSettings = {
       ...DEFAULT_GRAPH_SETTINGS,
       selectedTags: [],
@@ -504,11 +521,16 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     const isNodeVisible = (id: string) =>
       visibleNodeIds.has(id) && growthVisibleNodeIds.has(id);
 
+    const updateLabelVisibility = () => {
+      root.toggleAttribute("data-labels-visible", scale >= labelZoomThreshold);
+    };
+
     const applyViewport = () => {
       viewport.setAttribute(
         "transform",
         `translate(${translateX} ${translateY}) scale(${scale})`
       );
+      updateLabelVisibility();
     };
 
     const render = () => {
@@ -729,15 +751,20 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
         );
 
       for (const { circle, label, radius } of nodeElements) {
-        circle.setAttribute("r", String(radius * settings.nodeSize));
-        label.setAttribute("x", String(radius * settings.nodeSize + 5));
+        const scaledRadius = radius * settings.nodeSize;
+        circle.setAttribute("r", String(scaledRadius));
+        label.setAttribute("x", "0");
+        label.setAttribute("y", String(scaledRadius + 16));
       }
       updateFilters();
       animationPlaying ? restart() : cancelAnimationFrame(animationFrame);
     };
 
     const persistSettings = () => {
-      localStorage.setItem(settingsStorageKey, JSON.stringify(settings));
+      localStorage.setItem(
+        settingsStorageKey,
+        JSON.stringify({ ...settings, version: settingsStorageVersion })
+      );
     };
 
     const updateSetting = (patch: Partial<GraphSettings>) => {
@@ -974,6 +1001,13 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
         const stored = JSON.parse(
           localStorage.getItem(settingsStorageKey) ?? "null"
         );
+        if (
+          stored &&
+          stored.version !== settingsStorageVersion &&
+          stored.labelOpacity === 0
+        ) {
+          stored.labelOpacity = DEFAULT_GRAPH_SETTINGS.labelOpacity;
+        }
         applySettings(stored ?? { ...DEFAULT_GRAPH_SETTINGS });
       } catch {
         localStorage.removeItem(settingsStorageKey);
@@ -1393,17 +1427,18 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
   :global(.knowledge-graph-node text) {
     fill: currentColor;
     font-size: 11px;
-    opacity: var(--graph-label-opacity, 0);
+    opacity: 0;
     paint-order: stroke;
+    pointer-events: none;
     stroke: var(--background);
     stroke-width: 3px;
     stroke-linejoin: round;
     transition: opacity 140ms ease;
   }
 
-  :global(.knowledge-graph-node[data-label-visible] text),
-  :global(.knowledge-graph-node[data-search-match] text) {
-    opacity: 1;
+  .knowledge-graph-shell[data-labels-visible]
+    :global(.knowledge-graph-node text) {
+    opacity: var(--graph-label-opacity, 1);
   }
 
   :global(.knowledge-graph-node[hidden]),

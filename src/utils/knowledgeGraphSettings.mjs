@@ -13,7 +13,7 @@
 
 /** @type {Readonly<GraphSettings>} */
 export const DEFAULT_GRAPH_SETTINGS = Object.freeze({
-  labelOpacity: 0,
+  labelOpacity: 1,
   nodeSize: 1,
   linkWidth: 1,
   centerForce: 1,
