@@ -36,3 +36,14 @@ test("uses wider force layout for the full page graph", async () => {
   );
   assert.match(source, /\? 260\s*: 135;/);
 });
+
+test("plays growth animation by node creation time", async () => {
+  const source = await readFile(componentUrl, "utf8");
+
+  assert.match(source, /createdAt: string;/);
+  assert.match(source, /playGrowthAnimation/);
+  assert.match(source, /growthTimeline/);
+  assert.match(source, /localeCompare\(second\.createdAt\)/);
+  assert.match(source, /播放生长动画/);
+  assert.match(source, /停止动画/);
+});

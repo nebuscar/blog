@@ -4,6 +4,7 @@ type GraphNode = {
   title: string;
   url: string;
   tags: string[];
+  createdAt?: string;
 };
 
 type GraphLink = {
@@ -176,7 +177,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
                   />
                 </label>
                 <button type="button" data-graph-animation>
-                  暂停动画
+                  播放生长动画
                 </button>
               </details>
 
@@ -261,6 +262,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     title: string;
     url: string;
     tags: string[];
+    createdAt: string;
     x: number;
     y: number;
     vx: number;
@@ -404,6 +406,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       const jitter = (hash(node.id) % 70) - 35;
       const graphNode: GraphNode = {
         ...node,
+        createdAt: node.createdAt ?? "",
         x:
           dimensions.width / 2 +
           Math.cos(angle) * (dimensions.width * graphSpread) +
@@ -476,6 +479,8 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     let dragStartX = 0;
     let dragStartY = 0;
     let draggedDistance = 0;
+    let growthAnimationFrame = 0;
+    let growthPlaying = false;
     let panning = false;
     let panStartX = 0;
     let panStartY = 0;
@@ -487,8 +492,17 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       selectedTags: [],
     };
     let visibleNodeIds = new Set(nodes.map(node => node.id));
+    let growthVisibleNodeIds = new Set(nodes.map(node => node.id));
     let animationPlaying = true;
     const availableTags = new Set(nodes.flatMap(node => node.tags.map(String)));
+    const growthTimeline = [...nodes].sort(
+      (first, second) =>
+        first.createdAt.localeCompare(second.createdAt) ||
+        first.title.localeCompare(second.title, "zh-CN")
+    );
+
+    const isNodeVisible = (id: string) =>
+      visibleNodeIds.has(id) && growthVisibleNodeIds.has(id);
 
     const applyViewport = () => {
       viewport.setAttribute(
@@ -502,8 +516,9 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
         const source = nodeById.get(link.source)!;
         const target = nodeById.get(link.target)!;
         const visible =
-          visibleNodeIds.has(link.source) && visibleNodeIds.has(link.target);
+          isNodeVisible(link.source) && isNodeVisible(link.target);
         line.toggleAttribute("hidden", !visible);
+        line.toggleAttribute("data-growth-visible", growthPlaying && visible);
         if (!visible) continue;
         line.setAttribute("x1", String(source.x));
         line.setAttribute("y1", String(source.y));
@@ -512,10 +527,68 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       }
 
       for (const { node, group } of nodeElements) {
-        group.toggleAttribute("hidden", !visibleNodeIds.has(node.id));
-        if (!visibleNodeIds.has(node.id)) continue;
+        const visible = isNodeVisible(node.id);
+        group.toggleAttribute("hidden", !visible);
+        group.toggleAttribute("data-growth-visible", growthPlaying && visible);
+        if (!visible) continue;
         group.setAttribute("transform", `translate(${node.x} ${node.y})`);
       }
+    };
+
+    const updateGrowthButton = () => {
+      animationToggle &&
+        (animationToggle.textContent = growthPlaying
+          ? "停止动画"
+          : "播放生长动画");
+    };
+
+    const stopGrowthAnimation = () => {
+      cancelAnimationFrame(growthAnimationFrame);
+      growthPlaying = false;
+      growthVisibleNodeIds = new Set(nodes.map(node => node.id));
+      updateGrowthButton();
+      render();
+    };
+
+    const playGrowthAnimation = () => {
+      cancelAnimationFrame(growthAnimationFrame);
+      cancelAnimationFrame(animationFrame);
+      growthPlaying = true;
+      growthVisibleNodeIds = new Set();
+      const playbackNodes = growthTimeline.filter(node =>
+        visibleNodeIds.has(node.id)
+      );
+      updateGrowthButton();
+      render();
+
+      let growthIndex = 0;
+      let lastStep = 0;
+      const stepDuration = Math.max(
+        90,
+        Math.min(220, 3600 / Math.max(playbackNodes.length, 1))
+      );
+
+      const grow = (timestamp: number) => {
+        if (!growthPlaying) return;
+        if (!lastStep || timestamp - lastStep >= stepDuration) {
+          const node = playbackNodes[growthIndex];
+          if (node) growthVisibleNodeIds.add(node.id);
+          growthIndex += 1;
+          lastStep = timestamp;
+          render();
+        }
+
+        if (growthIndex < playbackNodes.length) {
+          growthAnimationFrame = requestAnimationFrame(grow);
+          return;
+        }
+
+        growthPlaying = false;
+        updateGrowthButton();
+        render();
+      };
+
+      growthAnimationFrame = requestAnimationFrame(grow);
     };
 
     const tick = () => {
@@ -648,10 +721,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       centerForce && (centerForce.value = String(settings.centerForce));
       repelForce && (repelForce.value = String(settings.repelForce));
       linkForce && (linkForce.value = String(settings.linkForce));
-      animationToggle &&
-        (animationToggle.textContent = animationPlaying
-          ? "暂停动画"
-          : "播放动画");
+      updateGrowthButton();
       tagFilter
         ?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
         .forEach(
@@ -874,7 +944,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       updateSetting({ linkForce: Number(linkForce.value) })
     );
     animationToggle?.addEventListener("click", () =>
-      updateSetting({ animation: !animationPlaying })
+      growthPlaying ? stopGrowthAnimation() : playGrowthAnimation()
     );
     settingsReset?.addEventListener("click", () => {
       localStorage.removeItem(settingsStorageKey);
@@ -882,6 +952,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     });
 
     reset?.addEventListener("click", () => {
+      stopGrowthAnimation();
       scale = 1;
       translateX = 0;
       translateY = 0;
@@ -1290,6 +1361,10 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     stroke-width: 2.2;
   }
 
+  :global(.knowledge-graph-link[data-growth-visible]) {
+    animation: graph-link-grow 260ms ease-out both;
+  }
+
   :global(.knowledge-graph-link[data-focus-dim]) {
     opacity: 0.1;
   }
@@ -1336,6 +1411,10 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     display: none;
   }
 
+  :global(.knowledge-graph-node[data-growth-visible]) {
+    animation: graph-node-grow 320ms ease-out both;
+  }
+
   :global(.knowledge-graph-node[data-focused]) {
     color: var(--accent);
   }
@@ -1356,6 +1435,28 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
 
   :global(.knowledge-graph-node[data-search-dim]) {
     opacity: 0.16;
+  }
+
+  @keyframes graph-node-grow {
+    from {
+      opacity: 0;
+      filter: drop-shadow(0 0 0 rgb(0 0 0 / 0%));
+    }
+
+    to {
+      opacity: 1;
+      filter: drop-shadow(0 2px 4px rgb(0 0 0 / 18%));
+    }
+  }
+
+  @keyframes graph-link-grow {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   @media (max-width: 640px) {

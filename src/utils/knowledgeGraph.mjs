@@ -112,6 +112,9 @@ export function buildKnowledgeGraph(posts, getUrl = post => post.url ?? "#") {
     title: post.data.title,
     url: getUrl(post),
     tags: post.data.tags ?? [],
+    createdAt: post.data.pubDatetime
+      ? new Date(post.data.pubDatetime).toISOString()
+      : "",
   }));
   const nodeIds = new Set(nodes.map(node => node.id));
   const aliasIndex = new Map();

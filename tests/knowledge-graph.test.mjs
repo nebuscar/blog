@@ -118,6 +118,40 @@ test("builds links only between published posts and removes duplicates", () => {
   ]);
 });
 
+test("adds creation timestamps to graph nodes for timeline playback", () => {
+  const graph = buildKnowledgeGraph([
+    {
+      id: "older",
+      body: "",
+      data: {
+        title: "Older",
+        tags: [],
+        pubDatetime: new Date("2026-06-11T03:00:00.000Z"),
+      },
+    },
+    {
+      id: "newer",
+      body: "",
+      data: {
+        title: "Newer",
+        tags: ["timeline"],
+        pubDatetime: new Date("2026-06-23T12:30:00.000Z"),
+      },
+    },
+  ]);
+
+  assert.deepEqual(
+    graph.nodes.map(node => ({
+      id: node.id,
+      createdAt: node.createdAt,
+    })),
+    [
+      { id: "older", createdAt: "2026-06-11T03:00:00.000Z" },
+      { id: "newer", createdAt: "2026-06-23T12:30:00.000Z" },
+    ]
+  );
+});
+
 test("creates a one-hop local graph including backlinks", () => {
   const graph = buildKnowledgeGraph(posts);
   const local = getLocalKnowledgeGraph(graph, "新笔记/SMR");
@@ -138,6 +172,7 @@ test("shows the current node for an isolated post", () => {
         title: "补体系统",
         url: "#",
         tags: [],
+        createdAt: "",
       },
     ],
     links: [],
