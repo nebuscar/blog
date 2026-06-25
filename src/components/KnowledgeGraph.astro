@@ -65,182 +65,184 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
           </span>
         </summary>
 
-        <div class="knowledge-graph-toolbar">
-          {!sidebar && (
-            <label>
-              <span class="sr-only">搜索图谱中的文章</span>
-              <input
-                type="search"
-                placeholder="搜索文章"
-                data-graph-search
-                autocomplete="off"
-              />
-            </label>
-          )}
-          <button type="button" data-graph-reset>
-            重置视图
-          </button>
-          {!compact && (
-            <button
-              type="button"
-              data-graph-settings-toggle
-              aria-expanded="false"
-              aria-controls="knowledge-graph-settings"
-            >
-              图谱设置
+        <div class="knowledge-graph-body">
+          <div class="knowledge-graph-toolbar">
+            {!sidebar && (
+              <label>
+                <span class="sr-only">搜索图谱中的文章</span>
+                <input
+                  type="search"
+                  placeholder="搜索文章"
+                  data-graph-search
+                  autocomplete="off"
+                />
+              </label>
+            )}
+            <button type="button" data-graph-reset>
+              重置视图
             </button>
-          )}
-          {compact && (
-            <a href="/graph/" class="knowledge-graph-full-link">
-              查看全站图谱
-            </a>
-          )}
-        </div>
-
-        {!compact && (
-          <aside
-            id="knowledge-graph-settings"
-            class="knowledge-graph-settings"
-            data-graph-settings-panel
-            hidden
-          >
-            <header>
-              <strong>图谱设置</strong>
-              <div>
-                <button type="button" data-graph-settings-reset>
-                  恢复默认
-                </button>
-                <button
-                  type="button"
-                  data-graph-settings-close
-                  aria-label="关闭设置"
-                >
-                  ×
-                </button>
-              </div>
-            </header>
-
-            <details open>
-              <summary>筛选</summary>
-              <label class="graph-switch">
-                <span>显示孤立文章</span>
-                <input type="checkbox" data-graph-show-orphans checked />
-              </label>
-              {graphTags.length > 0 && (
-                <fieldset class="graph-tag-filter" data-graph-tag-filter>
-                  <legend>标签</legend>
-                  {graphTags.map(tag => (
-                    <label>
-                      <input type="checkbox" value={tag} />
-                      <span>{tag}</span>
-                    </label>
-                  ))}
-                </fieldset>
-              )}
-            </details>
-
-            <details open>
-              <summary>外观</summary>
-              <label class="graph-range">
-                <span>标题透明度</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value="0"
-                  data-graph-label-opacity
-                />
-              </label>
-              <label class="graph-range">
-                <span>节点大小</span>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="2"
-                  step="0.1"
-                  value="1"
-                  data-graph-node-size
-                />
-              </label>
-              <label class="graph-range">
-                <span>连线粗细</span>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="4"
-                  step="0.25"
-                  value="1"
-                  data-graph-link-width
-                />
-              </label>
-              <button type="button" data-graph-animation>
-                暂停动画
+            {!compact && (
+              <button
+                type="button"
+                data-graph-settings-toggle
+                aria-expanded="false"
+                aria-controls="knowledge-graph-settings"
+              >
+                图谱设置
               </button>
-            </details>
+            )}
+            {compact && (
+              <a href="/graph/" class="knowledge-graph-full-link">
+                查看全站图谱
+              </a>
+            )}
+          </div>
 
-            <details open>
-              <summary>力度</summary>
-              <label class="graph-range">
-                <span>图谱向心力</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="2"
-                  step="0.1"
-                  value="1"
-                  data-graph-center-force
-                />
-              </label>
-              <label class="graph-range">
-                <span>节点排斥力</span>
-                <input
-                  type="range"
-                  min="0.25"
-                  max="2"
-                  step="0.05"
-                  value="1"
-                  data-graph-repel-force
-                />
-              </label>
-              <label class="graph-range">
-                <span>关联吸引力</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value="1"
-                  data-graph-link-force
-                />
-              </label>
-            </details>
-          </aside>
-        )}
+          {!compact && (
+            <aside
+              id="knowledge-graph-settings"
+              class="knowledge-graph-settings"
+              data-graph-settings-panel
+              hidden
+            >
+              <header>
+                <strong>图谱设置</strong>
+                <div>
+                  <button type="button" data-graph-settings-reset>
+                    恢复默认
+                  </button>
+                  <button
+                    type="button"
+                    data-graph-settings-close
+                    aria-label="关闭设置"
+                  >
+                    ×
+                  </button>
+                </div>
+              </header>
 
-        <div
-          class="knowledge-graph-canvas"
-          data-graph-canvas
-          role="application"
-          aria-label={`${title}，可拖动节点、滚轮缩放，点击节点打开文章`}
-        >
-          <svg aria-hidden="true">
-            <g data-graph-viewport>
-              <g data-graph-links />
-              <g data-graph-nodes />
-            </g>
-          </svg>
-          <p class="knowledge-graph-hint">
-            拖动节点 · 滚轮缩放 · 点击节点打开文章
-          </p>
+              <details open>
+                <summary>筛选</summary>
+                <label class="graph-switch">
+                  <span>显示孤立文章</span>
+                  <input type="checkbox" data-graph-show-orphans checked />
+                </label>
+                {graphTags.length > 0 && (
+                  <fieldset class="graph-tag-filter" data-graph-tag-filter>
+                    <legend>标签</legend>
+                    {graphTags.map(tag => (
+                      <label>
+                        <input type="checkbox" value={tag} />
+                        <span>{tag}</span>
+                      </label>
+                    ))}
+                  </fieldset>
+                )}
+              </details>
+
+              <details open>
+                <summary>外观</summary>
+                <label class="graph-range">
+                  <span>标题透明度</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value="0"
+                    data-graph-label-opacity
+                  />
+                </label>
+                <label class="graph-range">
+                  <span>节点大小</span>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="2"
+                    step="0.1"
+                    value="1"
+                    data-graph-node-size
+                  />
+                </label>
+                <label class="graph-range">
+                  <span>连线粗细</span>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="4"
+                    step="0.25"
+                    value="1"
+                    data-graph-link-width
+                  />
+                </label>
+                <button type="button" data-graph-animation>
+                  暂停动画
+                </button>
+              </details>
+
+              <details open>
+                <summary>力度</summary>
+                <label class="graph-range">
+                  <span>图谱向心力</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="0.1"
+                    value="1"
+                    data-graph-center-force
+                  />
+                </label>
+                <label class="graph-range">
+                  <span>节点排斥力</span>
+                  <input
+                    type="range"
+                    min="0.25"
+                    max="2"
+                    step="0.05"
+                    value="1"
+                    data-graph-repel-force
+                  />
+                </label>
+                <label class="graph-range">
+                  <span>关联吸引力</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value="1"
+                    data-graph-link-force
+                  />
+                </label>
+              </details>
+            </aside>
+          )}
+
+          <div
+            class="knowledge-graph-canvas"
+            data-graph-canvas
+            role="application"
+            aria-label={`${title}，可拖动节点、滚轮缩放，点击节点打开文章`}
+          >
+            <svg aria-hidden="true">
+              <g data-graph-viewport>
+                <g data-graph-links />
+                <g data-graph-nodes />
+              </g>
+            </svg>
+            <p class="knowledge-graph-hint">
+              拖动节点 · 滚轮缩放 · 点击节点打开文章
+            </p>
+          </div>
+
+          <script
+            type="application/json"
+            data-graph-data
+            is:inline
+            set:html={graphJson}
+          />
         </div>
-
-        <script
-          type="application/json"
-          data-graph-data
-          is:inline
-          set:html={graphJson}
-        />
       </details>
     </section>
   )
@@ -379,6 +381,18 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       details?.setAttribute("open", "");
     }
 
+    const isCompactGraph = root.classList.contains("knowledge-graph-compact");
+    const isFullPageGraph = root.classList.contains(
+      "knowledge-graph-full-page"
+    );
+    const graphSpread = isFullPageGraph ? 0.38 : 0.25;
+    const graphRepelBase = isFullPageGraph ? 2200 : 850;
+    const graphCenterFactor = isFullPageGraph ? 0.00018 : 0.0007;
+    const graphTargetDistance = isCompactGraph
+      ? 105
+      : isFullPageGraph
+        ? 260
+        : 135;
     const measureCanvas = () => ({
       width: Math.max(canvas.clientWidth, 320),
       height: Math.max(canvas.clientHeight, 320),
@@ -392,11 +406,11 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
         ...node,
         x:
           dimensions.width / 2 +
-          Math.cos(angle) * (dimensions.width * 0.25) +
+          Math.cos(angle) * (dimensions.width * graphSpread) +
           jitter,
         y:
           dimensions.height / 2 +
-          Math.sin(angle) * (dimensions.height * 0.25) +
+          Math.sin(angle) * (dimensions.height * graphSpread) +
           jitter,
         vx: 0,
         vy: 0,
@@ -515,7 +529,8 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
           let dy = second.y - first.y;
           const distanceSquared = Math.max(dx * dx + dy * dy, 80);
           const distance = Math.sqrt(distanceSquared);
-          const force = (850 * settings.repelForce) / distanceSquared;
+          const force =
+            (graphRepelBase * settings.repelForce) / distanceSquared;
           dx /= distance;
           dy /= distance;
           first.vx -= dx * force;
@@ -531,14 +546,8 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
         const dx = target.x - source.x;
         const dy = target.y - source.y;
         const distance = Math.max(Math.hypot(dx, dy), 1);
-        const targetDistance = root.classList.contains(
-          "knowledge-graph-compact"
-        )
-          ? 105
-          : root.classList.contains("knowledge-graph-full-page")
-            ? 185
-            : 135;
-        const force = (distance - targetDistance) * 0.0018 * settings.linkForce;
+        const force =
+          (distance - graphTargetDistance) * 0.0018 * settings.linkForce;
         source.vx += (dx / distance) * force;
         source.vy += (dy / distance) * force;
         target.vx -= (dx / distance) * force;
@@ -548,9 +557,13 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       for (const node of nodes) {
         if (node === draggedNode) continue;
         node.vx +=
-          (dimensions.width / 2 - node.x) * 0.0007 * settings.centerForce;
+          (dimensions.width / 2 - node.x) *
+          graphCenterFactor *
+          settings.centerForce;
         node.vy +=
-          (dimensions.height / 2 - node.y) * 0.0007 * settings.centerForce;
+          (dimensions.height / 2 - node.y) *
+          graphCenterFactor *
+          settings.centerForce;
         node.vx *= 0.9;
         node.vy *= 0.9;
         node.x = Math.min(
@@ -1182,20 +1195,32 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
   }
 
   .knowledge-graph-full-page .knowledge-graph-details {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(34rem, 1fr);
+    display: block;
+    height: 100%;
     min-height: 0;
     flex: 1;
   }
 
-  .knowledge-graph-full-page .knowledge-graph-details > summary,
+  .knowledge-graph-full-page .knowledge-graph-body {
+    position: absolute;
+    inset: 3.5rem 0 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    min-height: 0;
+  }
+
   .knowledge-graph-full-page .knowledge-graph-toolbar,
   .knowledge-graph-full-page .knowledge-graph-canvas {
     grid-column: 1;
   }
 
+  .knowledge-graph-full-page .knowledge-graph-toolbar {
+    grid-row: 1;
+  }
+
   .knowledge-graph-full-page .knowledge-graph-canvas {
+    grid-row: 2 / 4;
     height: auto;
     min-height: 0;
   }
@@ -1218,6 +1243,10 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
   }
 
   .knowledge-graph-full-page[data-settings-open] .knowledge-graph-details {
+    grid-template-columns: none;
+  }
+
+  .knowledge-graph-full-page[data-settings-open] .knowledge-graph-body {
     grid-template-columns: minmax(34rem, 1fr) minmax(19rem, 22rem);
   }
 
@@ -1365,6 +1394,11 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     }
 
     .knowledge-graph-full-page .knowledge-graph-details {
+      display: block;
+      min-height: 0;
+    }
+
+    .knowledge-graph-full-page .knowledge-graph-body {
       display: block;
       min-height: 0;
     }

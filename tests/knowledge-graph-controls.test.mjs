@@ -23,3 +23,16 @@ test("renders settings controls only for the full graph", async () => {
   assert.match(source, /data-graph-link-force/);
   assert.match(source, /\{!compact && \(/);
 });
+
+test("uses wider force layout for the full page graph", async () => {
+  const source = await readFile(componentUrl, "utf8");
+
+  assert.match(source, /const isFullPageGraph = root\.classList\.contains/);
+  assert.match(source, /const graphSpread = isFullPageGraph \? 0\.38 : 0\.25;/);
+  assert.match(source, /const graphRepelBase = isFullPageGraph \? 2200 : 850;/);
+  assert.match(
+    source,
+    /const graphCenterFactor = isFullPageGraph \? 0\.00018 : 0\.0007;/
+  );
+  assert.match(source, /\? 260\s*: 135;/);
+});
