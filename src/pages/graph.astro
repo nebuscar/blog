@@ -17,15 +17,34 @@ const graph = buildKnowledgeGraph(posts, post =>
 
 <Layout title={`知识图谱 | ${config.site.title}`}>
   <Breadcrumb />
-  <main id="main-content" class="app-layout">
-    <header class="mt-8 mb-6">
+  <main id="main-content" class="graph-page">
+    <header class="graph-page-header">
       <h1 class="text-accent text-3xl font-bold">知识图谱</h1>
       <p class="text-muted-foreground mt-2">
         根据已发布文章中的 Obsidian WikiLink 自动生成。点击节点可打开文章。
       </p>
     </header>
 
-    <KnowledgeGraph {graph} title="全站关联文档图谱" />
+    <KnowledgeGraph {graph} title="全站关联文档图谱" fullPage />
   </main>
   <Footer />
 </Layout>
+
+<style>
+  .graph-page {
+    width: min(100%, 112rem);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 3vw, 2.5rem);
+  }
+
+  .graph-page-header {
+    margin-block: 2rem 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .graph-page {
+      width: 100%;
+      max-width: none;
+    }
+  }
+</style>

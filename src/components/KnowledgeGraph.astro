@@ -21,6 +21,7 @@ type Props = {
   sidebar?: boolean;
   title?: string;
   collapsible?: boolean;
+  fullPage?: boolean;
 };
 
 const {
@@ -30,6 +31,7 @@ const {
   sidebar = false,
   title = "关联文档图谱",
   collapsible = false,
+  fullPage = false,
 } = Astro.props;
 
 const graphJson = JSON.stringify({ ...graph, currentId }).replace(
@@ -49,6 +51,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
         {
           "knowledge-graph-compact": compact,
           "knowledge-graph-sidebar": sidebar,
+          "knowledge-graph-full-page": fullPage,
         },
       ]}
       data-knowledge-graph
@@ -775,6 +778,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     settingsToggle?.addEventListener("click", () => {
       if (!settingsPanel) return;
       settingsPanel.hidden = !settingsPanel.hidden;
+      root.toggleAttribute("data-settings-open", !settingsPanel.hidden);
       settingsToggle.setAttribute(
         "aria-expanded",
         String(!settingsPanel.hidden)
@@ -784,6 +788,7 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     settingsClose?.addEventListener("click", () => {
       if (!settingsPanel) return;
       settingsPanel.hidden = true;
+      root.removeAttribute("data-settings-open");
       settingsToggle?.setAttribute("aria-expanded", "false");
     });
 
@@ -1121,6 +1126,52 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
     display: none;
   }
 
+  .knowledge-graph-full-page {
+    margin-block: 1rem 2rem;
+  }
+
+  .knowledge-graph-full-page .knowledge-graph-details {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(34rem, 1fr);
+    min-height: min(78vh, 58rem);
+  }
+
+  .knowledge-graph-full-page .knowledge-graph-details > summary,
+  .knowledge-graph-full-page .knowledge-graph-toolbar,
+  .knowledge-graph-full-page .knowledge-graph-canvas {
+    grid-column: 1;
+  }
+
+  .knowledge-graph-full-page .knowledge-graph-canvas {
+    height: clamp(34rem, 68vh, 58rem);
+    min-height: 34rem;
+  }
+
+  .knowledge-graph-full-page .knowledge-graph-settings {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    position: relative;
+    top: auto;
+    right: auto;
+    z-index: 1;
+    width: 22rem;
+    max-height: none;
+    border-block: 0;
+    border-inline-end: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .knowledge-graph-full-page[data-settings-open] .knowledge-graph-details {
+    grid-template-columns: minmax(34rem, 1fr) minmax(19rem, 22rem);
+  }
+
+  .knowledge-graph-full-page[data-settings-open] .knowledge-graph-canvas {
+    border-inline-end: 1px solid
+      color-mix(in srgb, var(--border) 55%, transparent);
+  }
+
   svg {
     width: 100%;
     height: 100%;
@@ -1257,6 +1308,28 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       bottom: 1rem;
       width: calc(100% - 1.5rem);
       max-height: none;
+    }
+
+    .knowledge-graph-full-page .knowledge-graph-details {
+      display: block;
+      min-height: 0;
+    }
+
+    .knowledge-graph-full-page .knowledge-graph-canvas {
+      height: 70svh;
+      min-height: 28rem;
+    }
+
+    .knowledge-graph-full-page .knowledge-graph-settings {
+      position: fixed;
+      top: 5rem;
+      right: 0.75rem;
+      bottom: 1rem;
+      width: calc(100% - 1.5rem);
+      max-height: none;
+      border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+      border-radius: 1rem;
+      box-shadow: 0 18px 48px rgb(0 0 0 / 18%);
     }
   }
 </style>
