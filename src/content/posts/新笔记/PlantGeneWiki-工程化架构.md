@@ -1,10 +1,10 @@
 ---
-title: "PlantGeneWiki-可持续更新植物知识库的工程化架构"
+title: "PlantGeneWiki-工程化架构"
 description: "用户直接使用交互的窗口"
 pubDatetime: 2026-06-25T17:09:00.000Z
-modDatetime: 2026-06-26T01:55:18+08:00
-slug: 20260626-0109-1pmq0
-legacySlug: "新笔记/plantgenewiki-可持续更新植物知识库的工程化架构"
+modDatetime: 2026-06-26T02:15:39+08:00
+slug: 20260626-0109-1arz4
+legacySlug: "新笔记/plantgenewiki-工程化架构"
 tags: []
 ---
 ## 1 面向用户的前端服务层
