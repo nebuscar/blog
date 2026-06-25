@@ -379,16 +379,25 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       details?.setAttribute("open", "");
     }
 
-    const width = Math.max(canvas.clientWidth, 320);
-    const height = Math.max(canvas.clientHeight, 320);
+    const measureCanvas = () => ({
+      width: Math.max(canvas.clientWidth, 320),
+      height: Math.max(canvas.clientHeight, 320),
+    });
+    const dimensions = measureCanvas();
     const nodeById = new Map<string, GraphNode>();
     const nodes = payload.nodes.map((node, index) => {
       const angle = (index / payload.nodes.length) * Math.PI * 2;
       const jitter = (hash(node.id) % 70) - 35;
       const graphNode: GraphNode = {
         ...node,
-        x: width / 2 + Math.cos(angle) * (width * 0.25) + jitter,
-        y: height / 2 + Math.sin(angle) * (height * 0.25) + jitter,
+        x:
+          dimensions.width / 2 +
+          Math.cos(angle) * (dimensions.width * 0.25) +
+          jitter,
+        y:
+          dimensions.height / 2 +
+          Math.sin(angle) * (dimensions.height * 0.25) +
+          jitter,
         vx: 0,
         vy: 0,
         degree: 0,
@@ -526,7 +535,9 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
           "knowledge-graph-compact"
         )
           ? 105
-          : 135;
+          : root.classList.contains("knowledge-graph-full-page")
+            ? 185
+            : 135;
         const force = (distance - targetDistance) * 0.0018 * settings.linkForce;
         source.vx += (dx / distance) * force;
         source.vy += (dy / distance) * force;
@@ -536,12 +547,20 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
 
       for (const node of nodes) {
         if (node === draggedNode) continue;
-        node.vx += (width / 2 - node.x) * 0.0007 * settings.centerForce;
-        node.vy += (height / 2 - node.y) * 0.0007 * settings.centerForce;
+        node.vx +=
+          (dimensions.width / 2 - node.x) * 0.0007 * settings.centerForce;
+        node.vy +=
+          (dimensions.height / 2 - node.y) * 0.0007 * settings.centerForce;
         node.vx *= 0.9;
         node.vy *= 0.9;
-        node.x = Math.min(width - 30, Math.max(30, node.x + node.vx));
-        node.y = Math.min(height - 25, Math.max(25, node.y + node.vy));
+        node.x = Math.min(
+          dimensions.width - 30,
+          Math.max(30, node.x + node.vx)
+        );
+        node.y = Math.min(
+          dimensions.height - 25,
+          Math.max(25, node.y + node.vy)
+        );
       }
 
       render();
@@ -553,6 +572,31 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
       cancelAnimationFrame(animationFrame);
       ticks = 0;
       if (animationPlaying) animationFrame = requestAnimationFrame(tick);
+    };
+
+    const resizeGraph = () => {
+      const next = measureCanvas();
+      if (
+        Math.abs(next.width - dimensions.width) < 4 &&
+        Math.abs(next.height - dimensions.height) < 4
+      ) {
+        return;
+      }
+
+      const xRatio = next.width / dimensions.width;
+      const yRatio = next.height / dimensions.height;
+      dimensions.width = next.width;
+      dimensions.height = next.height;
+
+      for (const node of nodes) {
+        node.x *= xRatio;
+        node.y *= yRatio;
+        node.vx = 0;
+        node.vy = 0;
+      }
+
+      render();
+      restart();
     };
 
     const getSelectedTags = () =>
@@ -855,6 +899,9 @@ const graphTags = [...new Set(graph.nodes.flatMap(node => node.tags))].sort(
 
     render();
     applyViewport();
+    requestAnimationFrame(resizeGraph);
+    const resizeObserver = new ResizeObserver(resizeGraph);
+    resizeObserver.observe(canvas);
     if (!settingsPanel) restart();
   }
 
