@@ -30,7 +30,7 @@ const config = JSON.stringify(musicPlayerConfig);
         <img id="music-mini-cover" class="music-mini-cover" alt="" hidden />
       </button>
       <header class="music-header">
-        <span aria-hidden="true"></span>
+        <span aria-hidden="true" />
         <strong>音乐</strong>
       </header>
 
@@ -52,7 +52,12 @@ const config = JSON.stringify(musicPlayerConfig);
             <path d="M7 9h10M7 13h7M7 17h4" />
           </svg>
         </button>
-        <button id="music-mute" class="icon-button" type="button" aria-label="静音">
+        <button
+          id="music-mute"
+          class="icon-button"
+          type="button"
+          aria-label="静音"
+        >
           <svg class="volume-on" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M11 5 6 9H3v6h3l5 4V5Z" />
             <path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" />
@@ -97,29 +102,60 @@ const config = JSON.stringify(musicPlayerConfig);
       />
 
       <div class="music-controls">
-        <button id="music-loop" class="icon-button" type="button" aria-label="循环播放">
-          <svg class="mode-icon mode-icon-single" viewBox="0 0 24 24" aria-hidden="true">
+        <button
+          id="music-loop"
+          class="icon-button"
+          type="button"
+          aria-label="循环播放"
+        >
+          <svg
+            class="mode-icon mode-icon-single"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3" />
             <path d="M12 9v6" />
           </svg>
-          <svg class="mode-icon mode-icon-shuffle" viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            class="mode-icon mode-icon-shuffle"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path d="M3 7h3c4 0 5 10 9 10h6" />
             <path d="M17 13l4 4-4 4M3 17h3c1.7 0 2.8-1.8 4-4M15 7h6M17 3l4 4-4 4" />
           </svg>
-          <svg class="mode-icon mode-icon-sequence" viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            class="mode-icon mode-icon-sequence"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path d="M4 7h11M4 12h13M4 17h11" />
             <path d="m17 14 3 3-3 3" />
           </svg>
-          <svg class="mode-icon mode-icon-list-loop" viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            class="mode-icon mode-icon-list-loop"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3" />
           </svg>
         </button>
-        <button id="music-prev" class="icon-button" type="button" aria-label="上一首">
+        <button
+          id="music-prev"
+          class="icon-button"
+          type="button"
+          aria-label="上一首"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M6 5v14M18 6 8 12l10 6V6Z" />
           </svg>
         </button>
-        <button id="music-play" class="play-button" type="button" aria-label="播放">
+        <button
+          id="music-play"
+          class="play-button"
+          type="button"
+          aria-label="播放"
+        >
           <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="m8 5 11 7-11 7V5Z" />
           </svg>
@@ -127,12 +163,23 @@ const config = JSON.stringify(musicPlayerConfig);
             <path d="M8 5v14M16 5v14" />
           </svg>
         </button>
-        <button id="music-next" class="icon-button" type="button" aria-label="下一首">
+        <button
+          id="music-next"
+          class="icon-button"
+          type="button"
+          aria-label="下一首"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M18 5v14M6 6l10 6-10 6V6Z" />
           </svg>
         </button>
-        <button id="music-list-toggle" class="icon-button" type="button" aria-label="展开歌单" aria-expanded="false">
+        <button
+          id="music-list-toggle"
+          class="icon-button"
+          type="button"
+          aria-label="展开歌单"
+          aria-expanded="false"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 6h12M4 11h12M4 16h8M19 5v12a3 3 0 1 1-2-2.83" />
           </svg>
@@ -144,8 +191,8 @@ const config = JSON.stringify(musicPlayerConfig);
           <p class="music-lyrics-empty">暂无歌词</p>
         </div>
       </section>
-      <div id="music-status" class="music-status" aria-live="polite"></div>
-      <ol id="music-playlist" class="music-playlist" hidden></ol>
+      <div id="music-status" class="music-status" aria-live="polite" />
+      <ol id="music-playlist" class="music-playlist" hidden />
       <a
         id="music-source"
         class="music-source"
@@ -155,7 +202,7 @@ const config = JSON.stringify(musicPlayerConfig);
       >
         在 QQ 音乐中打开
       </a>
-      <audio id="music-audio" preload="metadata"></audio>
+      <audio id="music-audio" preload="metadata" />
     </aside>
   )
 }
@@ -251,7 +298,12 @@ const config = JSON.stringify(musicPlayerConfig);
       return currentIndex + 1 < playlist.length ? currentIndex + 1 : null;
     };
 
-    const resourceIds = Array.isArray(settings.id) ? settings.id : [settings.id];
+    const resourceIds = Array.isArray(settings.id)
+      ? settings.id
+      : [settings.id];
+    const localTracks = Array.isArray(settings.localTracks)
+      ? settings.localTracks
+      : [];
 
     const qqUrl = (id = resourceIds[0]) => {
       const paths = {
@@ -271,7 +323,9 @@ const config = JSON.stringify(musicPlayerConfig);
         .replace(":r", String(Math.random()));
 
     const fetchLyrics = async lyrics => {
-      if (!lyrics || !/^https?:\/\//i.test(lyrics)) return lyrics || "";
+      if (!lyrics) return "";
+      if (!/^https?:\/\//i.test(lyrics) && !lyrics.startsWith("/"))
+        return lyrics;
       try {
         const response = await fetch(lyrics);
         return response.ok ? await response.text() : "";
@@ -292,7 +346,9 @@ const config = JSON.stringify(musicPlayerConfig);
       return lyrics
         .split(/\r?\n/)
         .flatMap(line => {
-          const text = line.replace(/\[(\d{1,3}):(\d{1,2}(?:\.\d+)?)\]/g, "").trim();
+          const text = line
+            .replace(/\[(\d{1,3}):(\d{1,2}(?:\.\d+)?)\]/g, "")
+            .trim();
           if (!text) return [];
           return [...line.matchAll(/\[(\d{1,3}):(\d{1,2}(?:\.\d+)?)\]/g)].map(
             match => ({
@@ -378,7 +434,10 @@ const config = JSON.stringify(musicPlayerConfig);
     const updateActiveTrack = () => {
       playlistElement.querySelectorAll("button").forEach((button, index) => {
         button.toggleAttribute("data-active", index === currentIndex);
-        button.setAttribute("aria-current", index === currentIndex ? "true" : "false");
+        button.setAttribute(
+          "aria-current",
+          index === currentIndex ? "true" : "false"
+        );
       });
       playlistElement
         .querySelector("button[data-active]")
@@ -404,7 +463,7 @@ const config = JSON.stringify(musicPlayerConfig);
       miniCover.hidden = !track.pic;
       if (track.pic) miniCover.src = track.pic;
       player.toggleAttribute("data-has-cover", Boolean(track.pic));
-      source.href = qqUrl(track.resourceId);
+      source.href = track.sourceUrl || track.url || qqUrl(track.resourceId);
       renderLyrics(track.lrc);
       updateActiveTrack();
       if (shouldPlay && hasPlaybackStarted) startPlayback();
@@ -413,6 +472,17 @@ const config = JSON.stringify(musicPlayerConfig);
     const fetchPlaylist = async () => {
       status.textContent = "正在加载 QQ 音乐...";
       const tracks = [];
+      const localPlaylist = await Promise.all(
+        localTracks.map(async track => ({
+          name: track.name || "Local track",
+          artist: track.artist || "Local audio",
+          url: track.url || "",
+          pic: track.pic || "",
+          lrc: await fetchLyrics(track.lrc || ""),
+          sourceUrl: track.sourceUrl || track.url || "",
+        }))
+      );
+      tracks.push(...localPlaylist.filter(item => item.url));
       for (const resourceId of resourceIds) {
         for (const template of [settings.api, ...settings.fallbackApis]) {
           try {
@@ -422,13 +492,13 @@ const config = JSON.stringify(musicPlayerConfig);
             if (!Array.isArray(data) || !data.length) continue;
             const resourceTracks = await Promise.all(
               data.map(async item => ({
-                  name: item.title || item.name || "未知歌曲",
-                  artist: item.author || item.artist || "未知歌手",
-                  url: item.url || "",
-                  pic: item.pic || item.cover || "",
-                  lrc: await fetchLyrics(item.lrc || item.lyric || ""),
-                  resourceId,
-                }))
+                name: item.title || item.name || "未知歌曲",
+                artist: item.author || item.artist || "未知歌手",
+                url: item.url || "",
+                pic: item.pic || item.cover || "",
+                lrc: await fetchLyrics(item.lrc || item.lyric || ""),
+                resourceId,
+              }))
             );
             tracks.push(...resourceTracks.filter(item => item.url));
             break;
@@ -455,9 +525,12 @@ const config = JSON.stringify(musicPlayerConfig);
     playerToggle.addEventListener("click", () => {
       setCollapsed(!player.hasAttribute("data-collapsed"));
     });
-    prev.addEventListener("click", () => loadTrack(currentIndex - 1, !audio.paused));
+    prev.addEventListener("click", () =>
+      loadTrack(currentIndex - 1, !audio.paused)
+    );
     next.addEventListener("click", () => {
-      const nextIndex = playMode === "shuffle" ? randomTrackIndex() : currentIndex + 1;
+      const nextIndex =
+        playMode === "shuffle" ? randomTrackIndex() : currentIndex + 1;
       loadTrack(nextIndex, !audio.paused);
     });
     loop.addEventListener("click", () => {
@@ -474,14 +547,20 @@ const config = JSON.stringify(musicPlayerConfig);
       lyricsElement.hidden = !lyricsElement.hidden;
       lyricsToggle.toggleAttribute("data-active", !lyricsElement.hidden);
       lyricsToggle.setAttribute("aria-expanded", String(!lyricsElement.hidden));
-      lyricsToggle.setAttribute("aria-label", lyricsElement.hidden ? "展开歌词" : "收起歌词");
+      lyricsToggle.setAttribute(
+        "aria-label",
+        lyricsElement.hidden ? "展开歌词" : "收起歌词"
+      );
       if (!lyricsElement.hidden) updateLyrics(audio.currentTime);
     });
     listToggle.addEventListener("click", () => {
       playlistElement.hidden = !playlistElement.hidden;
       listToggle.toggleAttribute("data-active", !playlistElement.hidden);
       listToggle.setAttribute("aria-expanded", String(!playlistElement.hidden));
-      listToggle.setAttribute("aria-label", playlistElement.hidden ? "展开歌单" : "收起歌单");
+      listToggle.setAttribute(
+        "aria-label",
+        playlistElement.hidden ? "展开歌单" : "收起歌单"
+      );
     });
     volume.addEventListener("input", () => {
       audio.volume = Number(volume.value);
@@ -720,7 +799,8 @@ const config = JSON.stringify(musicPlayerConfig);
     background: linear-gradient(
       to right,
       var(--accent) var(--range-progress, 0%),
-      color-mix(in srgb, var(--muted-foreground) 20%, transparent) var(--range-progress, 0%)
+      color-mix(in srgb, var(--muted-foreground) 20%, transparent)
+        var(--range-progress, 0%)
     );
     cursor: pointer;
   }
@@ -828,10 +908,21 @@ const config = JSON.stringify(musicPlayerConfig);
     height: 12rem;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-color: color-mix(in srgb, var(--muted-foreground) 45%, transparent) transparent;
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--muted-foreground) 45%,
+        transparent
+      )
+      transparent;
     scrollbar-width: thin;
     text-align: center;
-    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 15%,
+      black 85%,
+      transparent
+    );
   }
 
   .music-lyrics-content :global(.music-lyric-line) {
@@ -874,7 +965,12 @@ const config = JSON.stringify(musicPlayerConfig);
     overflow-y: auto;
     border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
     padding: 0.55rem 0.2rem 0 0;
-    scrollbar-color: color-mix(in srgb, var(--muted-foreground) 45%, transparent) transparent;
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--muted-foreground) 45%,
+        transparent
+      )
+      transparent;
     scrollbar-width: thin;
   }
 
