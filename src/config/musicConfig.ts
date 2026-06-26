@@ -31,6 +31,7 @@ export const musicPlayerConfig: MusicPlayerConfig = {
       artist: "Mich",
       url: "/music/lucky-one-mich.mp3",
       lrc: "/music/lucky-one-mich.lrc",
+      pic: "/music/lucky-one-mich.jpg",
     },
   ],
   volume: 0.7,

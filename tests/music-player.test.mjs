@@ -13,6 +13,7 @@ test("configures Lucky one as a local music track", async () => {
   assert.match(source, /artist:\s*"Mich"/);
   assert.match(source, /url:\s*"\/music\/lucky-one-mich\.mp3"/);
   assert.match(source, /lrc:\s*"\/music\/lucky-one-mich\.lrc"/);
+  assert.match(source, /pic:\s*"\/music\/lucky-one-mich\.jpg"/);
   assert.doesNotMatch(source, /003Au73Y23nAVf/);
 });
 
