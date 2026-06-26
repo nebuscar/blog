@@ -14,7 +14,7 @@ export const musicPlayerConfig: MusicPlayerConfig = {
   enabled: true,
   server: "tencent",
   type: "song",
-  id: ["004CMOqm4fVVzm", "003BlDgH3Gi3Tw", "004C3Rbj3tQVjF"],
+  id: ["004CMOqm4fVVzm", "003BlDgH3Gi3Tw", "004C3Rbj3tQVjF", "003Au73Y23nAVf"],
   volume: 0.7,
   api: "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r",
   fallbackApis: [
