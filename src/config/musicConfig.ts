@@ -24,7 +24,13 @@ export const musicPlayerConfig: MusicPlayerConfig = {
   enabled: true,
   server: "tencent",
   type: "song",
-  id: ["004CMOqm4fVVzm", "003BlDgH3Gi3Tw", "004C3Rbj3tQVjF", "004MiUav2nyM72"],
+  id: [
+    "004MiUav2nyM72",
+    "004CMOqm4fVVzm",
+    "003BlDgH3Gi3Tw",
+    "004C3Rbj3tQVjF",
+    "002Uwv4s2lKUWZ",
+  ],
   localTracks: [
     {
       name: "Lucky one",
