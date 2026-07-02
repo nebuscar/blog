@@ -5,6 +5,7 @@
 /posts/%E6%96%B0%E7%AC%94%E8%AE%B0/atg5-bulkrnaseq%E4%B8%8Escrna-seqmethods%E6%8F%8F%E8%BF%B0%E5%86%99%E4%BD%9C%E5%8F%82%E8%80%83/ /posts/20260622-2301-zgrvy/ 301
 /posts/%E6%96%B0%E7%AC%94%E8%AE%B0/astropaper%E5%8D%9A%E5%AE%A2%E7%BE%8E%E5%8C%96%E4%B8%8E%E5%8A%9F%E8%83%BD%E5%AE%9A%E5%88%B6%E8%AE%B0%E5%BD%95/ /posts/20260615-1833-atrqv/ 301
 /posts/%E6%96%B0%E7%AC%94%E8%AE%B0/mapt%E5%9F%BA%E5%9B%A0/ /posts/20260611-1904-9e94n/ 301
+/posts/%E6%96%B0%E7%AC%94%E8%AE%B0/mechanism%E6%9C%BA%E5%88%B6/ /posts/20260703-0510-m3ks3/ 301
 /posts/%E6%96%B0%E7%AC%94%E8%AE%B0/ncbidatasets/ /posts/20260611-1904-y7i74/ 301
 /posts/%E6%96%B0%E7%AC%94%E8%AE%B0/niko%E5%9C%86%E6%A2%A6%E7%A7%91%E9%9A%86major/ /posts/20260622-1743-1iog9/ 301
 /posts/%E6%96%B0%E7%AC%94%E8%AE%B0/omicverse/ /posts/20260611-1904-s6py9/ 301
