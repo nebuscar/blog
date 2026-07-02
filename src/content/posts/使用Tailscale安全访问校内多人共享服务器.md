@@ -2,7 +2,7 @@
 title: "使用-Tailscale-安全访问校内多人共享服务器"
 description: "使用 Tailscale 建立校外到校内 Linux 服务器的加密连接，同时保留 OpenSSH 的多用户账户、密钥和审计边界，并记录一次 SSH 非标准端口导致 Connection refused 的排障过程。"
 pubDatetime: 2026-07-02T05:54:00.000Z
-modDatetime: 2026-07-02T14:00:50+08:00
+modDatetime: 2026-07-02T15:05:43+08:00
 slug: 20260702-1354-lqxtx
 legacySlug: "使用tailscale安全访问校内多人共享服务器"
 tags:
@@ -101,6 +101,31 @@ sudo tailscale set --ssh=false
 ```
 
 这条命令不会关闭 Tailscale，只会确保 Tailscale 不接管 SSH 认证。
+
+### 设置本机 Tailscale operator
+
+首次设置 operator 需要由 root 执行一次：
+
+```bash
+sudo tailscale set --operator=nizhu
+```
+
+完成后，`nizhu` 可以不使用 `sudo` 管理本机 Tailscale。例如：
+
+```bash
+tailscale set --hostname=lab-cpu
+tailscale set --ssh=false
+tailscale debug prefs
+```
+
+现有 operator 也可以不使用 `sudo`，将 operator 权限转交给另一个本地 Unix 用户：
+
+```bash
+tailscale set --operator=alice
+```
+
+> [!warning] operator 不是用户列表
+> 一台机器同时只能配置一个 operator。执行上述命令后，`alice` 成为新的 operator，原来的 `nizhu` 将失去无 `sudo` 管理 Tailscale 的权限。operator 只影响本机 `tailscaled` 的管理权限，不会赋予 Linux root 权限，也不会改变 Tailnet 网页控制台中的 Owner 或 Admin 角色。
 
 > [!warning] 不要共享管理员账号
 > 每位成员应使用自己的 Tailscale 身份加入 Tailnet，不能共用管理员邮箱、浏览器会话或认证密钥。
