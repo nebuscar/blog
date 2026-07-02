@@ -1,8 +1,8 @@
 ---
-title: "使用-Tailscale-安全访问校内多人共享服务器"
+title: "使用Tailscale安全访问校内多人共享服务器"
 description: "使用 Tailscale 建立校外到校内 Linux 服务器的加密连接，同时保留 OpenSSH 的多用户账户、密钥和审计边界，并记录一次 SSH 非标准端口导致 Connection refused 的排障过程。"
 pubDatetime: 2026-07-02T05:54:00.000Z
-modDatetime: 2026-07-02T15:05:43+08:00
+modDatetime: 2026-07-02T18:34:21+08:00
 slug: 20260702-1354-lqxtx
 legacySlug: "使用tailscale安全访问校内多人共享服务器"
 tags:
