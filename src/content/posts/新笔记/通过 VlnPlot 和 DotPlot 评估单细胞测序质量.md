@@ -2,9 +2,9 @@
 title: "通过 VlnPlot 和 DotPlot 评估单细胞测序质量"
 description: "在单细胞/单核 RNA-seq 数据分析中，质控的核心目的不是简单画图，而是判断数据中是否存在低质量细胞、潜在 doublet/multiplet、样本级异常以及技术批次差异。"
 pubDatetime: 2026-06-29T18:03:00.000Z
-modDatetime: 2026-06-30T04:58:49+08:00
-slug: 20260630-0203-mlu7x
-legacySlug: "通过vlnplot和dotplot评估单细胞测序质量"
+modDatetime: 2026-07-02T14:00:50+08:00
+slug: 20260630-0203-18h7p
+legacySlug: "新笔记/通过vlnplot和dotplot评估单细胞测序质量"
 tags:
   - "单细胞"
 ---

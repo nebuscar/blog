@@ -2,9 +2,9 @@
 title: "RNA-seq分析流程SOP"
 description: "RNA-seq 分析用于从转录组测序数据中获得基因或转录本表达量，并比较不同实验组之间的表达差异。常见目标包括："
 pubDatetime: 2026-06-28T04:32:00.000Z
-modDatetime: 2026-06-28T12:51:51+08:00
-slug: 20260628-1232-2662y
-legacySlug: "rna-seq分析流程sop"
+modDatetime: 2026-07-02T14:00:50+08:00
+slug: 20260628-1232-1bb8a
+legacySlug: "新笔记/rna-seq分析流程sop"
 tags: []
 ---
 ## 1 图形摘要
