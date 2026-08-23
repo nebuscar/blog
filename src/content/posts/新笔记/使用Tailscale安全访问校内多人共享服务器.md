@@ -2,7 +2,7 @@
 title: "使用Tailscale安全访问校内多人共享服务器"
 description: "使用 Tailscale 建立校外到校内 Linux 服务器的加密连接，同时保留 OpenSSH 的多用户账户、密钥和审计边界，并记录一次 SSH 非标准端口导致 Connection refused 的排障过程。"
 pubDatetime: 2026-07-02T05:54:00.000Z
-modDatetime: 2026-07-08T02:59:20+08:00
+modDatetime: 2026-08-23T14:09:26+08:00
 slug: 20260702-1354-ngu20
 legacySlug: "新笔记/使用tailscale安全访问校内多人共享服务器"
 tags:
@@ -179,6 +179,8 @@ Test-NetConnection 100.64.10.20 -Port 22022
 
 ```powershell
 ssh -p 22022 alice@lab-cpu
+
+![](Recording%2020260721100404.m4a)
 ```
 
 也可以使用 Tailscale IP：
