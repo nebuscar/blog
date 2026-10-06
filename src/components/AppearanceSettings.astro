@@ -35,23 +35,6 @@ const config = JSON.stringify(backgroundWallpaper);
     >
   </div>
 
-  <section>
-    <div class="setting-title">
-      <span></span>
-      <strong>主题色相</strong>
-      <output id="hue-value">{backgroundWallpaper.defaultHue}</output>
-    </div>
-    <input
-      id="hue-slider"
-      class="hue-slider"
-      type="range"
-      min="0"
-      max="360"
-      value={backgroundWallpaper.defaultHue}
-      aria-label="主题色相"
-    />
-  </section>
-
   <button id="wallpaper-refresh" class="wallpaper-refresh" type="button">
     更换随机壁纸
   </button>
@@ -85,25 +68,13 @@ const config = JSON.stringify(backgroundWallpaper);
       image.src = sessionStorage.getItem("wallpaper-url");
     };
 
-    const applyHue = (hueSlider, hueValue, hue) => {
-      const root = document.documentElement;
-      root.style.setProperty("--user-hue", hue);
-      hueSlider.value = hue;
-      hueValue.value = hue;
-      hueValue.textContent = hue;
-      localStorage.setItem("theme-hue", hue);
-    };
-
     const setupAppearance = () => {
       const wallpaper = document.querySelector("#site-wallpaper");
       const toggle = document.querySelector("#appearance-toggle");
       const panel = document.querySelector("#appearance-panel");
       const close = document.querySelector("#appearance-close");
-      const hueSlider = document.querySelector("#hue-slider");
-      const hueValue = document.querySelector("#hue-value");
       const refresh = document.querySelector("#wallpaper-refresh");
-      if (!toggle || !panel || !close || !hueSlider || !hueValue || !refresh)
-        return;
+      if (!toggle || !panel || !close || !refresh) return;
 
       const setPanel = open => {
         panel.hidden = !open;
@@ -118,19 +89,11 @@ const config = JSON.stringify(backgroundWallpaper);
         toggle.toggleAttribute("data-appearance-bound", true);
         toggle.addEventListener("click", () => setPanel(panel.hidden));
         close.addEventListener("click", () => setPanel(false));
-        hueSlider.addEventListener("input", () =>
-          applyHue(hueSlider, hueValue, hueSlider.value)
-        );
         refresh.addEventListener("click", () =>
           applyWallpaper(wallpaper, true)
         );
       }
 
-      applyHue(
-        hueSlider,
-        hueValue,
-        localStorage.getItem("theme-hue") || String(settings.defaultHue)
-      );
       applyWallpaper(wallpaper);
     };
 
@@ -191,8 +154,7 @@ const config = JSON.stringify(backgroundWallpaper);
     backdrop-filter: blur(20px);
   }
 
-  .appearance-panel-header,
-  .setting-title {
+  .appearance-panel-header {
     display: flex;
     align-items: center;
   }
@@ -210,58 +172,6 @@ const config = JSON.stringify(backgroundWallpaper);
     font-size: 1.5rem;
   }
 
-  .appearance-panel section + section {
-    margin-top: 1rem;
-  }
-
-  .setting-title {
-    gap: 0.45rem;
-    margin-bottom: 0.55rem;
-  }
-
-  .setting-title > span {
-    width: 0.22rem;
-    height: 1rem;
-    border-radius: 999px;
-    background: var(--accent);
-  }
-
-  .setting-title output {
-    margin-left: auto;
-    border-radius: 0.35rem;
-    padding: 0.1rem 0.45rem;
-    color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
-    font-size: 0.75rem;
-  }
-
-  .hue-slider {
-    width: 100%;
-    height: 0.75rem;
-    appearance: none;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      hsl(0 80% 70%),
-      hsl(60 80% 70%),
-      hsl(120 70% 65%),
-      hsl(180 70% 65%),
-      hsl(240 80% 75%),
-      hsl(300 75% 75%),
-      hsl(360 80% 70%)
-    );
-  }
-
-  .hue-slider::-webkit-slider-thumb {
-    width: 0.75rem;
-    height: 1.1rem;
-    appearance: none;
-    border: 2px solid white;
-    border-radius: 999px;
-    background: var(--accent);
-    box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
-  }
-
   .wallpaper-refresh {
     border: 1px solid transparent;
     border-radius: 0.55rem;
@@ -271,7 +181,6 @@ const config = JSON.stringify(backgroundWallpaper);
 
   .wallpaper-refresh {
     width: 100%;
-    margin-top: 0.75rem;
     padding: 0.5rem;
     font-size: 0.78rem;
   }

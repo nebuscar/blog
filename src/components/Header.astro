@@ -181,23 +181,9 @@ const isActive = (path: string) => {
   </div>
 </header>
 
-<button
-  id="header-visibility-toggle"
-  type="button"
-  aria-controls="site-header"
-  aria-expanded="true"
-  aria-label="隐藏导航栏"
-  title="隐藏导航栏"
-  data-label-hide="隐藏导航栏"
-  data-label-show="显示导航栏"
->
-  <span aria-hidden="true"></span>
-</button>
-
 <script>
   type HeaderWindow = Window & {
     __headerAutoHideController?: AbortController;
-    __headerAutoHideTimer?: number;
   };
 
   function setupHeader() {
@@ -206,19 +192,7 @@ const isActive = (path: string) => {
     const menuIcon = document.querySelector("#menu-icon");
     const closeIcon = document.querySelector("#close-icon");
     const header = document.querySelector<HTMLElement>("#site-header");
-    const visibilityToggle = document.querySelector<HTMLButtonElement>(
-      "#header-visibility-toggle"
-    );
-
-    if (
-      !menuBtn ||
-      !menuItems ||
-      !menuIcon ||
-      !closeIcon ||
-      !header ||
-      !visibilityToggle
-    )
-      return;
+    if (!menuBtn || !menuItems || !menuIcon || !closeIcon || !header) return;
 
     const headerWindow = window as HeaderWindow;
     headerWindow.__headerAutoHideController?.abort();
@@ -227,67 +201,14 @@ const isActive = (path: string) => {
     const { signal } = controller;
     headerWindow.__headerAutoHideController = controller;
 
-    let lastScrollY = window.scrollY;
-    let pointerOverHeader = false;
-    let headerHasFocus = false;
-    let manuallyHidden = false;
-
     const openLabel = menuBtn.dataset.labelOpen ?? "Open menu";
     const closeLabel = menuBtn.dataset.labelClose ?? "Close menu";
-    const hideHeaderLabel = visibilityToggle.dataset.labelHide ?? "隐藏导航栏";
-    const showHeaderLabel = visibilityToggle.dataset.labelShow ?? "显示导航栏";
 
-    const menuIsOpen = () => menuBtn.getAttribute("aria-expanded") === "true";
-    const setToggleState = (expanded: boolean) => {
-      visibilityToggle.setAttribute("aria-expanded", String(expanded));
-      visibilityToggle.setAttribute(
-        "aria-label",
-        expanded ? hideHeaderLabel : showHeaderLabel
-      );
-      visibilityToggle.title = expanded ? hideHeaderLabel : showHeaderLabel;
-    };
-
-    const clearHideTimer = () => {
-      if (headerWindow.__headerAutoHideTimer) {
-        window.clearTimeout(headerWindow.__headerAutoHideTimer);
-      }
-    };
-
-    const showHeader = () => {
-      manuallyHidden = false;
-      header.classList.remove("is-hidden");
-      document.documentElement.classList.remove("site-header-hidden");
-      document.documentElement.classList.remove("site-header-manually-hidden");
-      setToggleState(true);
-    };
-
-    const hideHeader = (manual = false) => {
-      manuallyHidden = manual;
-      clearHideTimer();
-      header.classList.add("is-hidden");
-      document.documentElement.classList.add("site-header-hidden");
-      document.documentElement.classList.toggle(
-        "site-header-manually-hidden",
-        manual
-      );
-      setToggleState(false);
-    };
-
-    const scheduleHide = () => {
-      clearHideTimer();
-      if (pointerOverHeader || headerHasFocus || menuIsOpen()) return;
-
-      headerWindow.__headerAutoHideTimer = window.setTimeout(() => {
-        if (pointerOverHeader || headerHasFocus || menuIsOpen()) return;
-        hideHeader(false);
-      }, 3000);
-    };
-
-    const revealAndSchedule = () => {
-      if (manuallyHidden) return;
-      showHeader();
-      scheduleHide();
-    };
+    header.classList.remove("is-hidden");
+    document.documentElement.classList.remove(
+      "site-header-hidden",
+      "site-header-manually-hidden"
+    );
 
     menuBtn.addEventListener(
       "click",
@@ -301,105 +222,9 @@ const isActive = (path: string) => {
         menuItems.classList.toggle("grid");
         menuIcon.classList.toggle("hidden");
         closeIcon.classList.toggle("hidden");
-        revealAndSchedule();
       },
       { signal }
     );
-
-    visibilityToggle.addEventListener(
-      "click",
-      () => {
-        if (header.classList.contains("is-hidden")) {
-          showHeader();
-          scheduleHide();
-        } else {
-          hideHeader(true);
-        }
-      },
-      { signal }
-    );
-
-    header.addEventListener(
-      "pointerenter",
-      () => {
-        if (manuallyHidden) return;
-        pointerOverHeader = true;
-        clearHideTimer();
-        showHeader();
-      },
-      { signal }
-    );
-
-    header.addEventListener(
-      "pointerleave",
-      () => {
-        pointerOverHeader = false;
-        scheduleHide();
-      },
-      { signal }
-    );
-
-    header.addEventListener(
-      "focusin",
-      () => {
-        if (manuallyHidden) return;
-        headerHasFocus = true;
-        clearHideTimer();
-        showHeader();
-      },
-      { signal }
-    );
-
-    header.addEventListener(
-      "focusout",
-      () => {
-        headerHasFocus = false;
-        scheduleHide();
-      },
-      { signal }
-    );
-
-    document.addEventListener(
-      "pointermove",
-      event => {
-        if (
-          (event.target as Element | null)?.closest("#header-visibility-toggle")
-        )
-          return;
-        if (event.clientY <= 72) revealAndSchedule();
-      },
-      { signal, passive: true }
-    );
-
-    document.addEventListener(
-      "touchstart",
-      event => {
-        if (
-          (event.target as Element | null)?.closest("#header-visibility-toggle")
-        )
-          return;
-        if ((event.touches[0]?.clientY ?? 100) <= 72) revealAndSchedule();
-      },
-      { signal, passive: true }
-    );
-
-    document.addEventListener(
-      "scroll",
-      () => {
-        const currentScrollY = window.scrollY;
-
-        if (currentScrollY < lastScrollY - 4 || currentScrollY <= 24) {
-          revealAndSchedule();
-        } else if (currentScrollY > lastScrollY + 4) {
-          scheduleHide();
-        }
-
-        lastScrollY = currentScrollY;
-      },
-      { signal, passive: true }
-    );
-
-    revealAndSchedule();
   }
 
   setupHeader();
