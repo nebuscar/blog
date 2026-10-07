@@ -10,6 +10,7 @@ const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---/;
 const INVISIBLE_CHARACTERS = /[\u200B-\u200D\u2060\uFEFF]/g;
 
 let cachedPostIndex;
+let cachedPostIndexDir;
 
 function normalizeSlashes(value) {
   return String(value).replace(/\\/g, "/");
@@ -72,17 +73,17 @@ function addAlias(index, alias, post) {
     index.aliases.set(normalized, post);
 }
 
-function buildPostIndex() {
+function buildPostIndex(postsDir = POSTS_DIR) {
   const index = {
     byPath: new Map(),
     aliases: new Map(),
   };
 
-  for (const absolutePath of walkMarkdownFiles(POSTS_DIR)) {
+  for (const absolutePath of walkMarkdownFiles(postsDir)) {
     const markdown = fs.readFileSync(absolutePath, "utf8");
     const frontmatter = readFrontmatter(markdown);
     const relativePath = normalizeSlashes(
-      path.relative(POSTS_DIR, absolutePath)
+      path.relative(postsDir, absolutePath)
     );
     const basename = path.posix.basename(relativePath);
     const urlPath =
@@ -116,8 +117,11 @@ function buildPostIndex() {
   return index;
 }
 
-function getPostIndex() {
-  cachedPostIndex ??= buildPostIndex();
+function getPostIndex(postsDir = POSTS_DIR) {
+  if (!cachedPostIndex || cachedPostIndexDir !== postsDir) {
+    cachedPostIndex = buildPostIndex(postsDir);
+    cachedPostIndexDir = postsDir;
+  }
   return cachedPostIndex;
 }
 
@@ -149,17 +153,17 @@ function decodePathname(pathname) {
   }
 }
 
-function resolvePostUrl(rawUrl, currentFilePath) {
+function resolvePostUrl(rawUrl, currentFilePath, postsDir = POSTS_DIR) {
   if (isExternalOrSpecialUrl(rawUrl)) return undefined;
 
   const { pathname, suffix } = splitUrl(rawUrl);
   if (!pathname.toLowerCase().endsWith(".md")) return undefined;
 
-  const index = getPostIndex();
+  const index = getPostIndex(postsDir);
   const decodedPathname = decodePathname(pathname);
   const currentDir = currentFilePath
     ? path.dirname(currentFilePath)
-    : POSTS_DIR;
+    : postsDir;
   const absoluteTarget = normalizeSlashes(
     path.resolve(currentDir, decodedPathname)
   ).toLocaleLowerCase();
@@ -182,18 +186,19 @@ function visitLinks(node, visitor) {
 
 export function resetPostLinkIndexForTests() {
   cachedPostIndex = undefined;
+  cachedPostIndexDir = undefined;
 }
 
-export function resolvePostLinkForTests(url, currentFilePath) {
-  return resolvePostUrl(url, currentFilePath);
+export function resolvePostLinkForTests(url, currentFilePath, postsDir) {
+  return resolvePostUrl(url, currentFilePath, postsDir);
 }
 
-export default function remarkResolvePostLinks() {
+export default function remarkResolvePostLinks({ postsDir = POSTS_DIR } = {}) {
   return (tree, file) => {
     const currentFilePath = file?.path ? path.resolve(String(file.path)) : "";
 
     visitLinks(tree, node => {
-      const resolvedUrl = resolvePostUrl(node.url, currentFilePath);
+      const resolvedUrl = resolvePostUrl(node.url, currentFilePath, postsDir);
       if (resolvedUrl) node.url = resolvedUrl;
     });
   };

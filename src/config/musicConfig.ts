@@ -1,5 +1,3 @@
-export type MusicResourceType = "song" | "playlist" | "album" | "artist";
-
 export type LocalMusicTrack = {
   name: string;
   artist: string;
@@ -11,26 +9,12 @@ export type LocalMusicTrack = {
 
 export type MusicPlayerConfig = {
   enabled: boolean;
-  server: "tencent";
-  type: MusicResourceType;
-  id: string | string[];
   localTracks: LocalMusicTrack[];
   volume: number;
-  api: string;
-  fallbackApis: string[];
 };
 
 export const musicPlayerConfig: MusicPlayerConfig = {
   enabled: true,
-  server: "tencent",
-  type: "song",
-  id: [
-    "004MiUav2nyM72",
-    "004CMOqm4fVVzm",
-    "003BlDgH3Gi3Tw",
-    "004C3Rbj3tQVjF",
-    "002Uwv4s2lKUWZ",
-  ],
   localTracks: [
     {
       name: "Lucky one",
@@ -39,11 +23,41 @@ export const musicPlayerConfig: MusicPlayerConfig = {
       lrc: "/music/lucky-one-mich.lrc",
       pic: "/music/lucky-one-mich.jpg",
     },
+    {
+      name: "鸽子",
+      artist: "宋冬野",
+      url: "/music/gezi.m4a",
+      lrc: "/music/gezi.lrc",
+      pic: "/music/songye-album.jpg",
+    },
+    {
+      name: "Luv (Sic.) Pt.3",
+      artist: "Nujabes",
+      url: "/music/luv-sic-pt3.m4a",
+      lrc: "/music/luv-sic-pt3.lrc",
+      pic: "/music/luv-sic-pt3.jpg",
+    },
+    {
+      name: "Pierre",
+      artist: "Men I Trust",
+      url: "/music/pierre.m4a",
+      lrc: "/music/pierre.lrc",
+      pic: "/music/pierre.jpg",
+    },
+    {
+      name: "Intro",
+      artist: "宋冬野",
+      url: "/music/intro.m4a",
+      lrc: "/music/intro.lrc",
+      pic: "/music/songye-album.jpg",
+    },
+    {
+      name: "Before Every Load",
+      artist: "Mike Klubnika",
+      url: "/music/before-every-load.m4a",
+      lrc: "/music/before-every-load.lrc",
+      pic: "/music/before-every-load.jpg",
+    },
   ],
   volume: 0.7,
-  api: "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r",
-  fallbackApis: [
-    "https://api.injahow.cn/meting/?server=:server&type=:type&id=:id",
-    "https://api.moeyao.cn/meting/?server=:server&type=:type&id=:id",
-  ],
 };

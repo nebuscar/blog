@@ -38,7 +38,7 @@ const config = JSON.stringify(musicPlayerConfig);
         <img id="music-cover" alt="" hidden />
         <div class="music-meta">
           <strong id="music-title">正在加载音乐...</strong>
-          <span id="music-artist">QQ 音乐</span>
+          <span id="music-artist">本地音乐</span>
         </div>
         <button
           id="music-lyrics-toggle"
@@ -200,7 +200,7 @@ const config = JSON.stringify(musicPlayerConfig);
         target="_blank"
         rel="noopener noreferrer"
       >
-        在 QQ 音乐中打开
+        曲目信息与许可
       </a>
       <audio id="music-audio" preload="metadata" />
     </aside>
@@ -298,34 +298,15 @@ const config = JSON.stringify(musicPlayerConfig);
       return currentIndex + 1 < playlist.length ? currentIndex + 1 : null;
     };
 
-    const resourceIds = Array.isArray(settings.id)
-      ? settings.id
-      : [settings.id];
     const localTracks = Array.isArray(settings.localTracks)
       ? settings.localTracks
       : [];
 
-    const qqUrl = (id = resourceIds[0]) => {
-      const paths = {
-        song: "songDetail",
-        playlist: "playlist",
-        album: "albumDetail",
-        artist: "singer",
-      };
-      return `https://y.qq.com/n/ryqq_v2/${paths[settings.type]}/${id}`;
-    };
-
-    const apiUrl = (template, id) =>
-      template
-        .replace(":server", settings.server)
-        .replace(":type", settings.type)
-        .replace(":id", id)
-        .replace(":r", String(Math.random()));
+    const isLocalMusicAsset = value =>
+      typeof value === "string" && /^\/music\/[\w.-]+$/.test(value);
 
     const fetchLyrics = async lyrics => {
-      if (!lyrics) return "";
-      if (!/^https?:\/\//i.test(lyrics) && !lyrics.startsWith("/"))
-        return lyrics;
+      if (!isLocalMusicAsset(lyrics) || !lyrics.endsWith(".lrc")) return "";
       try {
         const response = await fetch(lyrics);
         return response.ok ? await response.text() : "";
@@ -463,59 +444,40 @@ const config = JSON.stringify(musicPlayerConfig);
       miniCover.hidden = !track.pic;
       if (track.pic) miniCover.src = track.pic;
       player.toggleAttribute("data-has-cover", Boolean(track.pic));
-      source.href = track.sourceUrl || track.url || qqUrl(track.resourceId);
+      if (track.sourceUrl) {
+        source.href = track.sourceUrl;
+        source.hidden = false;
+      } else {
+        source.removeAttribute("href");
+        source.hidden = true;
+      }
       renderLyrics(track.lrc);
       updateActiveTrack();
       if (shouldPlay && hasPlaybackStarted) startPlayback();
     };
 
-    const fetchPlaylist = async () => {
-      status.textContent = "正在加载 QQ 音乐...";
-      const tracks = [];
-      const localPlaylist = await Promise.all(
+    const loadLocalPlaylist = async () => {
+      status.textContent = "正在加载本地音乐...";
+      playlist = (await Promise.all(
         localTracks.map(async track => ({
-          name: track.name || "Local track",
-          artist: track.artist || "Local audio",
-          url: track.url || "",
-          pic: track.pic || "",
+          name: track.name || "未命名曲目",
+          artist: track.artist || "未知艺术家",
+          url: isLocalMusicAsset(track.url) && /\.(?:mp3|m4a)$/i.test(track.url) ? track.url : "",
+          pic: isLocalMusicAsset(track.pic) && /\.(?:jpg|jpeg|png|webp)$/i.test(track.pic) ? track.pic : "",
           lrc: await fetchLyrics(track.lrc || ""),
-          sourceUrl: track.sourceUrl || track.url || "",
+          sourceUrl: track.sourceUrl || "",
         }))
-      );
-      tracks.push(...localPlaylist.filter(item => item.url));
-      for (const resourceId of resourceIds) {
-        for (const template of [settings.api, ...settings.fallbackApis]) {
-          try {
-            const response = await fetch(apiUrl(template, resourceId));
-            if (!response.ok) continue;
-            const data = await response.json();
-            if (!Array.isArray(data) || !data.length) continue;
-            const resourceTracks = await Promise.all(
-              data.map(async item => ({
-                name: item.title || item.name || "未知歌曲",
-                artist: item.author || item.artist || "未知歌手",
-                url: item.url || "",
-                pic: item.pic || item.cover || "",
-                lrc: await fetchLyrics(item.lrc || item.lyric || ""),
-                resourceId,
-              }))
-            );
-            tracks.push(...resourceTracks.filter(item => item.url));
-            break;
-          } catch {}
-        }
-      }
-      playlist = tracks;
+      )).filter(track => track.url);
       if (playlist.length) {
         status.textContent = "";
         renderPlaylist();
         loadTrack(0);
         return;
       }
-      title.textContent = "音乐加载失败";
-      artist.textContent = "可前往 QQ 音乐播放";
-      source.href = qqUrl();
-      status.textContent = "Meting API 暂时不可用。";
+      title.textContent = "暂无本地音乐";
+      artist.textContent = "请将音频与歌词放入 public/music";
+      source.hidden = true;
+      status.textContent = "播放器仅使用随网站发布的本地文件。";
     };
 
     play.addEventListener("click", () => {
@@ -602,10 +564,10 @@ const config = JSON.stringify(musicPlayerConfig);
       updateLyrics(audio.currentTime);
     });
     audio.addEventListener("error", () => {
-      status.textContent = "当前歌曲无法播放，请尝试下一首或前往 QQ 音乐。";
+      status.textContent = "本地音频无法读取，请检查曲目文件。";
     });
 
-    source.href = qqUrl();
+    source.hidden = true;
     const savedCollapsed = localStorage.getItem("music-player-collapsed");
     setCollapsed(
       savedCollapsed === null
@@ -618,7 +580,7 @@ const config = JSON.stringify(musicPlayerConfig);
     updatePlayModeButton();
     updateRange(volume);
     updateRange(seek);
-    fetchPlaylist();
+    loadLocalPlaylist();
   })();
 </script>
 
@@ -1037,6 +999,10 @@ const config = JSON.stringify(musicPlayerConfig);
     display: none;
     margin-top: 0.5rem;
     text-align: center;
+  }
+
+  .music-source[hidden] {
+    display: none !important;
   }
 
   .music-status:not(:empty) + .music-playlist + .music-source {

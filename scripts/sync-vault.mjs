@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
+  realpathSync,
   readFileSync,
   readdirSync,
   rmSync,
@@ -83,6 +84,7 @@ function gitRoot(dir) {
 function gitDate(file, sourceDir, format, reverse = false) {
   try {
     const repoRoot = gitRoot(sourceDir);
+    const canonicalFile = realpathSync(file);
     const args = [
       "-c",
       `safe.directory=${repoRoot}`,
@@ -93,7 +95,7 @@ function gitDate(file, sourceDir, format, reverse = false) {
       `--format=${format}`,
       ...(reverse ? ["--reverse"] : []),
       "--",
-      relative(repoRoot, file),
+      relative(repoRoot, canonicalFile),
     ];
     return execFileSync("git", args, {
       encoding: "utf8",
