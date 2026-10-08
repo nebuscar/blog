@@ -135,6 +135,7 @@ test("removes a post after publish is changed to false", () => {
 
   assert.equal(syncVault(root, target, { redirectsFile }), 0);
   assert.equal(existsSync(join(target, "Published Note.md")), false);
+  assert.doesNotMatch(readFileSync(redirectsFile, "utf8"), /publishednote/);
 });
 
 test("rejects malformed frontmatter before publishing a note", () => {
