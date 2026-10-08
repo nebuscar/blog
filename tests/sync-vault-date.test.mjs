@@ -98,6 +98,70 @@ test("publishes only notes marked with publish true", () => {
   assert.match(publishedPost, /legacySlug: "notes\/publishednote"/);
 });
 
+test("removes a post after publish is changed to false", () => {
+  const root = mkdtempSync(join(tmpdir(), "vault-sync-unpublish-"));
+  const target = join(root, "blog", "src", "content", "posts");
+  const redirectsFile = join(root, "_redirects.txt");
+  const note = join(root, "Published Note.md");
+
+  writeFileSync(
+    note,
+    [
+      "---",
+      "title: Published Note",
+      "publish: true",
+      "pubDate: 2026-06-16T11:00:00+08:00",
+      "---",
+      "",
+      "This note starts public.",
+    ].join("\n")
+  );
+
+  assert.equal(syncVault(root, target, { redirectsFile }), 1);
+  assert.ok(existsSync(join(target, "Published Note.md")));
+
+  writeFileSync(
+    note,
+    [
+      "---",
+      "title: Published Note",
+      "publish: false",
+      "pubDate: 2026-06-16T11:00:00+08:00",
+      "---",
+      "",
+      "This note is private again.",
+    ].join("\n")
+  );
+
+  assert.equal(syncVault(root, target, { redirectsFile }), 0);
+  assert.equal(existsSync(join(target, "Published Note.md")), false);
+});
+
+test("rejects malformed frontmatter before publishing a note", () => {
+  const root = mkdtempSync(join(tmpdir(), "vault-sync-malformed-"));
+  const target = join(root, "blog", "src", "content", "posts");
+  const redirectsFile = join(root, "_redirects.txt");
+
+  writeFileSync(
+    join(root, "Malformed Note.md"),
+    [
+      "---",
+      "title: Malformed Note",
+      "publish: true",
+      "this is not a YAML field",
+      "---",
+      "",
+      "This note must not be published.",
+    ].join("\n")
+  );
+
+  assert.throws(
+    () => syncVault(root, target, { redirectsFile }),
+    /Invalid frontmatter/
+  );
+  assert.equal(existsSync(join(target, "Malformed Note.md")), false);
+});
+
 test("uses Git modified time instead of Obsidian update fields", () => {
   const root = mkdtempSync(join(tmpdir(), "vault-sync-git-date-"));
   const target = join(root, "blog", "src", "content", "posts");

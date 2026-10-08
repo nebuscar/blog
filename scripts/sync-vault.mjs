@@ -39,7 +39,9 @@ function parseFrontmatter(markdown) {
 
   const data = {};
   let listKey;
-  for (const line of match[1].split(/\r?\n/)) {
+  for (const [index, line] of match[1].split(/\r?\n/).entries()) {
+    if (!line.trim() || line.trimStart().startsWith("#")) continue;
+
     const item = line.match(/^\s+-\s+(.+?)\s*$/);
     if (item && listKey) {
       data[listKey].push(item[1].replace(/^["']|["']$/g, ""));
@@ -47,7 +49,9 @@ function parseFrontmatter(markdown) {
     }
 
     const field = line.match(/^([^:#][^:]*):\s*(.*?)\s*$/);
-    if (!field) continue;
+    if (!field) {
+      throw new Error(`Invalid frontmatter at line ${index + 2}: ${line}`);
+    }
 
     const key = field[1].trim();
     const value = field[2].trim();
